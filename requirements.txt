@@ -1,0 +1,11 @@
+langchain
+langchain-community
+langchain-openai
+chromadb
+streamlit
+python-dotenv
+tiktoken
+dashscope
+streamlit-lottie
+requests
+pypdf

@@ -1,0 +1,27 @@
+# API Keys and Environment Variables
+.env
+Fintech/.env
+
+# Virtual Environments
+venv/
+env/
+HKFinReg/
+
+# Python cache
+__pycache__/
+*/__pycache__/
+*.pyc
+
+# Mac system files
+.DS_Store
+
+# Logs
+logs/
+*.log
+Fintech/compliance_audit.log
+
+# Temporary test scripts
+test.py
+test2.py
+Fintech/test.py
+Fintech/test2.py
