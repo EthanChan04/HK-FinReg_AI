@@ -1,0 +1,22 @@
+# 忽略环境变量和密钥文件
+.env
+
+# 忽略虚拟环境
+venv/
+env/
+HKFinReg/
+
+# 忽略 Python 缓存文件
+__pycache__/
+*.pyc
+
+# 忽略 Mac 系统文件
+.DS_Store
+
+# 忽略日志文件
+logs/
+*.log
+
+# 忽略生成的临时文件
+test.py
+test2.py
