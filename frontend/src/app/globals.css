@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #0a0a12;
+  --bg-secondary: #12121e;
+  --bg-card: #161625;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --accent-blue: #667eea;
+  --accent-purple: #764ba2;
+}
+
+body {
+  background: var(--bg-primary);
+  color: #e0e0e0;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== Report Markdown Typography ===== */
+.prose-report {
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: #c8ccd4;
+}
+
+.prose-report h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #e8ecf2;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.prose-report h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #d0d6e0;
+  margin-top: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-report h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #b0b8c8;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.prose-report p {
+  margin-bottom: 0.6rem;
+}
+
+.prose-report strong {
+  color: #e0e4ec;
+  font-weight: 600;
+}
+
+.prose-report ul,
+.prose-report ol {
+  padding-left: 1.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.prose-report li {
+  margin-bottom: 0.25rem;
+}
+
+.prose-report li::marker {
+  color: #667eea;
+}
+
+/* Tables */
+.prose-report table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.8rem;
+}
+
+.prose-report thead th {
+  text-align: left;
+  font-weight: 600;
+  color: #a0a8b8;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+}
+
+.prose-report tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: #b8bcc8;
+}
+
+.prose-report tbody tr:hover {
+  background: rgba(102,126,234,0.04);
+}
+
+/* Horizontal rule */
+.prose-report hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  margin: 1.2rem 0;
+}
+
+/* Inline code */
+.prose-report code {
+  font-family: "Geist Mono", "Consolas", monospace;
+  font-size: 0.8rem;
+  background: rgba(255,255,255,0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #a78bfa;
+}

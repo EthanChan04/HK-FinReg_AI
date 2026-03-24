@@ -1,27 +1,62 @@
-# API Keys and Environment Variables
+# ===========================
+# HK-FinReg AI — Root .gitignore
+# ===========================
+
+# ----- Environment Variables (CRITICAL — never commit real keys) -----
 .env
+.env.*
+!.env.example
 Fintech/.env
+backend/.env
+frontend/.env.local
 
-# Virtual Environments
-venv/
-env/
-HKFinReg/
-
-# Python cache
+# ----- Python -----
 __pycache__/
 */__pycache__/
-*.pyc
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.egg-info/
+*.egg
 
-# Mac system files
+# ----- Virtual Environments -----
+HKFinReg/
+venv/
+.venv/
+env/
+
+# ----- Node.js -----
+node_modules/
+.next/
+out/
+
+# ----- ChromaDB local storage -----
+chroma_data/
+
+# ----- IDE / OS -----
 .DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Logs
-logs/
+# ----- Logs -----
 *.log
+logs/
 Fintech/compliance_audit.log
 
-# Temporary test scripts
+# ----- Temporary test scripts -----
 test.py
 test2.py
 Fintech/test.py
 Fintech/test2.py
+
+# ----- Build artifacts -----
+dist/
+build/
+*.pem
+.vercel

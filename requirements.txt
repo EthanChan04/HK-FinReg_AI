@@ -9,3 +9,4 @@ dashscope
 streamlit-lottie
 requests
 pypdf
+langgraph
