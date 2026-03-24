@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HK-FinReg AI — SSE Test Client</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .subtitle { color: #888; font-size: 0.85rem; margin-bottom: 30px; }
+        .container { width: 100%; max-width: 800px; }
+
+        /* Endpoint Selector */
+        .endpoint-bar {
+            display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .endpoint-bar button {
+            padding: 8px 16px; border: 1px solid #333; border-radius: 8px;
+            background: #1a1a2e; color: #aaa; cursor: pointer; font-size: 0.8rem;
+            transition: all .2s;
+        }
+        .endpoint-bar button.active {
+            border-color: #667eea; color: #fff; background: #1e1e3a;
+        }
+
+        /* Input Area */
+        textarea {
+            width: 100%; height: 180px; padding: 14px; border-radius: 10px;
+            border: 1px solid #333; background: #1a1a2e; color: #ddd;
+            font-family: 'Consolas', monospace; font-size: 0.85rem;
+            resize: vertical; outline: none;
+        }
+        textarea:focus { border-color: #667eea; }
+
+        .btn-send {
+            margin-top: 12px; padding: 12px 32px; border: none; border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff; font-size: 1rem; cursor: pointer; font-weight: 600;
+            transition: opacity .2s;
+        }
+        .btn-send:hover { opacity: 0.85; }
+        .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* Agent Status Chips */
+        #agent-status {
+            margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px;
+            min-height: 30px;
+        }
+        .agent-chip {
+            padding: 6px 14px; border-radius: 20px; font-size: 0.75rem;
+            background: #1e1e3a; border: 1px solid #333; color: #888;
+            transition: all .3s;
+        }
+        .agent-chip.running {
+            border-color: #667eea; color: #667eea;
+            box-shadow: 0 0 12px rgba(102,126,234,0.3);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Output Area */
+        #output-area {
+            margin-top: 16px; padding: 16px; border-radius: 10px;
+            border: 1px solid #333; background: #12121e;
+            min-height: 200px; max-height: 500px; overflow-y: auto;
+            font-family: 'Consolas', monospace; font-size: 0.82rem;
+            line-height: 1.6; white-space: pre-wrap; word-wrap: break-word;
+        }
+
+        .meta { margin-top: 12px; color: #555; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+    <h1>🏦 HK-FinReg AI — SSE Stream Tester</h1>
+    <p class="subtitle">Vanilla JS 测试客户端 · 直接对接 FastAPI SSE 端点</p>
+
+    <div class="container">
+        <!-- Endpoint Selector -->
+        <div class="endpoint-bar">
+            <button class="active" data-url="/api/v1/svf/analyze/stream">SVF 合规</button>
+            <button data-url="/api/v1/bank-account/verify/stream">银行开户</button>
+            <button data-url="/api/v1/cross-border/assess/stream">跨境汇款</button>
+            <button data-url="/api/v1/sme/credit-rating/stream">SME 信贷</button>
+        </div>
+
+        <!-- Input -->
+        <textarea id="input-box">SVF Compliance Inquiry:
+Company: FastPay HK Limited
+License Type: SVF
+Service: Stored value facility for retail payments
+Transaction Volume: HKD 50 million monthly
+AML Officer: Appointed
+KYC Procedure: eKYC with facial recognition
+Suspicious Transaction Reports: 2 filed in past year</textarea>
+
+        <button class="btn-send" id="send-btn" onclick="sendRequest()">🚀 发送并接收 SSE 流</button>
+
+        <!-- Agent State Display -->
+        <div id="agent-status"></div>
+
+        <!-- Streaming Output -->
+        <div id="output-area">等待发送请求...</div>
+
+        <p class="meta" id="meta-info"></p>
+    </div>
+
+    <script>
+        let selectedUrl = '/api/v1/svf/analyze/stream';
+
+        // Endpoint selector logic
+        document.querySelectorAll('.endpoint-bar button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.endpoint-bar button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedUrl = btn.dataset.url;
+            });
+        });
+
+        async function sendRequest() {
+            const inputBox = document.getElementById('input-box');
+            const outputArea = document.getElementById('output-area');
+            const agentStatus = document.getElementById('agent-status');
+            const sendBtn = document.getElementById('send-btn');
+            const metaInfo = document.getElementById('meta-info');
+
+            const text = inputBox.value.trim();
+            if (!text) return;
+
+            // Reset UI
+            outputArea.textContent = '';
+            agentStatus.innerHTML = '';
+            metaInfo.textContent = '';
+            sendBtn.disabled = true;
+            sendBtn.textContent = '⏳ 接收中...';
+
+            const startTime = performance.now();
+
+            try {
+                const response = await fetch(selectedUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        application_data: text,
+                        stream_agents_state: true
+                    })
+                });
+
+                if (!response.ok) {
+                    outputArea.textContent = `HTTP Error: ${response.status}`;
+                    return;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // keep incomplete line
+
+                    let eventType = '';
+                    for (const line of lines) {
+                        if (line.startsWith('event: ')) {
+                            eventType = line.slice(7).trim();
+                        } else if (line.startsWith('data: ')) {
+                            const dataStr = line.slice(6);
+                            try {
+                                const data = JSON.parse(dataStr);
+
+                                if (eventType === 'agent_state') {
+                                    // Add agent chip
+                                    const chip = document.createElement('span');
+                                    chip.className = 'agent-chip running';
+                                    chip.textContent = `🤖 ${data.agent}: ${data.message}`;
+                                    agentStatus.appendChild(chip);
+
+                                    // Stop previous chip animation after a moment
+                                    setTimeout(() => {
+                                        chip.classList.remove('running');
+                                        chip.style.borderColor = '#2a5';
+                                        chip.style.color = '#2a5';
+                                    }, 2000);
+                                }
+                                else if (eventType === 'token') {
+                                    outputArea.textContent += data.text;
+                                    outputArea.scrollTop = outputArea.scrollHeight;
+                                }
+                                else if (eventType === 'done') {
+                                    const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+                                    metaInfo.textContent = `✅ 流式传输完成 | 前端耗时: ${elapsed}s`;
+                                }
+                            } catch (e) {
+                                // non-JSON data line, ignore
+                            }
+                            eventType = '';
+                        }
+                    }
+                }
+            } catch (err) {
+                outputArea.textContent = `Connection Error: ${err.message}`;
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = '🚀 发送并接收 SSE 流';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+# ----- Environment Variables -----
+.env
+.env.*
+!.env.example
+
+# ----- Python -----
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+
+# ----- ChromaDB -----
+chroma_data/
+
+# ----- OS -----
+.DS_Store
+Thumbs.db

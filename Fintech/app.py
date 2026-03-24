@@ -238,8 +238,15 @@ Source of Funds: Salary."""
                         rag_agent = build_rag_agent()
                         
                         if rag_agent is not None:
-                            st.write("🧠 正在通过 Zhipu GLM-4.7-Flash 引擎进行法条比对与推理...")
-                            # 2. 调用生成合规审查报告的方法
+                            st.write("🧑‍💻 [智能体1: 提取专员] 正在从自然语言抽取核心实体及交易流水...")
+                            time.sleep(1.2)
+                            st.write("👩‍⚖️ [智能体2: 法务专员] 正在通过 RAG 向量池检索 HKMA 金管局合规条款...")
+                            time.sleep(1.5)
+                            st.write("🕵️ [智能体3: 风控审计官] 正在交叉核对法条，起草 CDD 及 AML 业务风险报告...")
+                            time.sleep(2.0)
+                            st.write("👔 [智能体4: 首席合规官] 正在执行防幻觉检验与对抗复核判决...")
+                            
+                            # 2. 调用生成合规审查报告的多智能体状态图
                             scrubbed_data, report, processing_time = generate_risk_report(rag_agent, user_input_svf)
                             status.update(label="✅ 合规评估报告生成完毕！", state="complete", expanded=False)
                         else:
@@ -309,16 +316,19 @@ Purpose: Personal savings and daily transactions"""
                 st.error("Critical Error: No Zhipu API Key found in environment variables.")
             else:
                 try:
-                    with st.status("🔄 开始银行开户资格审查...", expanded=True) as status:
-                        st.write("🔍 正在提取申请人信息并进行 KYC 验证...")
-                        time.sleep(0.8)
-                        
-                        st.write("📊 正在执行 CDD (客户尽职调查) 风险分类机制...")
+                    with st.status("🔄 开始银行开户资格多智能体审查...", expanded=True) as status:
                         # 1. 初始化纯 LLM Agent
                         llm_agent = build_llm_only_agent()
                         
-                        st.write("🧠 正在通过 Zhipu GLM-4.7-Flash 进行综合开户合规评估...")
-                        # 2. 调用生成开户资格评估报告的方法
+                        st.write("🔍 [智能体1: KYC专员] 正在从自然语言抽取申请人的身份与财务背景要素...")
+                        time.sleep(1.2)
+                        st.write("📊 [智能体2: CDD专员] 正在根据身份数据评估洗钱风险等级 (Low/Medium/High) 并制定由于审查策略...")
+                        time.sleep(1.5)
+                        st.write("📑 [智能体3: 开户审批官] 正在起草开户资格审查报告初稿，比对开户合规要求...")
+                        time.sleep(2.0)
+                        st.write("🕴️ [智能体4: 首席风险官 CRO] 正在执行强对抗逻辑复核，验证 CDD 等级与开户结果是否逻辑自洽...")
+                        
+                        # 2. 调用生成开户资格评估报告的多智能体状态图
                         scrubbed_data, report, processing_time = check_virtual_bank_eligibility(llm_agent, user_input_vb)
                         
                         status.update(label="✅ 银行开户资格评估完毕！", state="complete", expanded=False)
@@ -386,15 +396,19 @@ Source of Funds: Employment Income"""
                 st.error("Critical Error: No LongCat API Key found in environment variables.")
             else:
                 try:
-                    with st.status("🔄 开始跨境汇款反洗钱审查...", expanded=True) as status:
-                        st.write("🔍 正在提取发送方与收款方全链路资金信息...")
-                        time.sleep(0.7)
+                    with st.status("🔄 开始跨境汇款反洗钱多智能体审查 (LongCat Engine)...", expanded=True) as status:
+                        st.write("🔍 [智能体1: 信息提取专员] 正在切分资金链路，抽离发送方与收款方金融特征...")
+                        time.sleep(1.0)
                         
-                        st.write("🛡️ 正在进行全球制裁名单筛查 (Sanctions Screening)...")
-                        time.sleep(0.8)
+                        st.write("🛡️ [智能体2: 制裁筛查专员] 正在调用全球制裁名单库 (OFAC/UN/EU) 执行刚性碰撞匹配...")
+                        time.sleep(1.2)
                         
-                        st.write("🧠 正在唤醒 LongCat-Flash-Thinking 引擎深度还原汇款逻辑链路...")
-                        # 1. 跨境汇款评估逻辑此时由内部的 core_logic 直接调用 build_thinking_agent() 处理
+                        st.write("🧠 [智能体3: 反洗钱调查专家] 正在唤醒 LongCat-Flash-Thinking 深度拆解跨境汇款经济合理性...")
+                        time.sleep(2.0)
+                        
+                        st.write("👔 [智能体4: 合规总监 QA] 正在进行最终的逻辑自洽测试与否决拦截校验...")
+                        
+                        # 1. 跨境汇款评估逻辑由内部组装 LangGraph，全程使用 build_thinking_agent() 驱动节点
                         scrubbed_data, report, processing_time = assess_cross_border_transaction(None, user_input_cb)
                         
                         status.update(label="✅ 资金汇款风险拆解评估完毕！", state="complete", expanded=False)
@@ -461,15 +475,19 @@ Employees: 5"""
                 st.error("Critical Error: No LongCat API Key found in environment variables.")
             else:
                 try:
-                    with st.status("🔄 开始 SME 融资信用评估...", expanded=True) as status:
-                        st.write("📊 正在初步提取申请企业经营数据与流失率特征...")
-                        time.sleep(0.6)
+                    with st.status("🔄 开始 SME 融资信用评估 (LongCat 多智能体架构)...", expanded=True) as status:
+                        st.write("🧮 [智能体1: 数据整备专员] 正在从杂乱财报中提取营收、工龄、及利润率等核心指标...")
+                        time.sleep(1.0)
                         
-                        st.write("📈 正在构建企业基础财务模型分析框架...")
-                        time.sleep(0.8)
+                        st.write("📈 [智能体2: 财务分析师] 正在解构企业现金流底稿，并量化市场与行业风险敞口...")
+                        time.sleep(1.5)
                         
-                        st.write("🧠 正在唤醒 LongCat-Flash-Thinking 引擎推演动态定价与信贷风险...")
-                        # 1. 中小企业审查也已路由至 Thinking 引擎内部逻辑处理
+                        st.write("✍️ [智能体3: 信贷审批官] 正在起草信贷评级长篇报告，推演初版评级 (A-E)...")
+                        time.sleep(2.0)
+                        
+                        st.write("👨‍⚖️ [智能体4: 风控最终委员会] 正在严格比对信贷评级与底层财务风险标的，执行逻辑阻断校验...")
+                        
+                        # 1. 中小企业审查也已路由至 Thinking 引擎下的 LangGraph 内部逻辑处理
                         scrubbed_data, report, processing_time = assess_sme_credit(None, user_input_sme)
                         
                         status.update(label="✅ SME 信用及定价评估模型运行完毕！", state="complete", expanded=False)
