@@ -1,7 +1,7 @@
 """
 环境变量集中管理模块 (Configuration)
 基于 Pydantic BaseSettings，自动从 .env 文件中加载配置。
-包含 LangSmith 全链路追踪配置。
+包含 LangSmith 全链路追踪、CORS 安全策略与 API Key 认证配置。
 """
 from pydantic_settings import BaseSettings
 from functools import lru_cache
@@ -43,8 +43,12 @@ class Settings(BaseSettings):
 
     # --- App Config ---
     APP_TITLE: str = "HK-FinReg AI Backend"
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000", "*"]
+    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
     DEBUG: bool = False
+
+    # --- Security Config ---
+    API_KEY_ENABLED: bool = False        # 设为 True 启用 API Key 认证
+    API_KEY: str = ""                    # 在 .env 中设置: API_KEY=your_secret_key
 
     model_config = {
         "env_file": ".env", 

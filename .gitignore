@@ -10,6 +10,19 @@ Fintech/.env
 backend/.env
 frontend/.env.local
 
+# ----- Secrets & Private Keys -----
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*_rsa
+*_dsa
+*_ecdsa
+*_ed25519
+*.secret
+
 # ----- Python -----
 __pycache__/
 */__pycache__/
@@ -33,6 +46,7 @@ out/
 
 # ----- ChromaDB local storage -----
 chroma_data/
+**/chroma_data/
 
 # ----- IDE / OS -----
 .DS_Store
@@ -43,6 +57,11 @@ desktop.ini
 *.swp
 *.swo
 *~
+
+# ----- AI Assistant Files -----
+.gemini/
+.claude/
+CLAUDE.md
 
 # ----- Logs -----
 *.log
@@ -58,5 +77,8 @@ Fintech/test2.py
 # ----- Build artifacts -----
 dist/
 build/
-*.pem
 .vercel
+coverage/
+.coverage
+htmlcov/
+
