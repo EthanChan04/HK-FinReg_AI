@@ -5,6 +5,8 @@
 通过 .env 中的 API_KEY_ENABLED 和 API_KEY 控制是否启用。
 在 FastAPI 路由中使用 Depends(verify_api_key) 进行保护。
 """
+import hmac
+
 from fastapi import Request, HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
@@ -45,7 +47,8 @@ async def verify_api_key(
         )
 
     # 检查请求是否携带了有效的 Bearer Token
-    if credentials is None or credentials.credentials != settings.API_KEY:
+    # 使用 hmac.compare_digest 防止时序攻击 (timing attack)
+    if credentials is None or not hmac.compare_digest(credentials.credentials, settings.API_KEY):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing API key. Use header: Authorization: Bearer <your_api_key>",

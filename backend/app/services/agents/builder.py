@@ -8,6 +8,7 @@ LLM 工厂 & 检索引擎模块 (Builder)
 所有构建函数均使用 @lru_cache 做单例缓存。
 """
 import os
+import re
 from functools import lru_cache
 from typing import List
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -20,6 +21,31 @@ from langchain_core.documents import Document
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 
 from app.core.config import get_settings
+
+
+# ==========================================
+# Dynamic query profile (Phase 2)
+# ==========================================
+
+DYNAMIC_WEIGHT_PROFILES = {
+    "specific_clause": {"bm25": 0.7, "dense": 0.3},
+    "risk_assessment": {"bm25": 0.3, "dense": 0.7},
+    "entity_lookup": {"bm25": 0.8, "dense": 0.2},
+    "default": {"bm25": 0.4, "dense": 0.6},
+}
+
+
+def classify_query_type(extracted_entities: str) -> str:
+    """Classify query intent for dynamic BM25/Dense weighting."""
+    text = (extracted_entities or "").lower()
+
+    if re.search(r"\b(chapter|paragraph|section|clause)\s*[:\s]\s*\d+(?:\.\d+)*\b", text):
+        return "specific_clause"
+    if re.search(r"\b(license\s*(?:no|number)\.?\s*[:#-]?\s*\w+|svf-?\d+|registration\s*(?:no|number)?)\b", text):
+        return "entity_lookup"
+    if re.search(r"\b(risk|assessment|evaluation|exposure)\b", text):
+        return "risk_assessment"
+    return "default"
 
 
 # ==========================================
@@ -50,13 +76,122 @@ def build_thinking_llm() -> ChatOpenAI:
     )
 
 
+# 缓存 structured LLM 尝试结果（避免每次 reviewer_node 调用都重复尝试）
+_structured_llm_cache: dict = {"result": None, "checked": False}
+
+
+def get_structured_reviewer_llm():
+    """P2.5: 尝试构建支持 with_structured_output 的 Reviewer LLM
+
+    验证 GLM-4-Flash 是否支持 function calling / tool_choice。
+    如果支持 → 返回结构化 LLM（直接输出 ReviewerVerdict）
+    如果不支持 → 返回 None（调用方 fallback 到正则解析）
+
+    结果会被缓存，避免每次调用都重复尝试。
+
+    Returns:
+        结构化 LLM 实例 或 None
+    """
+    if _structured_llm_cache["checked"]:
+        return _structured_llm_cache["result"]
+
+    from app.schemas.requests import ReviewerVerdict
+    llm = build_zhipu_llm()
+    try:
+        structured = llm.with_structured_output(ReviewerVerdict)
+        # 简单验证：检查返回对象是否有 invoke 方法
+        if hasattr(structured, 'invoke'):
+            _structured_llm_cache["checked"] = True
+            _structured_llm_cache["result"] = structured
+            return structured
+    except (NotImplementedError, TypeError, Exception) as e:
+        print(f"[SVF][BUILDER] with_structured_output not supported: {type(e).__name__}: {e}")
+
+    _structured_llm_cache["checked"] = True
+    _structured_llm_cache["result"] = None
+    return None
+
+
 # ==========================================
 # PDF 加载 & 切片 (共享)
 # ==========================================
 
+# ==========================================
+# P3.1: 法规感知正则切分 (V1)
+# ==========================================
+
+# 法规文档常见章节标题模式
+REG_SECTION_PATTERNS = [
+    r'^#{1,3}\s+(Chapter|Section|Paragraph|Part|Schedule)\s+[\d.]+',
+    r'^#{1,3}\s+\d+\.\d*(?:\s+[A-Z])?',
+    r'^#{1,3}\s+Appendix\s+[A-Z]',
+]
+
+
+def reg_aware_split(text: str, metadata: dict) -> list:
+    """V1: 基于正则的法规感知切分
+
+    尝试按法规章节标题切分；如果标题太少（< 3 个），
+    fallback 到 CharacterTextSplitter。
+
+    Args:
+        text: 单页 PDF 的文本内容
+        metadata: 该页的元数据（page number 等）
+
+    Returns:
+        切分后的 Document 列表
+    """
+    lines = text.split('\n')
+    sections = []
+    current_lines = []
+    current_title = "Preamble"
+
+    for line in lines:
+        is_section_header = any(
+            re.match(pat, line.strip()) for pat in REG_SECTION_PATTERNS
+        )
+
+        if is_section_header and current_lines:
+            sections.append((current_title, '\n'.join(current_lines)))
+            current_title = line.strip().lstrip('#').strip()
+            current_lines = [line]
+        else:
+            current_lines.append(line)
+
+    if current_lines:
+        sections.append((current_title, '\n'.join(current_lines)))
+
+    # Fallback: 如果切出的段太少，说明不是结构化法规文档
+    if len(sections) < 3:
+        from langchain_text_splitter import CharacterTextSplitter
+        settings = get_settings()
+        splitter = CharacterTextSplitter(
+            chunk_size=settings.CHUNK_SIZE,
+            chunk_overlap=settings.CHUNK_OVERLAP,
+        )
+        chunks = splitter.split_text(text)
+        return [Document(page_content=c, metadata=metadata) for c in chunks]
+
+    # 正常切分
+    docs = []
+    for title, content in sections:
+        if len(content.strip()) < 50:
+            continue
+        doc_meta = {**metadata, "section_title": title}
+        docs.append(Document(page_content=content, metadata=doc_meta))
+
+    return docs
+
+
 @lru_cache()
 def _load_and_split_pdf() -> tuple:
-    """加载 PDF 并切片，返回 Document 元组 (lru_cache 需要 hashable)"""
+    """加载 PDF 并切片，返回 Document 元组 (lru_cache 需要 hashable)
+
+    根据 PARSER_MODE 配置选择解析模式：
+      - "hierarchy": 使用 document_parser 的层级感知解析器（M4 完整版）
+      - "reg_aware": 使用 reg_aware_split() V1 版本
+      - "flat": 使用纯 CharacterTextSplitter
+    """
     settings = get_settings()
     pdf_path = settings.PDF_PATH
     if not os.path.exists(pdf_path):
@@ -67,13 +202,51 @@ def _load_and_split_pdf() -> tuple:
     documents = loader.load()
     print(f"📄 PDF loaded: {len(documents)} pages")
 
-    text_splitter = CharacterTextSplitter(
-        chunk_size=settings.CHUNK_SIZE,
-        chunk_overlap=settings.CHUNK_OVERLAP
-    )
-    splits = text_splitter.split_documents(documents)
-    print(f"✂️ Chunked into {len(splits)} segments")
-    return tuple(splits)
+    parser_mode = getattr(settings, 'PARSER_MODE', 'reg_aware')
+
+    if parser_mode == "hierarchy":
+        # M4: 完整层级解析器
+        from app.services.agents.document_parser import (
+            parse_pdf_with_hierarchy,
+            regulation_chunks_to_documents,
+        )
+        source_name = os.path.basename(pdf_path)
+        chunks = parse_pdf_with_hierarchy(documents, source_name=source_name)
+        all_docs = regulation_chunks_to_documents(chunks)
+        # 统计层级信息
+        level_counts = {}
+        for chunk in chunks:
+            level_counts[chunk.hierarchy_level] = level_counts.get(chunk.hierarchy_level, 0) + 1
+        print(
+            f"✂️ [hierarchy] Chunked into {len(all_docs)} segments "
+            f"(levels: {dict(sorted(level_counts.items()))})"
+        )
+        return tuple(all_docs)
+
+    elif parser_mode == "reg_aware":
+        # V1: 正则感知切分
+        all_docs = []
+        reg_split_count = 0
+        fallback_count = 0
+        for doc in documents:
+            split_docs = reg_aware_split(doc.page_content, doc.metadata)
+            if split_docs and hasattr(split_docs[0].metadata, 'get') and split_docs[0].metadata.get('section_title'):
+                reg_split_count += 1
+            else:
+                fallback_count += 1
+            all_docs.extend(split_docs)
+        print(f"✂️ [reg_aware] Chunked into {len(all_docs)} segments (reg-aware: {reg_split_count} pages, fallback: {fallback_count} pages)")
+        return tuple(all_docs)
+
+    else:
+        # "flat": 纯 CharacterTextSplitter
+        text_splitter = CharacterTextSplitter(
+            chunk_size=settings.CHUNK_SIZE,
+            chunk_overlap=settings.CHUNK_OVERLAP,
+        )
+        splits = text_splitter.split_documents(documents)
+        print(f"✂️ [flat] Chunked into {len(splits)} segments")
+        return tuple(splits)
 
 
 @lru_cache()
@@ -104,6 +277,13 @@ def _build_chroma_db():
 # Reciprocal Rank Fusion (RRF) 算法
 # ==========================================
 
+def _compute_content_hash(content: str) -> str:
+    """计算文档内容哈希用于去重（P3.4 RRF 修复）"""
+    import hashlib
+    normalized = re.sub(r'\s+', ' ', content.strip().lower())
+    return hashlib.md5(normalized.encode()).hexdigest()[:16]
+
+
 def reciprocal_rank_fusion(
     result_lists: List[List[Document]],
     weights: List[float],
@@ -112,13 +292,16 @@ def reciprocal_rank_fusion(
     """
     RRF 分数 = Σ weight_i / (k + rank_i)
     其中 rank_i 是该 Document 在第 i 路检索结果中的排名（从 1 开始）。
+
+    P3.4 修复: 去重键用 content_hash 替代 page_content[:200]，
+    避免不同文档前缀相同时被错误合并。
     """
     score_map: dict[str, float] = {}
     doc_map: dict[str, Document] = {}
 
     for results, weight in zip(result_lists, weights):
         for rank, doc in enumerate(results, start=1):
-            doc_key = doc.page_content[:200]
+            doc_key = _compute_content_hash(doc.page_content)
             if doc_key not in doc_map:
                 doc_map[doc_key] = doc
                 score_map[doc_key] = 0.0
@@ -265,3 +448,36 @@ class RerankedRetriever(BaseRetriever):
         )
 
         return top_docs
+
+
+def build_profiled_retriever(base_retriever: BaseRetriever, query_type: str) -> BaseRetriever:
+    """
+    Build a profiled retriever for one request without mutating cached singleton retrievers.
+    """
+    profile = DYNAMIC_WEIGHT_PROFILES.get(query_type, DYNAMIC_WEIGHT_PROFILES["default"])
+
+    if isinstance(base_retriever, RerankedRetriever):
+        base_hybrid = base_retriever.hybrid_retriever
+        profiled_hybrid = HybridRetriever(
+            bm25_retriever=base_hybrid.bm25_retriever,
+            dense_retriever=base_hybrid.dense_retriever,
+            bm25_weight=profile["bm25"],
+            dense_weight=profile["dense"]
+        )
+        print(f"[SVF][RRF] {query_type} -> BM25={profile['bm25']}, Dense={profile['dense']}")
+        return RerankedRetriever(
+            hybrid_retriever=profiled_hybrid,
+            rerank_model=base_retriever.rerank_model,
+            top_k=base_retriever.top_k
+        )
+
+    if isinstance(base_retriever, HybridRetriever):
+        print(f"[SVF][RRF] {query_type} -> BM25={profile['bm25']}, Dense={profile['dense']}")
+        return HybridRetriever(
+            bm25_retriever=base_retriever.bm25_retriever,
+            dense_retriever=base_retriever.dense_retriever,
+            bm25_weight=profile["bm25"],
+            dense_weight=profile["dense"]
+        )
+
+    return base_retriever

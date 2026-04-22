@@ -15,6 +15,12 @@ interface StreamState {
   error: string | null;
   elapsedTime: number;
   phase: "idle" | "agents" | "streaming" | "done";
+  // P2: 置信度（三维）
+  confidenceScore: number | null;
+  confidenceWarning: string | null;
+  reasoningConfidence: number | null;
+  reviewerConfidence: number | null;
+  crossValidationPassed: boolean | null;
 }
 
 const INITIAL_STATE: StreamState = {
@@ -25,6 +31,11 @@ const INITIAL_STATE: StreamState = {
   error: null,
   elapsedTime: 0,
   phase: "idle",
+  confidenceScore: null,
+  confidenceWarning: null,
+  reasoningConfidence: null,
+  reviewerConfidence: null,
+  crossValidationPassed: null,
 };
 
 export function useAgentStream() {
@@ -88,11 +99,15 @@ export function useAgentStream() {
 
                 if (eventType === "agent_state") {
                   const agentEvent = data as AgentStateEvent;
+                  // 反思循环：Sub-Query Planner 标记
+                  const message = agentEvent.agent === "Sub-Query Planner"
+                    ? "反思循环：正在规划二次检索策略..."
+                    : agentEvent.message;
                   setState((prev) => ({
                     ...prev,
                     phase: "agents",
                     currentAgent: agentEvent.agent,
-                    agentStates: [...prev.agentStates, agentEvent],
+                    agentStates: [...prev.agentStates, { ...agentEvent, message }],
                   }));
                 } else if (eventType === "token") {
                   setState((prev) => ({
@@ -106,6 +121,31 @@ export function useAgentStream() {
                     ...prev,
                     phase: "done",
                   }));
+                } else if (eventType === "confidence") {
+                  // P2: 三维置信度事件
+                  const dim = data.dimension;
+                  if (dim === "full") {
+                    // 完整三维置信度
+                    setState((prev) => ({
+                      ...prev,
+                      confidenceScore: data.retrieval ?? prev.confidenceScore,
+                      reasoningConfidence: data.reasoning ?? null,
+                      reviewerConfidence: data.reviewer ?? null,
+                      crossValidationPassed: data.cross_validation_passed ?? null,
+                    }));
+                  } else if (dim === "reasoning") {
+                    setState((prev) => ({
+                      ...prev,
+                      reasoningConfidence: data.score ?? null,
+                    }));
+                  } else {
+                    // retrieval (默认)
+                    setState((prev) => ({
+                      ...prev,
+                      confidenceScore: data.score ?? null,
+                      confidenceWarning: data.warning ?? null,
+                    }));
+                  }
                 }
               } catch {
                 // skip non-JSON lines
