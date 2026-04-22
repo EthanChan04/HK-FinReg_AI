@@ -62,6 +62,15 @@ desktop.ini
 .gemini/
 .claude/
 CLAUDE.md
+.codebuddy/
+
+# ----- Internal Documents (Do NOT commit) -----
+SECURITY_AUDIT_REPORT.md
+analysis_of_plan_analysis.md
+implementation_plan.md
+rag_expansion_guide.md
+plan
+评估/
 
 # ----- Logs -----
 *.log
