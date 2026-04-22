@@ -9,6 +9,7 @@ const agentIcons: Record<string, string> = {
   "Retriever Agent": "📚",
   "Analyzer Agent": "🧠",
   "Reviewer Agent": "⚖️",
+  "Sub-Query Planner": "🔄",
   "KYC Analyst": "🪪",
   "CDD Specialist": "🔬",
   "Approval Officer": "✍️",

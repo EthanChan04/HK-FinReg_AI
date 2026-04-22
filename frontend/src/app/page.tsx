@@ -181,6 +181,11 @@ export default function Home() {
               isStreaming={stream.isStreaming}
               phase={stream.phase}
               elapsedTime={stream.elapsedTime}
+              confidenceScore={stream.confidenceScore}
+              confidenceWarning={stream.confidenceWarning}
+              reasoningConfidence={stream.reasoningConfidence}
+              reviewerConfidence={stream.reviewerConfidence}
+              crossValidationPassed={stream.crossValidationPassed}
             />
 
             {/* Footer metrics */}

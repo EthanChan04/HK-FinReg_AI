@@ -9,11 +9,12 @@ from langchain_core.messages import AIMessage
 
 
 def pii_scrubber(text: str) -> str:
-    """隐私护盾层：脱敏 HKID 和电话号码"""
+    """隐私护盾层：脱敏 HKID、电话号码和邮箱"""
     if not text:
         return ""
     text = re.sub(r'[A-Z]\d{6}\([0-9A]\)', '[HKID REDACTED]', text)
     text = re.sub(r'\b[569]\d{7}\b', '[PHONE REDACTED]', text)
+    text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '[EMAIL REDACTED]', text)
     return text
 
 

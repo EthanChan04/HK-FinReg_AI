@@ -14,6 +14,18 @@ export interface DoneEvent {
   processing_time?: number;
 }
 
+// P2 置信度事件（三维）
+export interface ConfidenceEvent {
+  score?: number;
+  warning?: string | null;
+  dimension?: "retrieval" | "reasoning" | "full";
+  // 三维置信度（dimension=full 时存在）
+  retrieval?: number | null;
+  reasoning?: number | null;
+  reviewer?: number | null;
+  cross_validation_passed?: boolean | null;
+}
+
 export interface ComplianceRequest {
   application_data: string;
   business_context?: string;

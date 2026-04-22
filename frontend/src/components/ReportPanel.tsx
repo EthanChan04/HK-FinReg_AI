@@ -11,9 +11,24 @@ interface Props {
   isStreaming: boolean;
   phase: "idle" | "agents" | "streaming" | "done";
   elapsedTime: number;
+  confidenceScore?: number | null;
+  confidenceWarning?: string | null;
+  reasoningConfidence?: number | null;
+  reviewerConfidence?: number | null;
+  crossValidationPassed?: boolean | null;
 }
 
-export default function ReportPanel({ text, isStreaming, phase, elapsedTime }: Props) {
+export default function ReportPanel({
+  text,
+  isStreaming,
+  phase,
+  elapsedTime,
+  confidenceScore,
+  confidenceWarning,
+  reasoningConfidence,
+  reviewerConfidence,
+  crossValidationPassed,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -61,6 +76,54 @@ export default function ReportPanel({ text, isStreaming, phase, elapsedTime }: P
           <span className="inline-block w-2 h-5 bg-blue-400 animate-pulse ml-0.5 align-middle rounded-sm" />
         )}
       </article>
+      {/* P2: 三维置信度徽章 */}
+      {confidenceScore !== null && confidenceScore !== undefined && phase === "done" && (
+        <div className={`mt-4 px-4 py-3 rounded-lg border ${
+          confidenceScore < 0.5
+            ? "bg-red-900/20 border-red-500/40"
+            : confidenceScore < 0.7
+            ? "bg-yellow-900/20 border-yellow-500/40"
+            : "bg-green-900/20 border-green-500/40"
+        }`}>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">
+                {confidenceScore < 0.5 ? "⚠️" : confidenceScore < 0.7 ? "📋" : "✅"}
+              </span>
+              <span className="text-sm">
+                檢索置信度：<strong>{(confidenceScore * 100).toFixed(0)}%</strong>
+              </span>
+              {confidenceWarning && (
+                <span className="text-xs opacity-80 ml-2">{confidenceWarning}</span>
+              )}
+            </div>
+            {/* 三维置信度详情 */}
+            {(reasoningConfidence !== null || reviewerConfidence !== null) && (
+              <div className="flex gap-4 text-xs text-gray-400 mt-1 pt-2 border-t border-white/[0.06]">
+                {reasoningConfidence !== null && (
+                  <span>
+                    🧠 推理：<strong className={reasoningConfidence < 0.5 ? "text-red-400" : reasoningConfidence < 0.7 ? "text-yellow-400" : "text-green-400"}>
+                      {(reasoningConfidence * 100).toFixed(0)}%
+                    </strong>
+                  </span>
+                )}
+                {reviewerConfidence !== null && (
+                  <span>
+                    ⚖️ 審查：<strong className={reviewerConfidence < 0.5 ? "text-red-400" : reviewerConfidence < 0.7 ? "text-yellow-400" : "text-green-400"}>
+                      {(reviewerConfidence * 100).toFixed(0)}%
+                    </strong>
+                  </span>
+                )}
+                {crossValidationPassed !== null && (
+                  <span>
+                    {crossValidationPassed ? "✅" : "⚠️"} 交叉驗證{crossValidationPassed ? "通過" : "未通過"}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       <div ref={endRef} />
     </div>
   );
