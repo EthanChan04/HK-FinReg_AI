@@ -1,11 +1,20 @@
 // 核心 SSE 流式解析 Hook — 针对 200s 长链路优化
-// 解析 agent_state / token / done 三类 SSE 事件
+// 解析 agent_state / token / done / action_required / checkpoint_saved 事件
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import type { AgentStateEvent } from "@/types";
+import type { AgentStateEvent, ActionRequiredEvent, CheckpointSavedEvent } from "@/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000";
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+
+function buildHeaders(): HeadersInit {
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (API_KEY) {
+    headers.Authorization = `Bearer ${API_KEY}`;
+  }
+  return headers;
+}
 
 interface StreamState {
   isStreaming: boolean;
@@ -14,13 +23,18 @@ interface StreamState {
   reportText: string;
   error: string | null;
   elapsedTime: number;
-  phase: "idle" | "agents" | "streaming" | "done";
+  phase: "idle" | "agents" | "streaming" | "done" | "action_required";
   // P2: 置信度（三维）
   confidenceScore: number | null;
   confidenceWarning: string | null;
   reasoningConfidence: number | null;
   reviewerConfidence: number | null;
   crossValidationPassed: boolean | null;
+  // Phase 1: HITL 状态
+  workflowRunId: string | null;
+  humanReviewRequired: boolean;
+  currentGate: string | null;
+  gateMessage: string | null;
 }
 
 const INITIAL_STATE: StreamState = {
@@ -36,6 +50,11 @@ const INITIAL_STATE: StreamState = {
   reasoningConfidence: null,
   reviewerConfidence: null,
   crossValidationPassed: null,
+  // Phase 1
+  workflowRunId: null,
+  humanReviewRequired: false,
+  currentGate: null,
+  gateMessage: null,
 };
 
 export function useAgentStream() {
@@ -65,7 +84,7 @@ export function useAgentStream() {
       try {
         const response = await fetch(`${API_BASE}${endpoint}`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: buildHeaders(),
           body: JSON.stringify({
             application_data: applicationData,
             stream_agents_state: true,
@@ -120,12 +139,12 @@ export function useAgentStream() {
                   setState((prev) => ({
                     ...prev,
                     phase: "done",
+                    workflowRunId: data.workflow_run_id || prev.workflowRunId,
                   }));
                 } else if (eventType === "confidence") {
                   // P2: 三维置信度事件
                   const dim = data.dimension;
                   if (dim === "full") {
-                    // 完整三维置信度
                     setState((prev) => ({
                       ...prev,
                       confidenceScore: data.retrieval ?? prev.confidenceScore,
@@ -146,6 +165,34 @@ export function useAgentStream() {
                       confidenceWarning: data.warning ?? null,
                     }));
                   }
+                } else if (eventType === "action_required") {
+                  // Phase 1: HITL 人工审查事件
+                  const actionEvent = data as ActionRequiredEvent;
+                  setState((prev) => ({
+                    ...prev,
+                    phase: "action_required",
+                    isStreaming: false,
+                    humanReviewRequired: true,
+                    workflowRunId: actionEvent.workflow_run_id || prev.workflowRunId,
+                    currentGate: actionEvent.gate_type || null,
+                    gateMessage: actionEvent.message || null,
+                  }));
+                } else if (eventType === "checkpoint_saved") {
+                  // Phase 1: Checkpoint 保存事件
+                  const cpEvent = data as CheckpointSavedEvent;
+                  setState((prev) => ({
+                    ...prev,
+                    workflowRunId: cpEvent.workflow_run_id || prev.workflowRunId,
+                  }));
+                } else if (eventType === "resume_ready") {
+                  // Phase 1: 工作流已恢复
+                  setState((prev) => ({
+                    ...prev,
+                    phase: "agents",
+                    humanReviewRequired: false,
+                    currentGate: null,
+                    gateMessage: null,
+                  }));
                 }
               } catch {
                 // skip non-JSON lines
@@ -163,14 +210,20 @@ export function useAgentStream() {
         }
       } finally {
         if (timerRef.current) clearInterval(timerRef.current);
-        setState((prev) => ({
-          ...prev,
-          isStreaming: false,
-          phase: prev.error ? "idle" : "done",
-          elapsedTime: Math.round(
-            (performance.now() - startTimeRef.current) / 1000
-          ),
-        }));
+        setState((prev) => {
+          // action_required 状态不改变 phase
+          if (prev.phase === "action_required") {
+            return { ...prev, isStreaming: false };
+          }
+          return {
+            ...prev,
+            isStreaming: false,
+            phase: prev.error ? "idle" : "done",
+            elapsedTime: Math.round(
+              (performance.now() - startTimeRef.current) / 1000
+            ),
+          };
+        });
       }
     },
     []
@@ -184,5 +237,17 @@ export function useAgentStream() {
     setState(INITIAL_STATE);
   }, []);
 
-  return { ...state, startStream, cancelStream, reset };
+  const setResumedResult = useCallback((finalReport: string, approved: boolean) => {
+    setState((prev) => ({
+      ...prev,
+      phase: "done",
+      isStreaming: false,
+      reportText: finalReport,
+      humanReviewRequired: false,
+      currentGate: null,
+      gateMessage: null,
+    }));
+  }, []);
+
+  return { ...state, startStream, cancelStream, reset, setResumedResult };
 }
