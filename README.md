@@ -303,10 +303,10 @@ Reviewer Agent (final)     → APPROVED
 
 | 模組 | 端點 | LLM | 反思循環 | RAG | 共享工具 |
 |------|------|-----|---------|-----|---------|
-| 📋 SVF 合規審查 | `/api/v1/svf/analyze/stream` | GLM-4-Flash | ✅ 三路條件邊 + 二次檢索 | ✅ Hybrid RAG | ✅ |
-| 🏦 銀行開戶審查 | `/api/v1/bank-account/verify/stream` | GLM-4-Flash | ✅ build_review_edges | ❌ | ✅ |
-| 💱 跨境匯款評估 | `/api/v1/cross-border/assess/stream` | LongCat-Thinking | ✅ build_review_edges | ❌ | ✅ |
-| 📈 SME 信貸評估 | `/api/v1/sme/credit-rating/stream` | LongCat-Thinking | ✅ build_review_edges | ❌ | ✅ |
+| 📋 SVF 合規審查 | `/api/v1/svf/analyze/stream` | glm-4.5-air | ✅ 三路條件邊 + 二次檢索 | ✅ Hybrid RAG | ✅ |
+| 🏦 銀行開戶審查 | `/api/v1/bank-account/verify/stream` | LongCat-Flash-Chat | ✅ build_review_edges | ❌ | ✅ |
+| 💱 跨境匯款評估 | `/api/v1/cross-border/assess/stream` | LongCat-Flash-Chat | ✅ build_review_edges | ❌ | ✅ |
+| 📈 SME 信貸評估 | `/api/v1/sme/credit-rating/stream` | LongCat-Flash-Chat | ✅ build_review_edges | ❌ | ✅ |
 
 > 每個路由均提供阻塞式 `/analyze` 和流式 `/analyze/stream` 雙端點模式。
 
@@ -326,8 +326,8 @@ Reviewer Agent (final)     → APPROVED
 
 ```env
 # ===== LLM API Keys =====
-ZHIPU_API_KEY=your_zhipu_api_key          # 智譜 AI (GLM-4-Flash + Embedding)
-LONGCAT_API_KEY=your_longcat_api_key      # LongCat (深度推理模型)
+ZHIPU_API_KEY=your_zhipu_api_key          # 智譜 AI (glm-4.5-air + Embedding)
+LONGCAT_API_KEY=your_longcat_api_key      # LongCat (LongCat-Flash-Chat)
 
 # ===== Cohere Reranker =====
 COHERE_API_KEY=your_cohere_api_key        # https://dashboard.cohere.com/api-keys
@@ -353,12 +353,21 @@ CONFIDENCE_CROSS_VALIDATION_THRESHOLD=0.3 # 交叉驗證偏差閾值
 PARSER_MODE=hierarchy                     # hierarchy / reg_aware / flat
 
 # ===== API Key Auth (可選) =====
-API_KEY_ENABLED=false                     # 默認關閉
-API_KEY=your_secret_api_key               # 啟用時需設置
+API_KEY_ENABLED=true                      # 安全默認：啟用後端 Bearer 鑑權
+API_KEY=your_secret_api_key               # 必填，前端也需配置對應 token
 
 # ===== CORS =====
 CORS_ORIGINS=http://localhost:3000        # 前端地址
 ```
+
+前端 `frontend/.env.local` 也應同步配置：
+
+```env
+NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000
+NEXT_PUBLIC_API_KEY=your_secret_api_key
+```
+
+若只在本機做無鑑權原型驗證，可明確將 `API_KEY_ENABLED=false`；否則保持預設值。
 
 ### 2. 啟動後端
 
@@ -498,7 +507,7 @@ MyFintech/
 | **前端渲染** | react-markdown + remark-gfm | 流式 Markdown 報告渲染 |
 | **後端框架** | FastAPI | 異步 API, SSE 推流 |
 | **AI 編排** | LangGraph | 多智能體狀態機工作流 + 條件邊 |
-| **LLM** | 智譜 GLM-4-Flash / LongCat-Thinking | 報告生成, 實體提取, 深度推理 |
+| **LLM** | 智譜 glm-4.5-air / LongCat-Flash-Chat | 報告生成, 實體提取, 深度推理 |
 | **Embedding** | 智譜 embedding-3 | 文檔向量化 + 語義緩存匹配 |
 | **向量庫** | ChromaDB | Dense Retrieval |
 | **關鍵詞檢索** | rank_bm25 | Sparse Retrieval |

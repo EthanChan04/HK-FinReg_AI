@@ -77,6 +77,9 @@ plan
 logs/
 Fintech/compliance_audit.log
 
+# ----- Runtime review queue state -----
+backend/data/interrupt_registry.json
+
 # ----- Temporary test scripts -----
 test.py
 test2.py

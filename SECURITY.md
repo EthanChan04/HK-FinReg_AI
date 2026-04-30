@@ -26,7 +26,8 @@ We will acknowledge receipt within 48 hours and provide a timeline for a fix.
 ### API Key Management
 - All API keys are loaded from `.env` files which are **excluded from version control** via `.gitignore`
 - `.env.example` files provide templates with placeholder values only
-- The backend supports optional API Key authentication via `Authorization: Bearer <key>` header
+- The backend is configured to use `Authorization: Bearer <key>` protection by default
+- The frontend can forward the same bearer token through `NEXT_PUBLIC_API_KEY` for local or private deployments
 
 ### CORS Policy
 - Cross-Origin Resource Sharing is restricted to explicitly allowed origins
@@ -35,9 +36,10 @@ We will acknowledge receipt within 48 hours and provide a timeline for a fix.
 ### Data Privacy
 - PII (Personally Identifiable Information) is scrubbed before being sent to LLM providers
 - HKID numbers and phone numbers are automatically redacted via regex filters
+- Review-queue runtime registry files must not persist raw user submissions or be committed to the repository
 
 ### Production Deployment Recommendations
-- Enable `API_KEY_ENABLED=True` and set a strong `API_KEY` in `.env`
+- Keep `API_KEY_ENABLED=True` and set a strong `API_KEY` in `.env`
 - Set `DEBUG=False` to disable Swagger documentation endpoints
 - Configure `CORS_ORIGINS` to only include your production frontend domain
 - Use HTTPS for all API communications

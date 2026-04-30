@@ -25,6 +25,9 @@ __pycache__/
 # ----- ChromaDB -----
 chroma_data/
 
+# ----- Runtime review queue state -----
+data/interrupt_registry.json
+
 # ----- OS -----
 .DS_Store
 Thumbs.db

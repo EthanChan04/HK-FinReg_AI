@@ -30,11 +30,12 @@ class Settings(BaseSettings):
     LANGCHAIN_PROJECT: str | None = None
 
     # --- Model Config ---
-    ZHIPU_MODEL: str = "glm-4-flash"
+    ZHIPU_MODEL: str = "glm-4.5-air"
     ZHIPU_BASE_URL: str = "https://open.bigmodel.cn/api/paas/v4/"
     ZHIPU_EMBEDDING_MODEL: str = "embedding-3"
-    LONGCAT_MODEL: str = "LongCat-Flash-Thinking-2601"
+    LONGCAT_MODEL: str = "LongCat-Flash-Chat"
     LONGCAT_BASE_URL: str = "https://api.longcat.chat/openai/v1"
+    LLM_TIMEOUT_SECONDS: int = 60  # LLM API 调用超时时间（秒）
 
     # --- RAG Config ---
     PDF_PATH: str = "../Fintech/AML Guideline for LCs_Eng_30 Sep 2021.pdf"
@@ -63,8 +64,13 @@ class Settings(BaseSettings):
     MAX_INPUT_LENGTH: int = 50000  # application_data 最大字符数
 
     # --- Security Config ---
-    API_KEY_ENABLED: bool = False        # 设为 True 启用 API Key 认证
+    API_KEY_ENABLED: bool = True         # 设为 True 启用 API Key 认证（安全默认）
     API_KEY: str = ""                    # 在 .env 中设置: API_KEY=your_secret_key
+
+    # --- Workflow Checkpoint Config (Phase 1) ---
+    WORKFLOW_CHECKPOINT_ENABLED: bool = True   # 是否启用工作流持久化
+    WORKFLOW_DB_URL: str = ""                  # PostgreSQL 连接串，为空时 fallback 到 MemorySaver
+    WORKFLOW_THREAD_PREFIX: str = "svf"        # workflow_run_id 前缀
 
     model_config = {
         "env_file": ".env", 
