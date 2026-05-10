@@ -5,6 +5,16 @@ from __future__ import annotations
 P0_SOURCES = {"HKMA", "SFC", "HK_IA", "HKMA_BNM"}
 
 
+def _get_attr(chunk, key):
+    """Get attribute from chunk, supporting both objects and dicts."""
+    val = getattr(chunk, key, None)
+    if val is not None:
+        return val
+    if isinstance(chunk, dict):
+        return chunk.get(key)
+    return None
+
+
 def evaluate_rag_quality(
     question: str,
     evidence_chunks: list,
@@ -34,24 +44,26 @@ def evaluate_rag_quality(
     topics_found: set[str] = set()
 
     for chunk in evidence_chunks:
-        # Accumulate regulator info
-        regulator = getattr(chunk, "regulator", None) or chunk.get("regulator")
+        regulator = _get_attr(chunk, "regulator")
         if regulator:
             regulators.add(regulator)
             if regulator in P0_SOURCES:
                 has_p0 = True
 
-        # Accumulate retrieval scores
-        score = getattr(chunk, "score", None) or chunk.get("score")
+        score = _get_attr(chunk, "score")
         if score is not None:
             try:
                 scores.append(float(score))
             except (TypeError, ValueError):
                 pass
 
-        # Collect topics from metadata
-        meta = getattr(chunk, "metadata", {}) or chunk.get("metadata", {})
-        for topic in meta.get("topics", []):
+        meta = _get_attr(chunk, "metadata") or {}
+        topics_raw = meta.get("topics", "")
+        if isinstance(topics_raw, str):
+            topics_list = [t.strip() for t in topics_raw.split(",") if t.strip()]
+        else:
+            topics_list = list(topics_raw)
+        for topic in topics_list:
             topics_found.add(str(topic).lower())
 
     topic_coverage = 0.0
@@ -87,7 +99,7 @@ def compute_retrieval_precision(
     retrieved_ids: set[str] = set()
 
     for chunk in evidence_chunks:
-        doc_id = getattr(chunk, "doc_id", None) or chunk.get("doc_id")
+        doc_id = _get_attr(chunk, "doc_id")
         if doc_id:
             retrieved_ids.add(doc_id.lower())
 
