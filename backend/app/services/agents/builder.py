@@ -1,4 +1,4 @@
-"""
+﻿"""
 LLM 工厂 & 检索引擎模块 (Builder)
 
 职责：
@@ -60,7 +60,8 @@ def build_zhipu_llm() -> ChatOpenAI:
         model_name=settings.ZHIPU_MODEL,
         temperature=0,
         openai_api_key=settings.ZHIPU_API_KEY,
-        openai_api_base=settings.ZHIPU_BASE_URL
+        openai_api_base=settings.ZHIPU_BASE_URL,
+        timeout=settings.LLM_TIMEOUT_SECONDS
     )
 
 
@@ -72,7 +73,8 @@ def build_thinking_llm() -> ChatOpenAI:
         model_name=settings.LONGCAT_MODEL,
         temperature=0,
         openai_api_key=settings.LONGCAT_API_KEY,
-        openai_api_base=settings.LONGCAT_BASE_URL
+        openai_api_base=settings.LONGCAT_BASE_URL,
+        timeout=settings.LLM_TIMEOUT_SECONDS
     )
 
 
@@ -163,7 +165,7 @@ def reg_aware_split(text: str, metadata: dict) -> list:
 
     # Fallback: 如果切出的段太少，说明不是结构化法规文档
     if len(sections) < 3:
-        from langchain_text_splitter import CharacterTextSplitter
+        from langchain_text_splitters import CharacterTextSplitter
         settings = get_settings()
         splitter = CharacterTextSplitter(
             chunk_size=settings.CHUNK_SIZE,
@@ -249,27 +251,119 @@ def _load_and_split_pdf() -> tuple:
         return tuple(splits)
 
 
+def _maybe_build_graph() -> None:
+    """Build and persist the regulatory graph if it doesn't already exist.
+
+    Uses the source manifest documents and an empty evidence list to create
+    a deterministic metadata-derived graph (regulators, topics, products).
+    Failures are non-fatal and logged as warnings.
+    """
+    import os
+
+    from app.core.config import get_settings
+
+    settings = get_settings()
+    graph_path = settings.GRAPH_STORE_PATH
+    if os.path.exists(graph_path):
+        return
+
+    try:
+        from app.services.kag.graph_builder import build_graph_from_sources
+        from app.services.corpus.manifest_loader import load_source_manifest
+
+        source_docs = load_source_manifest()
+        if not source_docs:
+            print("Regulatory graph: no source documents, skipping")
+            return
+
+        store = build_graph_from_sources(
+            documents=source_docs,
+            evidence_chunks=[],
+            graph_path=graph_path,
+        )
+        n_nodes = store.graph.number_of_nodes()
+        n_edges = store.graph.number_of_edges()
+        print(f"Regulatory graph built: {n_nodes} nodes, {n_edges} edges")
+    except Exception as exc:
+        print(f"Regulatory graph build skipped (non-fatal): {exc}")
+
+
+@lru_cache()
+def _load_and_split_corpus() -> tuple:
+    """Load manifest-backed corpus chunks, falling back to the legacy PDF path."""
+    import pickle
+
+    settings = get_settings()
+    os.makedirs(settings.CORPUS_INDEX_DIR, exist_ok=True)
+    cache_path = os.path.join(settings.CORPUS_INDEX_DIR, "corpus_documents.pkl")
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, "rb") as cache_file:
+                cached_docs = pickle.load(cache_file)
+            if cached_docs:
+                print(f"Regulatory corpus loaded from cache: {len(cached_docs)} chunks")
+                _maybe_build_graph()
+                return tuple(cached_docs)
+        except Exception as exc:
+            print(f"Regulatory corpus cache unreadable, rebuilding: {exc}")
+
+    try:
+        from app.services.corpus.corpus_ingestor import load_corpus_documents
+
+        corpus_docs = load_corpus_documents()
+        if corpus_docs:
+            print(f"Regulatory corpus loaded: {len(corpus_docs)} chunks")
+            try:
+                with open(cache_path, "wb") as cache_file:
+                    pickle.dump(corpus_docs, cache_file)
+                print(f"Regulatory corpus cached to {cache_path}")
+            except Exception as exc:
+                print(f"Regulatory corpus cache write failed: {exc}")
+            _maybe_build_graph()
+            return tuple(corpus_docs)
+        print("Regulatory corpus empty, falling back to legacy PDF_PATH")
+    except Exception as exc:
+        print(f"Regulatory corpus ingestion failed, falling back to legacy PDF_PATH: {exc}")
+
+    return _load_and_split_pdf()
+
+
 @lru_cache()
 def _build_chroma_db():
-    """构建 ChromaDB 向量库"""
+    """Build or load the persisted ChromaDB vector store."""
     settings = get_settings()
-    splits = list(_load_and_split_pdf())
-    if not splits:
-        return None
-
     embeddings = OpenAIEmbeddings(
         model=settings.ZHIPU_EMBEDDING_MODEL,
         openai_api_key=settings.ZHIPU_API_KEY,
         openai_api_base=settings.ZHIPU_BASE_URL,
-        chunk_size=64
+        chunk_size=64,
     )
 
+    persist_directory = os.path.join(
+        settings.CORPUS_INDEX_DIR,
+        f"chroma_{settings.CHROMA_COLLECTION}",
+    )
+    if os.path.exists(os.path.join(persist_directory, "chroma.sqlite3")):
+        db = Chroma(
+            collection_name=settings.CHROMA_COLLECTION,
+            embedding_function=embeddings,
+            persist_directory=persist_directory,
+        )
+        print(f"ChromaDB vector store loaded from {persist_directory}")
+        return db
+
+    splits = list(_load_and_split_corpus())
+    if not splits:
+        return None
+
+    os.makedirs(persist_directory, exist_ok=True)
     db = Chroma.from_documents(
         documents=splits,
         embedding=embeddings,
-        collection_name=settings.CHROMA_COLLECTION
+        collection_name=settings.CHROMA_COLLECTION,
+        persist_directory=persist_directory,
     )
-    print("✅ ChromaDB vector store initialized")
+    print(f"ChromaDB vector store initialized and persisted to {persist_directory}")
     return db
 
 
@@ -354,7 +448,7 @@ def build_hybrid_retriever() -> HybridRetriever | None:
       - Dense:  ChromaDB (语义向量匹配)
       - Fusion: RRF，权重 BM25=0.4 / Dense=0.6
     """
-    splits = list(_load_and_split_pdf())
+    splits = list(_load_and_split_corpus())
     if not splits:
         print("⚠️ No documents to build retriever")
         return None
