@@ -3,7 +3,13 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import type { AgentStateEvent, ActionRequiredEvent, CheckpointSavedEvent } from "@/types";
+import type {
+  AgentStateEvent,
+  ActionRequiredEvent,
+  CheckpointSavedEvent,
+  EvidenceChunk,
+  ResearchPlan,
+} from "@/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000";
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
@@ -35,6 +41,12 @@ interface StreamState {
   humanReviewRequired: boolean;
   currentGate: string | null;
   gateMessage: string | null;
+  // RAG/KAG/DeepResearch 升级：新数据字段
+  evidenceChunks: EvidenceChunk[];
+  graphPaths: Array<{ path: string[]; matched_node: string; matched_topics: string[] }>;
+  researchPlan: ResearchPlan | null;
+  evidenceBySubquestion: Record<string, EvidenceChunk[]>;
+  evidenceGaps: Array<{ sub_question_id: string; reason: string }>;
 }
 
 const INITIAL_STATE: StreamState = {
@@ -55,6 +67,12 @@ const INITIAL_STATE: StreamState = {
   humanReviewRequired: false,
   currentGate: null,
   gateMessage: null,
+  // RAG/KAG/DeepResearch
+  evidenceChunks: [],
+  graphPaths: [],
+  researchPlan: null,
+  evidenceBySubquestion: {},
+  evidenceGaps: [],
 };
 
 export function useAgentStream() {
@@ -140,6 +158,29 @@ export function useAgentStream() {
                     ...prev,
                     phase: "done",
                     workflowRunId: data.workflow_run_id || prev.workflowRunId,
+                    // 如果 done 事件内联包含 RAG/KAG/DeepResearch 数据，一并提取
+                    evidenceChunks: data.evidence_chunks
+                      ? (Array.isArray(data.evidence_chunks) ? data.evidence_chunks : [])
+                      : prev.evidenceChunks,
+                    graphPaths: data.graph_paths
+                      ? (Array.isArray(data.graph_paths) ? data.graph_paths : [])
+                      : prev.graphPaths,
+                    researchPlan: data.research_plan
+                      ? (data.research_plan || null)
+                      : prev.researchPlan,
+                    evidenceBySubquestion: data.evidence_by_subquestion
+                      ? (data.evidence_by_subquestion || {})
+                      : prev.evidenceBySubquestion,
+                    evidenceGaps: data.evidence_gaps
+                      ? (Array.isArray(data.evidence_gaps) ? data.evidence_gaps : [])
+                      : prev.evidenceGaps,
+                  }));
+                } else if (eventType === "error") {
+                  setState((prev) => ({
+                    ...prev,
+                    error: data.message || data.detail || "Stream failed",
+                    phase: "idle",
+                    isStreaming: false,
                   }));
                 } else if (eventType === "confidence") {
                   // P2: 三维置信度事件
@@ -192,6 +233,41 @@ export function useAgentStream() {
                     humanReviewRequired: false,
                     currentGate: null,
                     gateMessage: null,
+                  }));
+                } else if (eventType === "evidence_chunks") {
+                  // RAG/KAG: 证据块事件
+                  const chunks = data as EvidenceChunk[];
+                  setState((prev) => ({
+                    ...prev,
+                    evidenceChunks: Array.isArray(chunks) ? chunks : [],
+                  }));
+                } else if (eventType === "graph_paths") {
+                  // KAG: 知识图谱路径事件
+                  const paths = data as Array<{ path: string[]; matched_node: string; matched_topics: string[] }>;
+                  setState((prev) => ({
+                    ...prev,
+                    graphPaths: Array.isArray(paths) ? paths : [],
+                  }));
+                } else if (eventType === "research_plan") {
+                  // DeepResearch: 研究计划事件
+                  const plan = data as ResearchPlan;
+                  setState((prev) => ({
+                    ...prev,
+                    researchPlan: plan || null,
+                  }));
+                } else if (eventType === "evidence_by_subquestion") {
+                  // DeepResearch: 子问题证据映射
+                  const evMap = data as Record<string, EvidenceChunk[]>;
+                  setState((prev) => ({
+                    ...prev,
+                    evidenceBySubquestion: evMap || {},
+                  }));
+                } else if (eventType === "evidence_gaps") {
+                  // DeepResearch: 证据差距事件
+                  const gaps = data as Array<{ sub_question_id: string; reason: string }>;
+                  setState((prev) => ({
+                    ...prev,
+                    evidenceGaps: Array.isArray(gaps) ? gaps : [],
                   }));
                 }
               } catch {

@@ -18,12 +18,29 @@ Cohere Reranker 模块
         ▼
   最终上下文 → Analyzer Agent
 """
+import builtins
 import cohere
 from functools import lru_cache
 from typing import List
 from langchain_core.documents import Document
 
 from app.core.config import get_settings
+
+
+def _safe_print(*args, **kwargs) -> None:
+    """Print without crashing on non-UTF-8 Windows consoles."""
+
+    try:
+        builtins.print(*args, **kwargs)
+    except UnicodeEncodeError:
+        sanitized = [
+            str(arg).encode("ascii", errors="replace").decode("ascii")
+            for arg in args
+        ]
+        builtins.print(*sanitized, **kwargs)
+
+
+print = _safe_print
 
 
 @lru_cache()

@@ -135,15 +135,31 @@ Rejection Type Rules:
         content = resp.content.strip()
         parsed = _parse_committee_output(content)
 
-        if parsed["decision"] == "APPROVED" or rev_count >= MAX_REVISIONS:
-            return {"final_report": draft, "revision_count": rev_count, "rejection_type": ""}
+        if parsed["decision"] == "APPROVED":
+            return {
+                "final_report": draft,
+                "revision_count": rev_count,
+                "reviewer_feedback": "",
+                "rejection_type": "",
+            }
+
+        next_revision_count = rev_count + 1
+        if next_revision_count >= MAX_REVISIONS:
+            # Keep the latest draft as the terminal output when the revision
+            # budget is exhausted, instead of ending with an empty final report.
+            return {
+                "final_report": draft,
+                "revision_count": next_revision_count,
+                "reviewer_feedback": "",
+                "rejection_type": parsed["rejection_type"],
+            }
         return {
             "reviewer_feedback": (
                 f"REJECTED\n"
                 f"Reason: {parsed.get('feedback', content)}\n"
                 f"Rejection Type: {parsed['rejection_type']}"
             ),
-            "revision_count": rev_count + 1,
+            "revision_count": next_revision_count,
             "rejection_type": parsed["rejection_type"],
         }
 

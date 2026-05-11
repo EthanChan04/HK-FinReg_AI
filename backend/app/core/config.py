@@ -38,11 +38,23 @@ class Settings(BaseSettings):
     LLM_TIMEOUT_SECONDS: int = 60  # LLM API 调用超时时间（秒）
 
     # --- RAG Config ---
+    # Legacy fallback. Used only when SOURCE_MANIFEST_PATH is missing or empty.
     PDF_PATH: str = "../Fintech/AML Guideline for LCs_Eng_30 Sep 2021.pdf"
-    CHROMA_COLLECTION: str = "zhipu_collection"
+    CHROMA_COLLECTION: str = "hk_finreg_corpus"
     CHUNK_SIZE: int = 1500
     CHUNK_OVERLAP: int = 200
     PARSER_MODE: str = "hierarchy"  # "hierarchy" | "reg_aware" | "flat" — M5 解析模式开关
+    REG_DOC_DIR: str = "data/regulations"
+    SOURCE_MANIFEST_PATH: str = "data/source_manifest.json"
+    CORPUS_INDEX_DIR: str = "data/indexes"
+    GRAPH_STORE_BACKEND: str = "networkx"
+    GRAPH_STORE_PATH: str = "data/graph/regulatory_graph.json"
+    RETRIEVAL_ROUTER_ENABLED: bool = True
+    DEFAULT_RETRIEVAL_MODE: str = "rag"
+    DEEP_RESEARCH_ENABLED: bool = True
+    DEEP_RESEARCH_MAX_ITERATIONS: int = 3
+    DEEP_RESEARCH_MAX_SUBQUESTIONS: int = 8
+    DEEP_RESEARCH_MIN_EVIDENCE_PER_SUBQUESTION: int = 2
     SEMANTIC_CACHE_ENABLED: bool = False
     SEMANTIC_CACHE_THRESHOLD: float = 0.80
     SEMANTIC_CACHE_MAX_ENTRIES: int = 200

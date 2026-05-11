@@ -1,0 +1,23 @@
+[
+  {
+    "id": "RAG_SVF_AML_001",
+    "question": "What are the key CDD obligations for an SVF licensee?",
+    "expected_retrieval_mode": "rag",
+    "expected_topics": ["CDD", "AML", "SVF"],
+    "expected_regulators": ["HKMA"]
+  },
+  {
+    "id": "KAG_AI_ADVISOR_001",
+    "question": "Which regulators and obligations are relevant when a Hong Kong virtual bank launches an AI wealth advisory product?",
+    "expected_retrieval_mode": "kag",
+    "expected_topics": ["AI", "wealth_management", "consumer_protection"],
+    "expected_regulators": ["HKMA", "SFC", "PCPD"]
+  },
+  {
+    "id": "DR_AI_ADVISOR_001",
+    "question": "Analyze the compliance risks for a Hong Kong virtual bank launching an AI investment advisor and generate a pre-launch checklist.",
+    "expected_retrieval_mode": "deep_research",
+    "expected_topics": ["AI", "AML", "CDD", "data_privacy", "consumer_protection"],
+    "expected_regulators": ["HKMA", "SFC", "PCPD"]
+  }
+]

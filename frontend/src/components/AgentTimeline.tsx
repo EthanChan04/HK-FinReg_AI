@@ -29,7 +29,7 @@ interface Props {
   currentAgent: string | null;
   isStreaming: boolean;
   elapsedTime: number;
-  phase: "idle" | "agents" | "streaming" | "done";
+  phase: "idle" | "agents" | "streaming" | "done" | "action_required";
 }
 
 export default function AgentTimeline({

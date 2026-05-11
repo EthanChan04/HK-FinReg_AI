@@ -18,7 +18,7 @@ from fastapi.responses import StreamingResponse
 
 from app.schemas.requests import ComplianceRequest, ComplianceResponse, ComplianceMetrics
 from app.services.utils import pii_scrubber, format_output, get_current_timestamp
-from app.services.agents.builder import build_zhipu_llm
+from app.services.agents.builder import build_thinking_llm
 from app.core.monitoring import get_tracker
 from app.api.routers.workflow_utils import (
     format_sse_event,
@@ -78,7 +78,7 @@ def _parse_cro_output(content: str) -> dict:
 
 def _build_vb_graph():
     """构建 VB 多智能体图（含反思循环），返回编译后的 CompiledGraph"""
-    llm = build_zhipu_llm()
+    llm = build_thinking_llm()
 
     def kyc_node(state: VBState):
         prompt = (

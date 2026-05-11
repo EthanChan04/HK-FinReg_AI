@@ -22,7 +22,7 @@ from app.core.monitoring import get_tracker, setup_langsmith
 from app.core.security import verify_api_key
 from app.schemas.requests import HealthResponse
 
-from app.api.routers import svf, bank_account, cross_border, sme_lending
+from app.api.routers import svf, bank_account, cross_border, sme_lending, review_queue, research
 
 settings = get_settings()
 
@@ -52,6 +52,8 @@ app.include_router(svf.router, prefix="/api/v1", dependencies=[Depends(verify_ap
 app.include_router(bank_account.router, prefix="/api/v1", dependencies=[Depends(verify_api_key)])
 app.include_router(cross_border.router, prefix="/api/v1", dependencies=[Depends(verify_api_key)])
 app.include_router(sme_lending.router, prefix="/api/v1", dependencies=[Depends(verify_api_key)])
+app.include_router(review_queue.router, prefix="/api/v1", dependencies=[Depends(verify_api_key)])
+app.include_router(research.router, prefix="/api/v1", dependencies=[Depends(verify_api_key)])
 
 
 # --- 测试客户端页面 (仅 DEBUG 模式) ---

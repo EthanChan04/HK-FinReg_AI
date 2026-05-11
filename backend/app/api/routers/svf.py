@@ -37,6 +37,11 @@ from app.services.agents.builder import (
     get_structured_reviewer_llm,
 )
 from app.core.monitoring import get_tracker
+from app.services.workflow_checkpoint import (
+    CheckpointManager,
+    ReviewQueueItem,
+    get_checkpoint_manager,
+)
 
 from langgraph.graph import StateGraph, END
 from langgraph.types import interrupt, Command
@@ -750,6 +755,7 @@ def _build_svf_graph(checkpointer=None):
     def reviewer_node(state: SVFState):
         from app.services.agents.prompts import REVIEWER_SYSTEM_PROMPT
         rev_count = state.get("revision_count", 0)
+        draft = state.get("draft_report", "")
         reviewer_confidence = max(0.0, min(1.0, float(state.get("reasoning_confidence", 0.5))))
         verdict = ReviewerVerdict(
             decision="APPROVED",
@@ -1346,6 +1352,8 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
     reasoning_confidence = None
     reviewer_confidence = None
     cross_validation_passed = None
+    latest_evidence_chunks = []
+    latest_graph_paths = []
     hitl_gate_started = False
     chat_stream_event_count = 0
     
@@ -1390,6 +1398,16 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
                 if isinstance(output_data, dict):
                     # P2: 浠?retriever 鑺傜偣鎹曡幏妫绱㈢疆淇″害
                     if node_name == "retriever":
+                        evidence_chunks = output_data.get("evidence_chunks")
+                        if isinstance(evidence_chunks, list):
+                            latest_evidence_chunks = evidence_chunks
+                            yield _sse_event("evidence_chunks", evidence_chunks)
+
+                        graph_paths = output_data.get("graph_paths")
+                        if isinstance(graph_paths, list):
+                            latest_graph_paths = graph_paths
+                            yield _sse_event("graph_paths", graph_paths)
+
                         cs = output_data.get("confidence_score")
                         cw = output_data.get("confidence_warning")
                         if cs is not None:
@@ -1481,7 +1499,15 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
     for line in formatted.split("\n"):
         yield f"event: token\ndata: {json.dumps({'text': line + chr(10)}, ensure_ascii=False)}\n\n"
 
-    yield f"event: done\ndata: {json.dumps({'status': 'complete', 'workflow_run_id': workflow_run_id}, ensure_ascii=False)}\n\n"
+    yield _sse_event(
+        "done",
+        {
+            "status": "complete",
+            "workflow_run_id": workflow_run_id,
+            "evidence_chunks": latest_evidence_chunks,
+            "graph_paths": latest_graph_paths,
+        },
+    )
 
 
 async def _stream_svf(safe_input: str, workflow_run_id: str = "") -> AsyncGenerator[str, None]:

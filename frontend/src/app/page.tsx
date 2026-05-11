@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useAgentStream } from "@/hooks/useAgentStream";
 import AgentTimeline from "@/components/AgentTimeline";
 import ReportPanel from "@/components/ReportPanel";
+import EvidencePanel from "@/components/EvidencePanel";
+import KnowledgeGraphPanel from "@/components/KnowledgeGraphPanel";
+import DeepResearchPlanPanel from "@/components/DeepResearchPlanPanel";
 import { modules } from "@/lib/modules";
 
 function formatTime(seconds: number): string {
@@ -67,6 +70,14 @@ export default function Home() {
               >
                 ✕ Cancel
               </button>
+            </div>
+          )}
+
+          {/* Action Required indicator */}
+          {stream.phase === "action_required" && !stream.isStreaming && (
+            <div className="flex items-center gap-2 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-full">
+              <span>🔍</span>
+              <span>等待人工審查 — {stream.currentGate === "low_confidence_gate" ? "低置信度" : stream.currentGate === "missing_evidence_gate" ? "證據不足" : "需人工批准"}</span>
             </div>
           )}
 
@@ -163,38 +174,68 @@ export default function Home() {
             </div>
           )}
 
-          {/* Agent Pipeline Timeline */}
-          <div className="shrink-0 max-h-[320px] overflow-y-auto">
-            <AgentTimeline
-              agents={stream.agentStates}
-              currentAgent={stream.currentAgent}
-              isStreaming={stream.isStreaming}
-              elapsedTime={stream.elapsedTime}
-              phase={stream.phase}
-            />
-          </div>
+          {/* Scrollable content area with all panels */}
+          <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-2">
+            {/* Agent Pipeline Timeline */}
+            <div className="shrink-0 max-h-[320px] overflow-y-auto">
+              <AgentTimeline
+                agents={stream.agentStates}
+                currentAgent={stream.currentAgent}
+                isStreaming={stream.isStreaming}
+                elapsedTime={stream.elapsedTime}
+                phase={stream.phase}
+              />
+            </div>
 
-          {/* Report Output */}
-          <div className="flex-1 min-h-0 bg-white/[0.02] border border-white/[0.06] rounded-xl flex flex-col overflow-hidden">
-            <ReportPanel
-              text={stream.reportText}
-              isStreaming={stream.isStreaming}
-              phase={stream.phase}
-              elapsedTime={stream.elapsedTime}
-              confidenceScore={stream.confidenceScore}
-              confidenceWarning={stream.confidenceWarning}
-              reasoningConfidence={stream.reasoningConfidence}
-              reviewerConfidence={stream.reviewerConfidence}
-              crossValidationPassed={stream.crossValidationPassed}
-            />
+            {/* Report Output */}
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl flex flex-col overflow-hidden min-h-[250px]">
+              <ReportPanel
+                text={stream.reportText}
+                isStreaming={stream.isStreaming}
+                phase={stream.phase}
+                elapsedTime={stream.elapsedTime}
+                confidenceScore={stream.confidenceScore}
+                confidenceWarning={stream.confidenceWarning}
+                reasoningConfidence={stream.reasoningConfidence}
+                reviewerConfidence={stream.reviewerConfidence}
+                crossValidationPassed={stream.crossValidationPassed}
+                workflowRunId={stream.workflowRunId}
+                humanReviewRequired={stream.humanReviewRequired}
+                currentGate={stream.currentGate}
+                gateMessage={stream.gateMessage}
+                onResumeResult={stream.setResumedResult}
+              />
 
-            {/* Footer metrics */}
-            {stream.phase === "done" && stream.reportText && (
-              <div className="border-t border-white/[0.06] px-4 py-2.5 text-[11px] text-gray-500 flex gap-4 shrink-0">
-                <span>⏱️ {formatTime(stream.elapsedTime)}</span>
-                <span>📝 {stream.reportText.length.toLocaleString()} chars</span>
-                <span>🤖 {stream.agentStates.length} agent steps</span>
-              </div>
+              {/* Footer metrics */}
+              {(stream.phase === "done" || stream.phase === "action_required") && stream.reportText && (
+                <div className="border-t border-white/[0.06] px-4 py-2.5 text-[11px] text-gray-500 flex gap-4 shrink-0">
+                  <span>⏱️ {formatTime(stream.elapsedTime)}</span>
+                  <span>📝 {stream.reportText.length.toLocaleString()} chars</span>
+                  <span>🤖 {stream.agentStates.length} agent steps</span>
+                </div>
+              )}
+            </div>
+
+            {/* Evidence + KnowledgeGraph side by side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+              <EvidencePanel
+                evidence={stream.evidenceChunks}
+                isLoading={stream.isStreaming && stream.phase === "agents"}
+              />
+              <KnowledgeGraphPanel
+                paths={stream.graphPaths}
+                isLoading={stream.isStreaming && stream.phase === "agents"}
+              />
+            </div>
+
+            {/* DeepResearchPlanPanel (only when research plan data exists) */}
+            {stream.researchPlan && (
+              <DeepResearchPlanPanel
+                researchPlan={stream.researchPlan}
+                evidenceBySubquestion={stream.evidenceBySubquestion}
+                evidenceGaps={stream.evidenceGaps}
+                isLoading={stream.isStreaming && stream.phase === "agents"}
+              />
             )}
           </div>
         </div>

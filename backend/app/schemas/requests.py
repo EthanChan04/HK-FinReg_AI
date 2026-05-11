@@ -2,9 +2,21 @@
 Pydantic 请求体与响应体定义 (Schemas)
 用于 FastAPI 路由做严格的数据入参验证与出参序列化。
 """
+from enum import Enum
 from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+
+
+# ==========================================
+# Phase 1: HITL Gate 类型
+# ==========================================
+
+class GateType(str, Enum):
+    """三类标准中断 gate"""
+    LOW_CONFIDENCE = "low_confidence_gate"
+    MISSING_EVIDENCE = "missing_evidence_gate"
+    MANUAL_APPROVAL = "manual_approval_gate"
 
 
 # ==========================================
@@ -192,3 +204,35 @@ class ReviewerVerdict(BaseModel):
         if self.decision == "REJECTED" and not self.rejection_type:
             raise ValueError("REJECTED verdict must include a rejection_type")
         return self
+
+
+# ==========================================
+# Phase 1: HITL Review Queue Schemas
+# ==========================================
+
+class ReviewQueueItemResponse(BaseModel):
+    """审查队列条目响应"""
+    workflow_run_id: str
+    gate_type: str = Field(..., description="触发暂停的 gate 类型")
+    checkpoint_created_at: float = Field(..., description="Checkpoint 创建时间戳")
+    evidence_snapshot: dict = Field(default_factory=dict, description="证据快照")
+    latest_draft_report: str = Field("", description="最新草稿报告")
+    confidence_data: dict = Field(default_factory=dict, description="置信度数据")
+    original_input: str = Field("", description="原始输入")
+    human_review_status: str = Field("pending", description="审查状态: pending/approved/rejected")
+    human_review_notes: str = Field("", description="人工批注")
+    reviewed_at: Optional[float] = Field(None, description="审查时间戳")
+    reviewed_by: Optional[str] = Field(None, description="审查人")
+
+
+class ReviewResumeRequest(BaseModel):
+    """恢复执行请求"""
+    notes: str = Field("", description="人工批注")
+    reviewed_by: str = Field("", description="审查人标识")
+    additional_context: Optional[str] = Field(None, description="补充的外部事实或上下文")
+
+
+class ReviewRejectRequest(BaseModel):
+    """驳回请求"""
+    notes: str = Field(..., min_length=1, description="驳回原因")
+    reviewed_by: str = Field("", description="审查人标识")

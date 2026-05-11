@@ -9,6 +9,7 @@ LLM 工厂 & 检索引擎模块 (Builder)
 """
 import os
 import re
+import builtins
 from functools import lru_cache
 from typing import List
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -21,6 +22,22 @@ from langchain_core.documents import Document
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 
 from app.core.config import get_settings
+
+
+def _safe_print(*args, **kwargs) -> None:
+    """Print without crashing on non-UTF-8 Windows consoles."""
+
+    try:
+        builtins.print(*args, **kwargs)
+    except UnicodeEncodeError:
+        sanitized = [
+            str(arg).encode("ascii", errors="replace").decode("ascii")
+            for arg in args
+        ]
+        builtins.print(*sanitized, **kwargs)
+
+
+print = _safe_print
 
 
 # ==========================================

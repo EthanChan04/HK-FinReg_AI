@@ -100,7 +100,7 @@ export default function ReportPanel({
         )}
       </article>
       {/* P2: 三维置信度徽章 */}
-      {(confidenceScore !== null && confidenceScore !== undefined && phase === "done") && (
+      {(confidenceScore != null && phase === "done") && (
         <div className={`mt-4 px-4 py-3 rounded-lg border ${
           confidenceScore < 0.5
             ? "bg-red-900/20 border-red-500/40"
@@ -121,23 +121,23 @@ export default function ReportPanel({
               )}
             </div>
             {/* 三维置信度详情 */}
-            {(reasoningConfidence !== null || reviewerConfidence !== null) && (
+            {(reasoningConfidence != null || reviewerConfidence != null) && (
               <div className="flex gap-4 text-xs text-gray-400 mt-1 pt-2 border-t border-white/[0.06]">
-                {reasoningConfidence !== null && (
+                {reasoningConfidence != null && (
                   <span>
                     🧠 推理：<strong className={reasoningConfidence < 0.5 ? "text-red-400" : reasoningConfidence < 0.7 ? "text-yellow-400" : "text-green-400"}>
                       {(reasoningConfidence * 100).toFixed(0)}%
                     </strong>
                   </span>
                 )}
-                {reviewerConfidence !== null && (
+                {reviewerConfidence != null && (
                   <span>
                     ⚖️ 審查：<strong className={reviewerConfidence < 0.5 ? "text-red-400" : reviewerConfidence < 0.7 ? "text-yellow-400" : "text-green-400"}>
                       {(reviewerConfidence * 100).toFixed(0)}%
                     </strong>
                   </span>
                 )}
-                {crossValidationPassed !== null && (
+                {crossValidationPassed != null && (
                   <span>
                     {crossValidationPassed ? "✅" : "⚠️"} 交叉驗證{crossValidationPassed ? "通過" : "未通過"}
                   </span>
@@ -176,21 +176,21 @@ export default function ReportPanel({
 
             {/* 关键指标 */}
             <div className="flex gap-3 text-xs">
-              {confidenceScore !== null && (
+              {confidenceScore != null && (
                 <span className={`px-2 py-1 rounded ${
                   confidenceScore < 0.5 ? "bg-red-900/30 text-red-400" : "bg-yellow-900/30 text-yellow-400"
                 }`}>
                   檢索 {(confidenceScore * 100).toFixed(0)}%
                 </span>
               )}
-              {reasoningConfidence !== null && (
+              {reasoningConfidence != null && (
                 <span className={`px-2 py-1 rounded ${
                   reasoningConfidence < 0.5 ? "bg-red-900/30 text-red-400" : "bg-yellow-900/30 text-yellow-400"
                 }`}>
                   推理 {(reasoningConfidence * 100).toFixed(0)}%
                 </span>
               )}
-              {crossValidationPassed !== null && (
+              {crossValidationPassed != null && (
                 <span className={`px-2 py-1 rounded ${
                   crossValidationPassed ? "bg-green-900/30 text-green-400" : "bg-red-900/30 text-red-400"
                 }`}>
