@@ -1,165 +1,214 @@
-﻿# HK-FinReg AI: Trustworthy RAG + KAG + DeepResearch Compliance System
+﻿# HK-FinReg AI
 
-A full-stack Hong Kong fintech regulatory analysis platform with **FastAPI + Next.js**, supporting **streaming multi-agent workflows**, **evidence-grounded retrieval**, and **human review queue** operations.
+<p align="center">
+  <a href="./SECURITY.md"><img src="https://img.shields.io/badge/Security-Policy-1f6feb?style=for-the-badge" alt="Security Policy" /></a>
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Frontend-Next.js-111111?style=for-the-badge" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Workflow-LangGraph-7a3cff?style=for-the-badge" alt="LangGraph" />
+  <img src="https://img.shields.io/badge/Retrieval-RAG%20%2B%20KAG-2ea44f?style=for-the-badge" alt="RAG + KAG" />
+</p>
 
-## Highlights
+**HK-FinReg AI** is a compliance intelligence platform for Hong Kong financial regulation, designed for production-grade engineering workflows and research-grade methodological transparency. The system combines retrieval-augmented generation (RAG), knowledge-assisted generation (KAG), and multi-stage deep research orchestration to produce evidence-grounded regulatory analyses.
 
-- Trustworthy compliance analysis with evidence references and confidence signals.
-- Hybrid retrieval pipeline: BM25 + dense vector search + RRF + optional reranker.
-- KAG-style knowledge graph support for regulatory reasoning paths.
-- DeepResearch workflow for multi-step analysis planning, gap detection, and report drafting.
-- Real-time SSE streaming from backend to frontend for agent progress and outputs.
-- Human-in-the-loop review queue for escalations and continuation.
+## Table of Contents
 
-## Business Modules
+- [Executive Summary](#executive-summary)
+- [Scope](#scope)
+- [System Architecture](#system-architecture)
+- [Methodology](#methodology)
+- [API Surface](#api-surface)
+- [Technology Stack](#technology-stack)
+- [Configuration](#configuration)
+- [Development Workflow](#development-workflow)
+- [Quality Assurance](#quality-assurance)
+- [Data Governance and Security](#data-governance-and-security)
+- [Reproducibility and Benchmarking](#reproducibility-and-benchmarking)
+- [Repository Structure](#repository-structure)
+- [Limitations](#limitations)
+- [Citation](#citation)
+- [License](#license)
 
-| Module | Endpoint | Description |
-| --- | --- | --- |
-| SVF Compliance | `POST /api/v1/svf/analyze/stream` | Stored Value Facility compliance analysis |
-| Bank Account | `POST /api/v1/bank-account/verify/stream` | Account opening / verification compliance checks |
-| Cross-Border | `POST /api/v1/cross-border/assess/stream` | Cross-border payment risk and compliance review |
-| SME Lending | `POST /api/v1/sme/credit-rating/stream` | SME credit/risk compliance workflow |
-| DeepResearch | `POST /api/v1/research/analyze` | Multi-step regulatory research |
-| Review Queue | `/api/v1/review-queue/` | Human review continuation workflow |
+## Executive Summary
 
-## Architecture
+HK-FinReg AI provides:
 
-```text
-frontend (Next.js 16 + React 19)
-  |- AgentTimeline / ReportPanel / EvidencePanel / KnowledgeGraphPanel
-  |- SSE + REST
-  v
-backend (FastAPI)
-  |- api/routers/: module APIs + streaming routes
-  |- services/agents/: model builder, parser, prompts, reranker
-  |- services/retrieval/: routing, evidence rendering, citation verification
-  |- services/kag/: graph store, graph builder, graph retriever
-  |- services/deepresearch/: planner, gap detector, report writer
-  |- services/corpus/: manifest loading and corpus ingestion
-  |- services/evaluation/: benchmark evaluation
+- End-to-end compliance analysis workflows across key financial scenarios.
+- Hybrid retrieval and ranking for high-recall, high-precision evidence discovery.
+- Knowledge graph reasoning for cross-document regulatory linkage.
+- Streaming multi-agent execution with explicit intermediate states.
+- Human review queue support for supervisory and expert escalation.
+- Deterministic evaluation pipelines for benchmarking and regression tracking.
+
+## Scope
+
+The current implementation supports the following domain workflows:
+
+- Stored Value Facility (SVF) compliance analysis
+- Bank account onboarding and verification review
+- Cross-border payment compliance assessment
+- SME lending and credit-related compliance workflow
+- DeepResearch for multi-step regulatory investigation
+- Human-in-the-loop review queue continuation
+
+## System Architecture
+
+```mermaid
+flowchart LR
+  A["Client Layer\nNext.js + React + TypeScript"] -->|"REST + SSE"| B["Service Layer\nFastAPI"]
+  B --> B1["API Routers"]
+  B --> B2["Agent Services"]
+  B --> B3["Retrieval Services"]
+  B --> B4["KAG Services"]
+  B --> B5["DeepResearch Services"]
+  B --> B6["Corpus Services"]
+  B --> B7["Evaluation Services"]
+  B --> C["Data Layer"]
+  C --> C1["Regulatory Corpus + Manifest"]
+  C --> C2["Vector Index + Cache"]
+  C --> C3["Regulatory Graph Store"]
 ```
 
-## Tech Stack
+## Methodology
 
-| Layer | Stack |
+### 1. Retrieval and Evidence Formation
+
+- Sparse retrieval (BM25) and dense retrieval are executed in parallel.
+- Reciprocal Rank Fusion (RRF) merges candidate sets.
+- Optional reranking refines ordering for evidence relevance.
+- Citation verification validates evidential support before final synthesis.
+
+### 2. Knowledge-Assisted Reasoning (KAG)
+
+- The system derives a regulatory graph from corpus metadata and semantic relations.
+- Graph traversal supports contextual expansion, dependency tracing, and regulatory linkage analysis.
+
+### 3. DeepResearch Orchestration
+
+- Query decomposition and plan generation
+- Evidence acquisition and iterative gap detection
+- Structured synthesis into analyst-facing compliance narratives
+
+## API Surface
+
+| Module | Endpoint | Contract |
+| --- | --- | --- |
+| SVF Compliance | `POST /api/v1/svf/analyze/stream` | SSE stream with intermediate agent events and final report |
+| Bank Account | `POST /api/v1/bank-account/verify/stream` | SSE stream for onboarding/verification compliance |
+| Cross-Border | `POST /api/v1/cross-border/assess/stream` | SSE stream for cross-border risk/compliance assessment |
+| SME Lending | `POST /api/v1/sme/credit-rating/stream` | SSE stream for lending compliance workflow |
+| DeepResearch | `POST /api/v1/research/analyze` | Structured multi-stage regulatory analysis output |
+| Review Queue | `/api/v1/review-queue/*` | Human review continuation and stateful escalation |
+
+## Technology Stack
+
+| Layer | Technologies |
 | --- | --- |
-| Frontend | Next.js `16.2.6`, React `19.2.4`, TypeScript |
-| Backend | FastAPI, Pydantic Settings, SSE |
-| Workflow | LangGraph |
+| Frontend | Next.js, React, TypeScript |
+| Backend | FastAPI, Pydantic, SSE |
+| Workflow Engine | LangGraph |
 | Retrieval | ChromaDB, BM25, RRF |
 | Graph | NetworkX |
-| Rerank | Cohere (`rerank-v3.5`, optional) |
-| LLM/Embedding | Zhipu GLM, LongCat, Zhipu Embedding |
+| Reranking | Cohere (optional) |
+| LLM/Embedding | Zhipu GLM family, LongCat, Zhipu Embeddings |
 | Observability | LangSmith |
 
-## Quick Start
+## Configuration
 
-### 1) Backend env (`backend/.env`)
+### Backend Environment
 
-```env
-ZHIPU_API_KEY=your_zhipu_api_key
-LONGCAT_API_KEY=your_longcat_api_key
-COHERE_API_KEY=your_cohere_api_key
+Create `backend/.env` from the project template and configure:
 
-ZHIPU_MODEL=glm-4.5-air
-ZHIPU_EMBEDDING_MODEL=embedding-3
-ZHIPU_BASE_URL=https://open.bigmodel.cn/api/paas/v4/
-LONGCAT_MODEL=LongCat-Flash-Chat
-LONGCAT_BASE_URL=https://api.longcat.chat/openai/v1
+- Provider credentials (`ZHIPU_API_KEY`, `LONGCAT_API_KEY`, optional `COHERE_API_KEY`)
+- Model and endpoint settings
+- API security controls (`API_KEY_ENABLED`, `API_KEY`)
+- Corpus/index/graph storage configuration
+- Retrieval and DeepResearch feature toggles
 
-API_KEY_ENABLED=true
-API_KEY=your_local_api_key
+### Frontend Environment
 
-REG_DOC_DIR=data/regulations
-SOURCE_MANIFEST_PATH=data/source_manifest.json
-CORPUS_INDEX_DIR=data/indexes
-CHROMA_COLLECTION=hk_finreg_corpus
+Configure `frontend/.env.local`:
 
-GRAPH_STORE_BACKEND=networkx
-GRAPH_STORE_PATH=data/graph/regulatory_graph.json
+- `NEXT_PUBLIC_API_BASE`
+- `NEXT_PUBLIC_API_KEY`
 
-RETRIEVAL_ROUTER_ENABLED=true
-DEFAULT_RETRIEVAL_MODE=rag
-DEEP_RESEARCH_ENABLED=true
+## Development Workflow
+
+### Backend
+
+```bash
+cd backend
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-### 2) Frontend env (`frontend/.env.local`)
+### Frontend
 
-```env
-NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000
-NEXT_PUBLIC_API_KEY=your_local_api_key
-```
-
-### 3) Run services
-
-Backend:
-
-```powershell
-cd F:\MyFintech\backend
-F:\MyFintech\HKFinReg\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
-Frontend:
-
-```powershell
-cd F:\MyFintech\frontend
+```bash
+cd frontend
 npm install
-npm run dev -- --hostname 127.0.0.1 --port 3000
+npm run dev
 ```
 
-Open: `http://127.0.0.1:3000`
+## Quality Assurance
 
-## Security Notes
+### Dependency Security Audit
 
-- Real secrets (`.env`, `.env.local`, keys) are ignored by Git and should stay local.
-- API key auth can be enabled with `API_KEY_ENABLED=true`.
-- Citation verification and evidence checks are built into the backend retrieval workflow.
-- For dependency auditing, use:
-
-```powershell
+```bash
 python -m pip_audit -r backend/requirements.txt
-cd frontend; npm audit --omit=dev
+cd frontend && npm audit --omit=dev
 ```
 
-## Evaluation & Tests
+### Automated Evaluation
 
-Run retrieval/deepresearch benchmark:
-
-```powershell
-cd F:\MyFintech\backend
+```bash
+cd backend
 python -m app.services.evaluation.run_eval
 ```
 
-Run backend tests:
+### Test and Build Checks
 
-```powershell
-cd F:\MyFintech
-python -m pytest backend\tests -q
+```bash
+python -m pytest backend/tests -q
+cd frontend && npm run lint && npm run build
 ```
 
-Run frontend checks:
+## Data Governance and Security
 
-```powershell
-cd F:\MyFintech\frontend
-npm run lint
-npm run build
-```
+- Secrets and runtime credentials are excluded from version control.
+- API key authentication is supported for service-layer access control.
+- Evidence validation and citation checks are integrated into output generation.
+- The repository includes dedicated security guidance in `SECURITY.md`.
 
-## Repository Layout
+## Reproducibility and Benchmarking
+
+The benchmark framework is designed for deterministic regression monitoring across retrieval and synthesis components. For metric definitions and protocol details, refer to:
+
+- `docs/evaluation_protocol.md`
+
+## Repository Structure
 
 ```text
-F:\MyFintech
-|- backend/
-|  |- app/
-|  |- data/
-|  |- tests/
-|- frontend/
-|  |- src/
-|- docs/
-|- SECURITY.md
-|- README.md
+.
+├─ backend/
+│  ├─ app/
+│  ├─ data/
+│  └─ tests/
+├─ frontend/
+│  └─ src/
+├─ docs/
+├─ SECURITY.md
+└─ README.md
 ```
 
-## Disclaimer
+## Limitations
 
-This project is for research/prototyping. Outputs are not legal advice and must be reviewed by qualified compliance/legal professionals before production use.
+- Model outputs may reflect source ambiguity and should be validated by qualified professionals.
+- Regulatory interpretation is jurisdiction- and context-dependent.
+- This system is decision-support infrastructure, not legal counsel.
+
+## Citation
+
+If you use this project in research or internal methodology reports, cite the repository and commit hash used for reproducibility.
+
+## License
+
+This project is distributed under the repository's license terms.
