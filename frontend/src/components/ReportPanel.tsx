@@ -50,6 +50,7 @@ export default function ReportPanel({
   gateMessage,
   onResumeResult,
 }: Props) {
+  void isStreaming;
   const containerRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [reviewNotes, setReviewNotes] = useState("");

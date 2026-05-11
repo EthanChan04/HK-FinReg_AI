@@ -75,10 +75,20 @@ plan
 # ----- Logs -----
 *.log
 logs/
+backend/logs/
 Fintech/compliance_audit.log
+backend/*trace*.txt
+backend/*_trace*.log
+backend/*timeout*.log
 
 # ----- Runtime review queue state -----
 backend/data/interrupt_registry.json
+
+# ----- Generated Index / Cache Artifacts -----
+backend/data/indexes/
+data/indexes/
+backend/data/graph/regulatory_graph.json
+data/graph/regulatory_graph.json
 
 # ----- Temporary test scripts -----
 test.py
@@ -108,3 +118,7 @@ _test_output.txt
 
 # Keep legacy PoC local-only
 Fintech/
+
+# ----- Legacy local mirrors / experiments -----
+HKFinReg/
+data/

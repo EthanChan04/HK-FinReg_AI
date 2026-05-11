@@ -144,7 +144,6 @@ def test_single_embedding_flow():
 
     assert embeddings.call_count == 2, f"預期 2 次 Embedding 調用，實際 {embeddings.call_count}"
     print("\n✅ 單次 Embedding 流程測試通過！")
-    return True
 
 
 def test_lru_eviction():
@@ -190,7 +189,6 @@ def test_lru_eviction():
     assert list(cache._entries.keys()) == ["A", "D", "E"]
 
     print("\n✅ LRU 淘汰機制測試通過！")
-    return True
 
 
 def test_pii_scrubbing():
@@ -217,7 +215,6 @@ def test_pii_scrubbing():
     assert "[EMAIL]" in scrubbed
 
     print("\n✅ PII 脫敏測試通過！")
-    return True
 
 
 def test_cache_ordered_dict_move_to_end():
@@ -246,7 +243,6 @@ def test_cache_ordered_dict_move_to_end():
     assert list(od.keys()) == ["c", "a", "d"]
 
     print("\n✅ OrderedDict 行為驗證通過！")
-    return True
 
 
 def main():

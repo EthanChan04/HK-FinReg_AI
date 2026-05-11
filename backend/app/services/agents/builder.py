@@ -20,6 +20,7 @@ from langchain_community.retrievers import BM25Retriever
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.documents import Document
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
+from pydantic import ConfigDict
 
 from app.core.config import get_settings
 
@@ -436,8 +437,7 @@ class HybridRetriever(BaseRetriever):
     bm25_weight: float = 0.4
     dense_weight: float = 0.6
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def _get_relevant_documents(
         self, query: str, *, run_manager: CallbackManagerForRetrieverRun
@@ -538,8 +538,7 @@ class RerankedRetriever(BaseRetriever):
     rerank_model: str = "rerank-v3.5"
     top_k: int = 5
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def _get_relevant_documents(
         self, query: str, *, run_manager: CallbackManagerForRetrieverRun

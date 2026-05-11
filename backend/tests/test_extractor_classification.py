@@ -97,7 +97,6 @@ def test_flatten_json_payload():
         print(f"  ✅ 通過")
 
     print("\n✅ _flatten_json_payload 測試完成\n")
-    return True
 
 
 def test_normalize_extracted_entities():
@@ -141,7 +140,6 @@ def test_normalize_extracted_entities():
             print(f"  ✅ 處理完成")
 
     print("\n✅ _normalize_extracted_entities 測試完成\n")
-    return True
 
 
 def test_query_classification_after_normalization():
@@ -203,7 +201,7 @@ def test_query_classification_after_normalization():
     else:
         print("❌ 部分分類測試失敗")
     print("=" * 60)
-    return all_passed
+    assert all_passed
 
 
 def main():

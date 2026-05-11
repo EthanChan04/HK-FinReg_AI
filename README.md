@@ -18,6 +18,7 @@
 - [Methodology](#methodology)
 - [API Surface](#api-surface)
 - [Technology Stack](#technology-stack)
+- [Installation](#installation)
 - [Configuration](#configuration)
 - [Development Workflow](#development-workflow)
 - [Quality Assurance](#quality-assurance)
@@ -112,6 +113,25 @@ flowchart LR
 | LLM/Embedding | Zhipu GLM family, LongCat, Zhipu Embeddings |
 | Observability | LangSmith |
 
+## Installation
+
+### Python Backend Dependencies (Canonical Entrypoint)
+
+Install backend dependencies from the repository root:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+`requirements.txt` is a thin entrypoint that delegates to `backend/requirements.txt`, which is the single source of truth for backend dependency versions.
+
+### Frontend Dependencies
+
+```bash
+cd frontend
+npm install
+```
+
 ## Configuration
 
 ### Backend Environment
@@ -153,7 +173,7 @@ npm run dev
 ### Dependency Security Audit
 
 ```bash
-python -m pip_audit -r backend/requirements.txt
+python -m pip_audit -r requirements.txt
 cd frontend && npm audit --omit=dev
 ```
 

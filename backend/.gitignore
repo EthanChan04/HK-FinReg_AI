@@ -24,6 +24,14 @@ __pycache__/
 
 # ----- ChromaDB -----
 chroma_data/
+data/indexes/
+data/graph/regulatory_graph.json
+
+# ----- Runtime traces / logs -----
+logs/
+*trace*.txt
+*_trace*.log
+*timeout*.log
 
 # ----- Runtime review queue state -----
 data/interrupt_registry.json

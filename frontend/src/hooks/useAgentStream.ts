@@ -314,6 +314,7 @@ export function useAgentStream() {
   }, []);
 
   const setResumedResult = useCallback((finalReport: string, approved: boolean) => {
+    void approved;
     setState((prev) => ({
       ...prev,
       phase: "done",
