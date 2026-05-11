@@ -94,3 +94,14 @@ coverage/
 .coverage
 htmlcov/
 
+
+# ----- Local Planning / Upgrade Docs (keep local only) -----
+HK-FinReg_AI_RAG_KAG_DeepResearch_Update_Plan.md
+HK-FinReg_AI_Regulatory_Corpus_Plan.md
+future_architecture_analysis.md
+implementation_plan_v3.md
+langgraph_diagram.html
+langgraph_workflow_diagram.md
+项目升级方案.md
+_import_test.txt
+_test_output.txt
