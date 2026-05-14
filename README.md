@@ -1,131 +1,187 @@
-﻿# HK-FinReg AI
+# HK-FinReg AI
 
 <p align="center">
   <a href="./SECURITY.md"><img src="https://img.shields.io/badge/Security-Policy-1f6feb?style=for-the-badge" alt="Security Policy" /></a>
   <img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Frontend-Next.js-111111?style=for-the-badge" alt="Next.js" />
   <img src="https://img.shields.io/badge/Workflow-LangGraph-7a3cff?style=for-the-badge" alt="LangGraph" />
-  <img src="https://img.shields.io/badge/Retrieval-RAG%20%2B%20KAG-2ea44f?style=for-the-badge" alt="RAG + KAG" />
+  <img src="https://img.shields.io/badge/Retrieval-Hybrid%20RAG-2ea44f?style=for-the-badge" alt="Hybrid RAG" />
+  <img src="https://img.shields.io/badge/Reasoning-KAG%20%2B%20DeepResearch-2ea44f?style=for-the-badge" alt="KAG + DeepResearch" />
 </p>
 
-**HK-FinReg AI** is a compliance intelligence platform for Hong Kong financial regulation, designed for production-grade engineering workflows and research-grade methodological transparency. The system combines retrieval-augmented generation (RAG), knowledge-assisted generation (KAG), and multi-stage deep research orchestration to produce evidence-grounded regulatory analyses.
+HK-FinReg AI is an internal Regulatory Intelligence and Compliance Operations Platform for Hong Kong banking teams.
 
-## Table of Contents
+It helps compliance, AML, KYC, product, legal, regulatory affairs, and audit teams run evidence-backed compliance reviews, policy impact analysis, regulatory research, obligation mapping, and human review workflows.
 
-- [Executive Summary](#executive-summary)
-- [Scope](#scope)
-- [System Architecture](#system-architecture)
-- [Methodology](#methodology)
-- [API Surface](#api-surface)
-- [Technology Stack](#technology-stack)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Development Workflow](#development-workflow)
-- [Quality Assurance](#quality-assurance)
-- [Data Governance and Security](#data-governance-and-security)
-- [Reproducibility and Benchmarking](#reproducibility-and-benchmarking)
-- [Repository Structure](#repository-structure)
-- [Limitations](#limitations)
-- [Citation](#citation)
-- [License](#license)
+The platform combines:
 
-## Executive Summary
+- Hybrid regulatory retrieval with BM25, dense embeddings, reciprocal rank fusion, optional reranking, and citation audit metadata.
+- KAG, a regulatory knowledge graph layer for obligation, risk, control, regulator, and product mapping.
+- DeepResearch workflows for multi-step planning, evidence gathering, gap analysis, and memo/report synthesis.
+- Compliance Copilot, a context-aware bilingual assistant that routes user intent across RAG, KAG, DeepResearch, workflow recommendations, and human review support.
+- Human-in-the-loop gates for low-confidence, missing-evidence, and manual-approval cases.
 
-HK-FinReg AI provides:
+## Current Capabilities
 
-- End-to-end compliance analysis workflows across key financial scenarios.
-- Hybrid retrieval and ranking for high-recall, high-precision evidence discovery.
-- Knowledge graph reasoning for cross-document regulatory linkage.
-- Streaming multi-agent execution with explicit intermediate states.
-- Human review queue support for supervisory and expert escalation.
-- Deterministic evaluation pipelines for benchmarking and regression tracking.
+### Bank Workspaces
 
-## Scope
+The frontend organizes workflows into six bank ToB workspaces:
 
-The current implementation supports the following domain workflows:
+1. Customer & Account Compliance
+2. Transaction & Payment Compliance
+3. Product & Business Launch Review
+4. Regulatory Research & Policy Change
+5. Human Review & Audit
+6. Regulatory Knowledge Base
 
-- Stored Value Facility (SVF) compliance analysis
-- Bank account onboarding and verification review
-- Cross-border payment compliance assessment
-- SME lending and credit-related compliance workflow
-- DeepResearch for multi-step regulatory investigation
-- Human-in-the-loop review queue continuation
+### Workflow Routing
 
-## System Architecture
+- Routine compliance review uses Hybrid RAG.
+- Obligation, risk, and control mapping uses RAG + KAG.
+- Product launch, AI governance, regulatory memo, and policy impact workflows use DeepResearch.
+- Low-confidence and missing-evidence cases can pause for Human Review.
+- Compliance Copilot classifies intent and routes to the appropriate backend tool path.
+
+### Compliance Copilot
+
+Compliance Copilot is implemented as a streaming chat assistant:
+
+- Uses `MiMo-v2.5` through OpenAI-compatible model settings.
+- Reads active workspace, workflow, input, report, evidence, graph, research plan, confidence, and review-gate context from the frontend.
+- Streams SSE events: `intent`, `tool_call`, `evidence`, `graph`, `token`, `citation_audit`, and `done`.
+- Produces a bilingual response contract with Traditional Chinese first and English second.
+- Applies guardrails against final approval/rejection decisions and legal-advice claims.
+- Surfaces unsupported-claim and low-confidence signals for audit-friendly review.
+
+### Engineering Upgrades
+
+- Evidence metadata includes RRF score and richer display fields for the Evidence Panel.
+- Citation verifier returns explanation fields and audit summaries.
+- KAG ontology and graph retrieval support obligation, risk, and control mapping.
+- KAG APIs expose obligation mapping and graph search.
+- DeepResearch request schema supports `task_type`, `output_format`, and `product_profile`.
+- Obligation Mapper regression assets and release thresholds are wired into CI.
+- Reranker cooldown handling reduces repeated external failures after Cohere `429` responses.
+- Frontend API proxy keeps backend bearer tokens server-side.
+
+## Architecture
 
 ```mermaid
 flowchart LR
-  A["Client Layer\nNext.js + React + TypeScript"] -->|"REST + SSE"| B["Service Layer\nFastAPI"]
-  B --> B1["API Routers"]
-  B --> B2["Agent Services"]
-  B --> B3["Retrieval Services"]
-  B --> B4["KAG Services"]
-  B --> B5["DeepResearch Services"]
-  B --> B6["Corpus Services"]
-  B --> B7["Evaluation Services"]
-  B --> C["Data Layer"]
-  C --> C1["Regulatory Corpus + Manifest"]
-  C --> C2["Vector Index + Cache"]
-  C --> C3["Regulatory Graph Store"]
+  A["Next.js Frontend"] -->|"Server-side proxy + SSE"| B["FastAPI Backend"]
+  B --> C["Hybrid Retrieval: BM25 + Dense + RRF + Optional Rerank"]
+  B --> D["KAG: Graph Store + Graph Retriever + Obligation Mapper"]
+  B --> E["DeepResearch: Planner + Evidence Evaluator + Workflow"]
+  B --> H["Human Review Queue + Workflow Checkpoints"]
+  C --> F["Evidence + Citation Audit"]
+  D --> F
+  E --> F
+  H --> G["Compliance Report / Memo / Mapping"]
+  F --> G
 ```
-
-## Methodology
-
-### 1. Retrieval and Evidence Formation
-
-- Sparse retrieval (BM25) and dense retrieval are executed in parallel.
-- Reciprocal Rank Fusion (RRF) merges candidate sets.
-- Optional reranking refines ordering for evidence relevance.
-- Citation verification validates evidential support before final synthesis.
-
-### 2. Knowledge-Assisted Reasoning (KAG)
-
-- The system derives a regulatory graph from corpus metadata and semantic relations.
-- Graph traversal supports contextual expansion, dependency tracing, and regulatory linkage analysis.
-
-### 3. DeepResearch Orchestration
-
-- Query decomposition and plan generation
-- Evidence acquisition and iterative gap detection
-- Structured synthesis into analyst-facing compliance narratives
 
 ## API Surface
 
-| Module | Endpoint | Contract |
-| --- | --- | --- |
-| SVF Compliance | `POST /api/v1/svf/analyze/stream` | SSE stream with intermediate agent events and final report |
-| Bank Account | `POST /api/v1/bank-account/verify/stream` | SSE stream for onboarding/verification compliance |
-| Cross-Border | `POST /api/v1/cross-border/assess/stream` | SSE stream for cross-border risk/compliance assessment |
-| SME Lending | `POST /api/v1/sme/credit-rating/stream` | SSE stream for lending compliance workflow |
-| DeepResearch | `POST /api/v1/research/analyze` | Structured multi-stage regulatory analysis output |
-| Review Queue | `/api/v1/review-queue/*` | Human review continuation and stateful escalation |
+### Streaming Compliance Workflows
 
-## Technology Stack
+- `POST /api/v1/svf/analyze/stream`
+- `POST /api/v1/bank-account/verify/stream`
+- `POST /api/v1/cross-border/assess/stream`
+- `POST /api/v1/sme/credit-rating/stream`
 
-| Layer | Technologies |
-| --- | --- |
-| Frontend | Next.js, React, TypeScript |
-| Backend | FastAPI, Pydantic, SSE |
-| Workflow Engine | LangGraph |
-| Retrieval | ChromaDB, BM25, RRF |
-| Graph | NetworkX |
-| Reranking | Cohere (optional) |
-| LLM/Embedding | Zhipu GLM family, LongCat, Zhipu Embeddings |
-| Observability | LangSmith |
+These endpoints return SSE events such as `agent_state`, `token`, `confidence`, `checkpoint_saved`, `action_required`, `evidence_chunks`, `graph_paths`, `research_plan`, and `done`.
+
+### Compliance Copilot
+
+- `POST /api/v1/copilot/chat/stream`
+
+Copilot returns SSE events:
+
+- `intent`
+- `tool_call`
+- `evidence`
+- `graph`
+- `token`
+- `citation_audit`
+- `done`
+
+### KAG
+
+- `POST /api/v1/kag/obligation-map`
+- `POST /api/v1/kag/graph/search`
+
+### DeepResearch
+
+- `POST /api/v1/research/analyze`
+
+Supported `task_type` values include:
+
+- `routine_review`
+- `product_launch_review`
+- `ai_governance_review`
+- `cross_regulator_analysis`
+- `regulatory_memo`
+- `checklist_generation`
+- `regulatory_change_impact`
+
+### Human Review and Operations
+
+- `GET /api/v1/review-queue/pending`
+- `POST /api/v1/review-queue/{workflow_run_id}/resume`
+- `POST /api/v1/review-queue/{workflow_run_id}/reject`
+- `GET /api/v1/health`
+- `GET /api/v1/metrics`
+
+Most business endpoints are protected by bearer-token API key validation when `API_KEY_ENABLED=True`.
+
+## Repository Layout
+
+```text
+.
+|-- backend/
+|   |-- app/
+|   |   |-- api/routers/          # FastAPI routes
+|   |   |-- core/                 # configuration, security, monitoring
+|   |   |-- schemas/              # request/response models
+|   |   `-- services/             # agents, retrieval, KAG, DeepResearch, Copilot
+|   |-- data/                     # regulatory source manifest, indexes, graph data
+|   `-- tests/                    # backend unit/regression tests
+|-- frontend/
+|   |-- src/app/                  # Next.js app and API proxy
+|   |-- src/components/           # dashboard, evidence, report, graph, chat UI
+|   |-- src/hooks/                # streaming workflow and Copilot hooks
+|   |-- src/lib/                  # workspace config, routing, report formatting
+|   `-- scripts/                  # workspace validation
+|-- docs/
+|   |-- product/                  # product architecture and Copilot notes
+|   `-- superpowers/plans/        # implementation plans
+|-- .github/workflows/            # release gates
+|-- requirements.txt              # root backend dependency entrypoint
+|-- SECURITY.md
+`-- README.md
+```
+
+## Prerequisites
+
+- Python 3.11+
+- Node.js 20+
+- npm
+- Model/API credentials for the configured OpenAI-compatible endpoints
+- Optional Cohere API key for reranking
+- Optional LangSmith credentials for tracing
 
 ## Installation
 
-### Python Backend Dependencies (Canonical Entrypoint)
-
-Install backend dependencies from the repository root:
+### Backend
 
 ```bash
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-`requirements.txt` is a thin entrypoint that delegates to `backend/requirements.txt`, which is the single source of truth for backend dependency versions.
+The root `requirements.txt` delegates to `backend/requirements.txt`, which is the canonical backend dependency list.
 
-### Frontend Dependencies
+### Frontend
 
 ```bash
 cd frontend
@@ -134,100 +190,126 @@ npm install
 
 ## Configuration
 
-### Backend Environment
-
-Create `backend/.env` from the project template and configure:
-
-- Provider credentials (`ZHIPU_API_KEY`, `LONGCAT_API_KEY`, optional `COHERE_API_KEY`)
-- Model and endpoint settings
-- API security controls (`API_KEY_ENABLED`, `API_KEY`)
-- Corpus/index/graph storage configuration
-- Retrieval and DeepResearch feature toggles
-
-### Frontend Environment
-
-Configure `frontend/.env.local`:
-
-- `NEXT_PUBLIC_API_BASE`
-- `NEXT_PUBLIC_API_KEY`
-
-## Development Workflow
-
 ### Backend
+
+Create `backend/.env` from `backend/.env.example`:
 
 ```bash
 cd backend
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+cp .env.example .env
 ```
+
+Configure at least:
+
+- `ZHIPU_API_KEY` and/or `LONGCAT_API_KEY`
+- `ZHIPU_BASE_URL`, `LONGCAT_BASE_URL`, `ZHIPU_MODEL`, and `LONGCAT_MODEL`
+- Embedding settings: `EMBEDDING_PROVIDER`, `EMBEDDING_MODEL`, `EMBEDDING_BASE_URL`, `EMBEDDING_API_KEY`, `EMBEDDING_DIMENSIONS`
+- Copilot settings: `COPILOT_MODEL`, `COPILOT_BASE_URL`, `COPILOT_API_KEY`, `COPILOT_TIMEOUT_SECONDS`, `COPILOT_MAX_CONTEXT_CHARS`, `COPILOT_MAX_HISTORY_MESSAGES`
+- `API_KEY_ENABLED` and `API_KEY`
+- Optional `COHERE_API_KEY`
+- Optional LangSmith variables: `LANGCHAIN_TRACING_V2`, `LANGCHAIN_ENDPOINT`, `LANGCHAIN_API_KEY`, `LANGCHAIN_PROJECT`
+- CORS settings for deployed frontend origins
 
 ### Frontend
 
+Create `frontend/.env.local` from `frontend/.env.example`:
+
 ```bash
 cd frontend
-npm install
-npm run dev
+cp .env.example .env.local
 ```
 
-## Quality Assurance
+Configure:
 
-### Dependency Security Audit
+- `BACKEND_API_BASE`, usually `http://127.0.0.1:8000` for local development.
+- `BACKEND_API_KEY`, which should match backend `API_KEY` when API key validation is enabled.
+
+Do not expose backend credentials with a `NEXT_PUBLIC_` prefix.
+
+## Local Development
+
+Start the backend:
 
 ```bash
-python -m pip_audit -r requirements.txt
-cd frontend && npm audit --omit=dev
+cd backend
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-### Automated Evaluation
+Start the frontend:
+
+```bash
+cd frontend
+npm run dev -- --hostname 127.0.0.1 --port 3000
+```
+
+Open:
+
+- Frontend: `http://127.0.0.1:3000`
+- Backend health check: `http://127.0.0.1:8000/api/v1/health`
+- Backend Swagger UI, only when `DEBUG=True`: `http://127.0.0.1:8000/docs`
+
+## Testing and Quality Gates
+
+### Backend Tests
+
+```bash
+python -m pytest backend/tests -q
+```
+
+### Frontend Checks
+
+```bash
+cd frontend
+npm run validate:workspaces
+npm run lint
+npm run build
+```
+
+### Retrieval/KAG Evaluation
 
 ```bash
 cd backend
 python -m app.services.evaluation.run_eval
 ```
 
-### Test and Build Checks
+### Obligation Mapper Regression Gate
 
 ```bash
-python -m pytest backend/tests -q
-cd frontend && npm run lint && npm run build
+cd backend
+python -m app.services.evaluation.run_obligation_mapper_regression
 ```
 
-## Data Governance and Security
+The regression gate writes:
 
-- Secrets and runtime credentials are excluded from version control.
-- API key authentication is supported for service-layer access control.
-- Evidence validation and citation checks are integrated into output generation.
-- The repository includes dedicated security guidance in `SECURITY.md`.
+- `backend/tests/regression/obligation_mapper/latest_regression_report.json`
 
-## Reproducibility and Benchmarking
+Current release thresholds:
 
-The benchmark framework is designed for deterministic regression monitoring across retrieval and synthesis components. For metric definitions and protocol details, refer to:
+- Regulator Coverage >= 0.90
+- Obligation Coverage >= 0.85
+- Evidence Support Rate >= 0.90
+- Structured Output Validity = 1.00
 
-- `docs/evaluation_protocol.md`
+### CI
 
-## Repository Structure
+`.github/workflows/release-gates.yml` runs:
 
-```text
-.
-├─ backend/
-│  ├─ app/
-│  ├─ data/
-│  └─ tests/
-├─ frontend/
-│  └─ src/
-├─ docs/
-├─ SECURITY.md
-└─ README.md
-```
+1. Backend test suite
+2. Obligation Mapper regression gate
+3. Frontend lint and build
 
-## Limitations
+## Runtime Notes
 
-- Model outputs may reflect source ambiguity and should be validated by qualified professionals.
-- Regulatory interpretation is jurisdiction- and context-dependent.
-- This system is decision-support infrastructure, not legal counsel.
+- The backend defaults to `DEBUG=False`; Swagger and `/test` are only exposed when debug mode is enabled.
+- `API_KEY_ENABLED=True` is the secure default for business APIs.
+- The frontend talks to the backend through `/api/backend/...`; the proxy allowlist intentionally exposes only known backend paths.
+- If Cohere rerank returns `429`, the system cools down and falls back to top-k retrieval without reranking.
+- Some historical source comments/docstrings still contain mojibake, but the runtime APIs and user-facing README have been normalized.
+- This project is decision-support tooling for internal compliance analysis. It is not legal advice and must not be treated as final regulatory approval.
 
-## Citation
+## Security
 
-If you use this project in research or internal methodology reports, cite the repository and commit hash used for reproducibility.
+See [SECURITY.md](./SECURITY.md) for security policy and reporting guidance.
 
 ## License
 

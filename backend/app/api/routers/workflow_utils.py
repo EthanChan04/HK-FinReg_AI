@@ -1,14 +1,14 @@
-"""
-多路由共享工作流工具函数集 (P4.1)
+﻿"""
+澶氳矾鐢卞叡浜伐浣滄祦宸ュ叿鍑芥暟闆?(P4.1)
 
-设计原则：组合优于继承。各路由按需组合调用，不强制实现接口。
+璁捐鍘熷垯锛氱粍鍚堜紭浜庣户鎵裤€傚悇璺敱鎸夐渶缁勫悎璋冪敤锛屼笉寮哄埗瀹炵幇鎺ュ彛銆?
 
-提供的工具函数：
-  1. format_sse_event    — 统一 SSE 事件格式化
-  2. create_streaming_response — 流式响应包装（预播报 + 异步图执行 + 逐行 token）
-  3. build_review_edges  — 反思循环条件边工厂
-  4. create_initial_state — State 初始化工厂
-  5. build_format_validator — 格式验证中间件工厂
+鎻愪緵鐨勫伐鍏峰嚱鏁帮細
+  1. format_sse_event    鈥?缁熶竴 SSE 浜嬩欢鏍煎紡鍖?
+  2. create_streaming_response 鈥?娴佸紡鍝嶅簲鍖呰锛堥鎾姤 + 寮傛鍥炬墽琛?+ 閫愯 token锛?
+  3. build_review_edges  鈥?鍙嶆€濆惊鐜潯浠惰竟宸ュ巶
+  4. create_initial_state 鈥?State 鍒濆鍖栧伐鍘?
+  5. build_format_validator 鈥?鏍煎紡楠岃瘉涓棿浠跺伐鍘?
 """
 import asyncio
 import json
@@ -18,24 +18,24 @@ from langgraph.graph import StateGraph, END
 
 
 # ==========================================
-# 1. 统一 SSE 事件格式化
+# 1. 缁熶竴 SSE 浜嬩欢鏍煎紡鍖?
 # ==========================================
 
 def format_sse_event(event_type: str, data: dict) -> str:
-    """统一 SSE 事件格式化
+    """缁熶竴 SSE 浜嬩欢鏍煎紡鍖?
 
     Args:
-        event_type: 事件类型（agent_state / token / done / confidence）
-        data: 事件数据字典
+        event_type: 浜嬩欢绫诲瀷锛坅gent_state / token / done / confidence锛?
+        data: 浜嬩欢鏁版嵁瀛楀吀
 
     Returns:
-        格式化的 SSE 字符串
+        鏍煎紡鍖栫殑 SSE 瀛楃涓?
     """
     return f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
 # ==========================================
-# 2. 流式响应包装
+# 2. 娴佸紡鍝嶅簲鍖呰
 # ==========================================
 
 async def create_streaming_response(
@@ -44,26 +44,35 @@ async def create_streaming_response(
     agent_steps: list[tuple[str, str]],
     max_revisions: int = 2,
 ) -> AsyncGenerator[str, None]:
-    """流式响应包装：agent 状态播报 + 异步图执行 + 逐行推送
+    """娴佸紡鍝嶅簲鍖呰锛歛gent 鐘舵€佹挱鎶?+ 寮傛鍥炬墽琛?+ 閫愯鎺ㄩ€?
 
-    采用 asyncio.to_thread 避免同步图阻塞 ASGI 事件循环。
+    閲囩敤 asyncio.to_thread 閬垮厤鍚屾鍥鹃樆濉?ASGI 浜嬩欢寰幆銆?
 
     Args:
-        graph_fn: 同步图执行函数（如 _run_vb_graph）
-        safe_input: 脱敏后的输入文本
-        agent_steps: [(agent_name, message), ...] 状态播报列表
-        max_revisions: 最大修订次数（传递给图函数内部逻辑）
+        graph_fn: 鍚屾鍥炬墽琛屽嚱鏁帮紙濡?_run_vb_graph锛?
+        safe_input: 鑴辨晱鍚庣殑杈撳叆鏂囨湰
+        agent_steps: [(agent_name, message), ...] 鐘舵€佹挱鎶ュ垪琛?
+        max_revisions: 鏈€澶т慨璁㈡鏁帮紙浼犻€掔粰鍥惧嚱鏁板唴閮ㄩ€昏緫锛?
     """
-    # 1. 播报 agent 状态
+    # 1. 鎾姤 agent 鐘舵€?
     for agent_name, msg in agent_steps:
         yield format_sse_event("agent_state", {
             "agent": agent_name, "status": "running", "message": msg
         })
 
-    # 2. 在线程池中执行同步图（避免阻塞 ASGI）
-    report = await asyncio.to_thread(graph_fn, safe_input)
+    # 2. 鍦ㄧ嚎绋嬫睜涓墽琛屽悓姝ュ浘锛堥伩鍏嶉樆濉?ASGI锛?
+    try:
+        report = await asyncio.to_thread(graph_fn, safe_input)
+    except Exception as exc:
+        yield format_sse_event("error", {
+            "status": "error",
+            "message": str(exc) or type(exc).__name__,
+            "error_type": type(exc).__name__,
+        })
+        yield format_sse_event("done", {"status": "error"})
+        return
 
-    # 3. 逐行推送报告
+    # 3. 閫愯鎺ㄩ€佹姤鍛?
     from app.services.utils import format_output
     formatted = format_output(report)
     for line in formatted.split("\n"):
@@ -73,7 +82,7 @@ async def create_streaming_response(
 
 
 # ==========================================
-# 3. 反思循环条件边工厂
+# 3. 鍙嶆€濆惊鐜潯浠惰竟宸ュ巶
 # ==========================================
 
 def build_review_edges(
@@ -84,43 +93,46 @@ def build_review_edges(
     max_revisions: int = 2,
     max_retrieval_rounds: int = 0,
 ) -> None:
-    """反思循环条件边工厂
+    """鍙嶆€濆惊鐜潯浠惰竟宸ュ巶
 
-    根据 reviewer 节点的输出决定下一步路由：
-    - end: 审查通过或超过修订上限 → 结束
-    - revise: 质量问题 → 回到 analyzer 修订
-    - re_retrieve: 信息不足 → 经过 planner 再检索
+    鏍规嵁 reviewer 鑺傜偣鐨勮緭鍑哄喅瀹氫笅涓€姝ヨ矾鐢憋細
+    - end: 瀹℃煡閫氳繃鎴栬秴杩囦慨璁笂闄?鈫?缁撴潫
+    - revise: 璐ㄩ噺闂 鈫?鍥炲埌 analyzer 淇
+    - re_retrieve: 淇℃伅涓嶈冻 鈫?缁忚繃 planner 鍐嶆绱?
 
     Args:
-        workflow: StateGraph 实例
-        reviewer_node: Reviewer 节点名
-        analyzer_node: Analyzer 节点名（修订目标）
-        planner_node: SubQueryPlanner 节点名（None 表示无二次检索）
-        max_revisions: 最大修订次数
-        max_retrieval_rounds: 最大二次检索次数（0 = 不支持）
+        workflow: StateGraph 瀹炰緥
+        reviewer_node: Reviewer 鑺傜偣鍚?
+        analyzer_node: Analyzer 鑺傜偣鍚嶏紙淇鐩爣锛?
+        planner_node: SubQueryPlanner 鑺傜偣鍚嶏紙None 琛ㄧず鏃犱簩娆℃绱級
+        max_revisions: 鏈€澶т慨璁㈡鏁?
+        max_retrieval_rounds: 鏈€澶т簩娆℃绱㈡鏁帮紙0 = 涓嶆敮鎸侊級
     """
     def route_fn(state):
         rev_count = state.get("revision_count", 0)
         feedback = state.get("reviewer_feedback", "")
 
-        # 已通过或超过修订上限
+        # 宸查€氳繃鎴栬秴杩囦慨璁笂闄?
         if not feedback or rev_count >= max_revisions:
             return "end"
 
-        # 如果支持二次检索且未达上限
+        # 濡傛灉鏀寔浜屾妫€绱笖鏈揪涓婇檺
         if max_retrieval_rounds > 0 and planner_node:
             retrieval_round = state.get("retrieval_round", 0)
             if retrieval_round < max_retrieval_rounds:
-                # 结构化 rejection_type 优先
+                # 缁撴瀯鍖?rejection_type 浼樺厛
                 rejection_type = state.get("rejection_type", "")
                 if rejection_type == "insufficient_info":
                     return "re_retrieve"
-                # Fallback: 关键词匹配
+                # Fallback: 鍏抽敭璇嶅尮閰?
                 if rejection_type == "":
                     needs_retrieval_keywords = [
-                        "missing", "insufficient", "lack", "not found",
-                        "not available", "inadequate",
-                        "缺少", "不足", "未找到", "需要更多信息",
+                        "missing",
+                        "insufficient",
+                        "lack",
+                        "not found",
+                        "not available",
+                        "inadequate",
                     ]
                     if any(kw in feedback.lower() for kw in needs_retrieval_keywords):
                         return "re_retrieve"
@@ -138,28 +150,28 @@ def build_review_edges(
 
 
 # ==========================================
-# 4. State 初始化工厂
+# 4. State 鍒濆鍖栧伐鍘?
 # ==========================================
 
 def create_initial_state(safe_input: str, **extra) -> dict:
-    """统一 State 初始化工厂
+    """缁熶竴 State 鍒濆鍖栧伐鍘?
 
-    各路由追加自定义字段：
+    鍚勮矾鐢辫拷鍔犺嚜瀹氫箟瀛楁锛?
 
     SVF:
         create_initial_state(safe_input,
             retrieval_round=0, format_retry_count=0,
             accumulated_docs=[], sub_queries=[], rejection_type="")
 
-    其他路由:
+    鍏朵粬璺敱:
         create_initial_state(safe_input)
 
     Args:
-        safe_input: 脱敏后的输入文本
-        **extra: 各路由的自定义初始字段
+        safe_input: 鑴辨晱鍚庣殑杈撳叆鏂囨湰
+        **extra: 鍚勮矾鐢辩殑鑷畾涔夊垵濮嬪瓧娈?
 
     Returns:
-        初始 State 字典
+        鍒濆 State 瀛楀吀
     """
     base = {
         "original_input": safe_input,
@@ -172,7 +184,7 @@ def create_initial_state(safe_input: str, **extra) -> dict:
 
 
 # ==========================================
-# 5. 格式验证中间件工厂
+# 5. 鏍煎紡楠岃瘉涓棿浠跺伐鍘?
 # ==========================================
 
 def build_format_validator(
@@ -180,15 +192,15 @@ def build_format_validator(
     schema_cls: type,
     max_retries: int = 2,
 ) -> Callable:
-    """格式验证中间件工厂
+    """鏍煎紡楠岃瘉涓棿浠跺伐鍘?
 
     Args:
-        parse_fn: 将 Markdown 文本解析为字典的函数
-        schema_cls: Pydantic 模型类（如 AnalyzerOutput）
-        max_retries: 最大重试次数
+        parse_fn: 灏?Markdown 鏂囨湰瑙ｆ瀽涓哄瓧鍏哥殑鍑芥暟
+        schema_cls: Pydantic 妯″瀷绫伙紙濡?AnalyzerOutput锛?
+        max_retries: 鏈€澶ч噸璇曟鏁?
 
     Returns:
-        format_validator_node 函数（可直接注册到 StateGraph）
+        format_validator_node 鍑芥暟锛堝彲鐩存帴娉ㄥ唽鍒?StateGraph锛?
     """
     def format_validator_node(state):
         from pydantic import ValidationError
@@ -225,3 +237,4 @@ def build_format_validator(
             }
 
     return format_validator_node
+

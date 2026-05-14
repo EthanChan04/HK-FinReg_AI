@@ -10,9 +10,9 @@ from threading import Lock
 from typing import List, Optional, Tuple
 
 from langchain_core.documents import Document
-from langchain_openai import OpenAIEmbeddings
 
 from app.core.config import get_settings
+from app.services.agents.builder import build_embeddings_client
 from app.services.utils import pii_scrubber
 
 
@@ -38,7 +38,7 @@ def _cosine_similarity(a: List[float], b: List[float]) -> float:
 class SemanticCache:
     def __init__(
         self,
-        embeddings: OpenAIEmbeddings,
+        embeddings,
         similarity_threshold: float = 0.80,
         max_entries: int = 200,
         ttl_seconds: int = 3600,
@@ -98,16 +98,8 @@ def get_semantic_cache() -> Optional[SemanticCache]:
     settings = get_settings()
     if not settings.SEMANTIC_CACHE_ENABLED:
         return None
-    if not settings.ZHIPU_API_KEY:
-        print("[SVF][CACHE] Disabled: missing embedding API key.")
-        return None
 
-    embeddings = OpenAIEmbeddings(
-        model=settings.ZHIPU_EMBEDDING_MODEL,
-        openai_api_key=settings.ZHIPU_API_KEY,
-        openai_api_base=settings.ZHIPU_BASE_URL,
-        chunk_size=64,
-    )
+    embeddings = build_embeddings_client()
     return SemanticCache(
         embeddings=embeddings,
         similarity_threshold=settings.SEMANTIC_CACHE_THRESHOLD,

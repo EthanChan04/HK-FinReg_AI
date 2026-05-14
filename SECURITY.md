@@ -27,7 +27,7 @@ We will acknowledge receipt within 48 hours and provide a timeline for a fix.
 - All API keys are loaded from `.env` files which are **excluded from version control** via `.gitignore`
 - `.env.example` files provide templates with placeholder values only
 - The backend is configured to use `Authorization: Bearer <key>` protection by default
-- The frontend can forward the same bearer token through `NEXT_PUBLIC_API_KEY` for local or private deployments
+- The frontend must not expose backend tokens via `NEXT_PUBLIC_*`; use server-side proxy env vars like `BACKEND_API_KEY` only
 
 ### CORS Policy
 - Cross-Origin Resource Sharing is restricted to explicitly allowed origins

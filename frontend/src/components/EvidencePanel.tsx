@@ -10,6 +10,20 @@ interface Props {
   isLoading: boolean;
 }
 
+function readNumericMetadata(
+  metadata: Record<string, unknown> | undefined,
+  key: string
+): number | null {
+  if (!metadata) return null;
+  const value = metadata[key];
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
 function ScoreBar({ score }: { score: number | null | undefined }) {
   if (score == null) return null;
   const pct = Math.round(score * 100);
@@ -182,6 +196,24 @@ export default function EvidencePanel({ evidence, isLoading }: Props) {
                       <span className="ml-auto">{chunk.jurisdiction}</span>
                     )}
                   </div>
+
+                  {(() => {
+                    const metadata = (chunk.metadata ?? {}) as Record<string, unknown>;
+                    const rerankScore = readNumericMetadata(metadata, "rerank_score");
+                    const rrfScore = readNumericMetadata(metadata, "rrf_score");
+                    const priority =
+                      typeof metadata.priority === "string" ? metadata.priority : null;
+                    if (rerankScore == null && rrfScore == null && !priority) return null;
+                    return (
+                      <div className="flex items-center gap-2 text-[10px] text-gray-500 font-mono">
+                        {rerankScore != null && (
+                          <span>rerank:{rerankScore.toFixed(3)}</span>
+                        )}
+                        {rrfScore != null && <span>rrf:{rrfScore.toFixed(4)}</span>}
+                        {priority && <span>priority:{priority}</span>}
+                      </div>
+                    );
+                  })()}
                 </div>
               </button>
 

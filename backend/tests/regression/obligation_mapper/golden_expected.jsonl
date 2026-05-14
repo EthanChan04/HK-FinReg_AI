@@ -1,0 +1,20 @@
+{"case_id": "L1-001", "applicable_regulators": ["HKMA"], "risk_types": ["AML/CFT"], "obligations": ["CDD"], "evidence_chunks": ["source_1"]}
+{"case_id": "L1-002", "applicable_regulators": ["HKMA"], "risk_types": ["AML/CFT"], "obligations": ["CDD", "Record Keeping"], "evidence_chunks": ["source_1"]}
+{"case_id": "L1-003", "applicable_regulators": ["SFC"], "risk_types": ["Conduct Risk"], "obligations": ["Suitability"], "evidence_chunks": ["source_1"]}
+{"case_id": "L1-004", "applicable_regulators": ["HKMA"], "risk_types": ["AML/CFT"], "obligations": ["CDD"], "evidence_chunks": ["source_1"]}
+{"case_id": "L1-005", "applicable_regulators": ["HKMA", "PCPD"], "risk_types": ["Data Privacy", "Model Risk"], "obligations": ["Human Oversight"], "evidence_chunks": ["source_1"]}
+{"case_id": "L1-006", "applicable_regulators": ["HKMA"], "risk_types": ["AML/CFT", "Fraud"], "obligations": ["Ongoing Monitoring"], "evidence_chunks": ["source_1"]}
+{"case_id": "L1-007", "applicable_regulators": ["PCPD"], "risk_types": ["Data Privacy"], "obligations": ["Data Protection"], "evidence_chunks": ["source_1"]}
+{"case_id": "L2-008", "applicable_regulators": ["HKMA", "PCPD", "JFIU"], "risk_types": ["AML/CFT", "Data Privacy", "Fraud", "Model Risk"], "obligations": ["CDD", "Human Oversight"], "evidence_chunks": ["source_1"]}
+{"case_id": "L2-009", "applicable_regulators": ["HKMA", "PCPD"], "risk_types": ["Model Risk", "Data Privacy"], "obligations": ["Model Governance", "Data Protection"], "evidence_chunks": ["source_1"]}
+{"case_id": "L2-010", "applicable_regulators": ["SFC", "PCPD"], "risk_types": ["Conduct Risk", "Model Risk", "Data Privacy"], "obligations": ["Suitability", "Human Oversight"], "evidence_chunks": ["source_1"]}
+{"case_id": "L2-011", "applicable_regulators": ["IA", "PCPD"], "risk_types": ["Model Risk", "Data Privacy"], "obligations": ["Model Governance", "Data Protection"], "evidence_chunks": ["source_1"]}
+{"case_id": "L2-012", "applicable_regulators": ["MPFA", "PCPD"], "risk_types": ["Data Privacy", "Model Risk"], "obligations": ["Human Oversight"], "evidence_chunks": ["source_1"]}
+{"case_id": "L2-013", "applicable_regulators": ["HKMA", "JFIU"], "risk_types": ["AML/CFT", "Fraud", "Model Risk"], "obligations": ["Ongoing Monitoring", "STR"], "evidence_chunks": ["source_1"]}
+{"case_id": "L2-014", "applicable_regulators": ["HKMA", "PCPD"], "risk_types": ["Model Risk", "Data Privacy"], "obligations": ["Human Oversight", "Record Keeping"], "evidence_chunks": ["source_1"]}
+{"case_id": "L3-015", "applicable_regulators": ["HKMA", "PCPD"], "risk_types": ["AML/CFT", "Data Privacy", "Model Risk"], "obligations": ["CDD"], "evidence_chunks": ["source_1"]}
+{"case_id": "L3-016", "applicable_regulators": ["HKMA"], "risk_types": ["AML/CFT"], "obligations": ["CDD"], "evidence_chunks": ["source_1"]}
+{"case_id": "L3-017", "applicable_regulators": ["SFC", "PCPD"], "risk_types": ["Conduct Risk", "Model Risk", "Data Privacy"], "obligations": ["Suitability", "Human Oversight"], "evidence_chunks": ["source_1"]}
+{"case_id": "L3-018", "applicable_regulators": ["HKMA", "PCPD"], "risk_types": ["Data Privacy", "Fraud", "Model Risk"], "obligations": ["Data Protection", "Human Oversight"], "evidence_chunks": ["source_1"]}
+{"case_id": "L3-019", "applicable_regulators": ["HKMA", "PCPD"], "risk_types": ["Data Privacy", "Model Risk", "Cybersecurity"], "obligations": ["Third-party Risk Control", "Human Oversight"], "evidence_chunks": ["source_1"]}
+{"case_id": "L3-020", "applicable_regulators": ["HKMA", "JFIU", "PCPD"], "risk_types": ["AML/CFT", "Fraud", "Data Privacy", "Model Risk"], "obligations": ["Ongoing Monitoring", "STR", "Data Protection"], "evidence_chunks": ["source_1"]}

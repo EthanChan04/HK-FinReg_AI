@@ -10,6 +10,21 @@ def test_deepresearch_fallback_plan_has_minimum_subquestions():
     assert plan.research_goal == "AI investment advisor compliance risks"
 
 
+def test_deepresearch_task_type_templates():
+    from app.schemas.deepresearch import ResearchRequest
+    from app.services.deepresearch.planner import build_research_plan
+
+    request = ResearchRequest(
+        query="Compare HKMA and PCPD obligations for AI onboarding",
+        task_type="cross_regulator_analysis",
+        output_format="memo",
+    )
+    plan = build_research_plan(request.query, request=request)
+
+    assert len(plan.sub_questions) == 4
+    assert "Evidence Appendix" in plan.expected_output_sections
+
+
 def test_evidence_evaluator_reports_gaps():
     from app.services.deepresearch.evidence_evaluator import evaluate_evidence_coverage
     from app.services.deepresearch.planner import fallback_research_plan

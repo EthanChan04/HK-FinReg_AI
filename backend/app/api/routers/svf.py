@@ -1,4 +1,4 @@
-﻿﻿"""
+﻿"""
 SVF 鍚堣瀹℃煡璺敱 (Agentic RAG + 鍙嶆濆惊鐜?
 杩佺Щ鑷?core_logic.py 涓殑 generate_risk_report 澶氭櫤鑳戒綋
 
@@ -436,7 +436,7 @@ def _evaluate_hitl_gate(state: SVFState) -> str:
     return ""
 
 
-NODE_DISPLAY_MAP["hitl_gate"] = ("HITL Gate", "姝ｅ湪璇勪及鏄惁闇瑕佷汉宸ュ鏌?..")
+NODE_DISPLAY_MAP["hitl_gate"] = ("HITL Gate", "Evaluating whether human review is required...")
 
 
 def _build_svf_graph(checkpointer=None):
@@ -1073,7 +1073,7 @@ def _build_svf_graph(checkpointer=None):
         interrupt_payload = {
             "workflow_run_id": workflow_run_id,
             "gate_type": gate,
-            "message": f"宸ヤ綔娴佸凡鏆傚仠锛岀瓑寰呬汉宸ュ鏌?(gate: {gate})",
+            "message": f"Workflow paused and waiting for human review (gate: {gate})",
             "evidence_snapshot": evidence_snapshot,
             "confidence_data": confidence_data,
             "latest_draft_report": state.get("draft_report", "")[:500],
@@ -1122,7 +1122,7 @@ def _build_svf_graph(checkpointer=None):
             # 娑堣垂 additional_context锛氭敞鍏ュ埌 original_input 涓緵涓嬫父鑺傜偣寮曠敤
             updated_input = state.get("original_input", "")
             if additional_context and additional_context.strip():
-                updated_input += f"\n\n[浜哄伐琛ュ厖涓婁笅鏂嘳: {additional_context.strip()}"
+                updated_input += f"\n\n[Human additional context]: {additional_context.strip()}"
                 print(f"[SVF][HITL_GATE] Additional context injected ({len(additional_context)} chars)")
 
             # 鎵瑰噯鍚庢彁鍗囩疆淇″害锛堜汉宸ヨ儗涔︼級锛屾竻闄?gate 鏍囪
@@ -1142,7 +1142,7 @@ def _build_svf_graph(checkpointer=None):
                 "human_review_status": "rejected",
                 "human_review_notes": notes,
                 "current_gate": "",
-                "final_report": f"鉂?鎶ュ憡宸茶浜哄伐椹冲洖銆傚師鍥狅細{notes}",
+                "final_report": f"Report rejected by human review. Reason: {notes}",
                 "total_steps": state.get("total_steps", 0) + 1,
             }
 
@@ -1248,25 +1248,68 @@ def _run_svf_graph(safe_input: str, workflow_run_id: str = "") -> str:
     initial = {**_INITIAL_STATE, "original_input": safe_input, "workflow_run_id": workflow_run_id}
 
     config = {"configurable": {"thread_id": workflow_run_id}, "recursion_limit": 100}
-    final_state = app_graph.invoke(initial, config=config)
+    def _is_timeout_error(exc: Exception) -> bool:
+        name = type(exc).__name__.lower()
+        message = str(exc).lower()
+        timeout_markers = (
+            "timeout",
+            "timed out",
+            "apitimeouterror",
+            "readtimeout",
+            "connecttimeout",
+        )
+        return ("timeout" in name) or any(marker in message for marker in timeout_markers)
+
+    max_timeout_retries = 2
+    final_state = None
+    for attempt in range(1, max_timeout_retries + 2):
+        try:
+            final_state = app_graph.invoke(initial, config=config)
+            break
+        except Exception as exc:
+            is_timeout = _is_timeout_error(exc)
+            if (not is_timeout) or attempt > max_timeout_retries:
+                raise
+            backoff_seconds = min(2 * attempt, 5)
+            print(
+                f"[SVF][SYNC] Upstream timeout on attempt {attempt}/{max_timeout_retries + 1}; "
+                f"retrying in {backoff_seconds}s. error={type(exc).__name__}"
+            )
+            time.sleep(backoff_seconds)
+
+    if final_state is None:
+        raise RuntimeError("SVF graph did not produce a final state.")
+
+    def _extract_interrupt_value(task) -> dict | None:
+        """兼容不同 LangGraph 版本的 interrupt 字段结构。"""
+        legacy_interrupt = getattr(task, "interrupt", None)
+        if legacy_interrupt is not None:
+            return getattr(legacy_interrupt, "value", None)
+
+        interrupts = getattr(task, "interrupts", None)
+        if not interrupts:
+            return None
+
+        first_interrupt = interrupts[0]
+        return getattr(first_interrupt, "value", None)
 
     # 妫娴?interrupt锛歩nvoke() 鍦?interrupt() 澶勮繑鍥炲綋鍓?state
     # 姝ゆ椂 state.next 涓嶄负绌猴紙杩樻湁寰呮墽琛岃妭鐐癸級锛宼asks 涓湁 interrupt 淇℃伅
     state_snapshot = app_graph.get_state(config)
     for task in state_snapshot.tasks:
-        if task.interrupt:
-            interrupt_value = task.interrupt.value
+        interrupt_value = _extract_interrupt_value(task)
+        if interrupt_value:
             gate = interrupt_value.get("gate_type", "unknown")
             return (
-                f"鈴革笍 宸ヤ綔娴佸凡鏆傚仠锛岀瓑寰呬汉宸ュ鏌ャ俓n\n"
-                f"**鏆傚仠鍘熷洜**: {gate}\n"
+                f"⏸ Workflow paused and waiting for human review.\n\n"
+                f"**Pause reason**: {gate}\n"
                 f"**Workflow Run ID**: {workflow_run_id}\n\n"
-                f"璇烽氳繃瀹℃煡闃熷垪 API 鎭㈠鎵ц锛歕n"
-                f"- 鎵瑰噯: POST /api/v1/review-queue/{workflow_run_id}/resume\n"
-                f"- 椹冲洖: POST /api/v1/review-queue/{workflow_run_id}/reject"
+                f"Use the review queue API to continue:\n"
+                f"- Approve: POST /api/v1/review-queue/{workflow_run_id}/resume\n"
+                f"- Reject: POST /api/v1/review-queue/{workflow_run_id}/reject"
             )
 
-    return final_state.get("final_report", "鉂?Report generation failed.")
+    return final_state.get("final_report", "Report generation failed.")
 
 
 # ---- SSE Streaming Generator (astream_events 鐪熷紓姝? ----
@@ -1280,6 +1323,7 @@ def _sse_keepalive() -> str:
 
 GRAPH_BUILD_KEEPALIVE_INTERVAL_SECONDS = 5.0
 GRAPH_EVENT_KEEPALIVE_INTERVAL_SECONDS = 5.0
+SVF_SYNC_TIMEOUT_SECONDS = 180
 
 
 async def _iter_graph_events_with_keepalive(event_source):
@@ -1468,9 +1512,17 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
         try:
             state_snapshot = await asyncio.to_thread(app_graph.get_state, config)
             for task in state_snapshot.tasks:
-                if task.interrupt:
+                interrupt_value = None
+                legacy_interrupt = getattr(task, "interrupt", None)
+                if legacy_interrupt is not None:
+                    interrupt_value = getattr(legacy_interrupt, "value", None)
+                else:
+                    interrupts = getattr(task, "interrupts", None)
+                    if interrupts:
+                        interrupt_value = getattr(interrupts[0], "value", None)
+
+                if interrupt_value:
                     # 浠?interrupt payload 涓幏鍙栧畬鏁寸殑 evidence / confidence 鏁版嵁
-                    interrupt_value = task.interrupt.value
                     action_payload = {
                         "workflow_run_id": workflow_run_id,
                         "gate_type": interrupt_value.get("gate_type", ""),
@@ -1534,15 +1586,46 @@ async def svf_analyze(req: ComplianceRequest):
     tracker = get_tracker()
     start = time.time()
     safe_input = pii_scrubber(req.application_data)
-    report = await asyncio.to_thread(_run_svf_graph, safe_input)
-    formatted = format_output(report)
-    elapsed = time.time() - start
-    tracker.log_query("SVF Multi-Agent (RAG)", elapsed, len(req.application_data), "success")
-    return ComplianceResponse(
-        scrubbed_input=safe_input,
-        final_report=formatted,
-        metrics=ComplianceMetrics(processing_time=round(elapsed, 2))
-    )
+    try:
+        report = await asyncio.wait_for(
+            asyncio.to_thread(_run_svf_graph, safe_input),
+            timeout=SVF_SYNC_TIMEOUT_SECONDS,
+        )
+        formatted = format_output(report)
+        elapsed = time.time() - start
+        tracker.log_query("SVF Multi-Agent (RAG)", elapsed, len(req.application_data), "success")
+        return ComplianceResponse(
+            status="success",
+            scrubbed_input=safe_input,
+            final_report=formatted,
+            metrics=ComplianceMetrics(processing_time=round(elapsed, 2))
+        )
+    except Exception as exc:
+        elapsed = time.time() - start
+        error_name = type(exc).__name__
+        error_text = str(exc)
+        lowered = f"{error_name} {error_text}".lower()
+        is_timeout = ("timeout" in lowered) or ("timed out" in lowered)
+
+        if is_timeout:
+            tracker.log_query("SVF Multi-Agent (RAG)", elapsed, len(req.application_data), "degraded_timeout")
+            recoverable_report = (
+                "服务暂时降级：SVF 分析在调用上游模型时超时。\n\n"
+                "这通常是瞬时抖动，可恢复。建议：\n"
+                "1) 稍后重试（建议 30-90 秒）\n"
+                "2) 缩短输入文本后重试\n"
+                "3) 使用流式接口 `/api/v1/svf/analyze/stream` 获取增量结果\n\n"
+                f"错误类型: {error_name}"
+            )
+            return ComplianceResponse(
+                status="degraded",
+                scrubbed_input=safe_input,
+                final_report=recoverable_report,
+                metrics=ComplianceMetrics(processing_time=round(elapsed, 2))
+            )
+
+        tracker.log_query("SVF Multi-Agent (RAG)", elapsed, len(req.application_data), "error")
+        raise
 
 
 @router.post("/analyze/stream")

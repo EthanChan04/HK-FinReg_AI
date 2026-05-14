@@ -1,14 +1,17 @@
-﻿﻿"""
+﻿"""
 LLM 工厂 & 检索引擎模块 (Builder)
 
 职责：
-  1. 构建 LLM 实例 (Zhipu GLM / LongCat Thinking)
+  1. 构建 LLM 实例 (MiMo-v2.5, OpenAI-compatible)
   2. 构建 Hybrid Retriever (BM25 + ChromaDB Dense, 自定义 RRF 融合)
 
 所有构建函数均使用 @lru_cache 做单例缓存。
 """
 import os
 import re
+import math
+import hashlib
+import shutil
 import builtins
 from functools import lru_cache
 from typing import List
@@ -25,6 +28,17 @@ from pydantic import ConfigDict
 from app.core.config import get_settings
 
 
+def _normalize_model_name(model_name: str) -> str:
+    """Normalize known provider model aliases for compatibility."""
+    if not model_name:
+        return model_name
+    lowered = model_name.lower()
+    # Current gateway supports lowercase MiMo model ids.
+    if lowered == "mimo-v2.5":
+        return "mimo-v2.5"
+    return model_name
+
+
 def _safe_print(*args, **kwargs) -> None:
     """Print without crashing on non-UTF-8 Windows consoles."""
 
@@ -39,6 +53,83 @@ def _safe_print(*args, **kwargs) -> None:
 
 
 print = _safe_print
+
+
+# ==========================================
+# Embedding client builder
+# ==========================================
+
+class LocalHashEmbeddings:
+    """Deterministic local embedding fallback with no external dependency."""
+
+    def __init__(self, dimensions: int = 256):
+        self.dimensions = max(32, int(dimensions))
+
+    def _tokenize(self, text: str) -> list[str]:
+        return re.findall(r"[a-zA-Z0-9_]+", (text or "").lower())
+
+    def _embed(self, text: str) -> list[float]:
+        vec = [0.0] * self.dimensions
+        tokens = self._tokenize(text)
+        if not tokens:
+            return vec
+
+        for token in tokens:
+            digest = hashlib.sha256(token.encode("utf-8")).digest()
+            idx = int.from_bytes(digest[:4], "big") % self.dimensions
+            sign = -1.0 if digest[4] % 2 else 1.0
+            vec[idx] += sign
+
+        norm = math.sqrt(sum(v * v for v in vec))
+        if norm > 0:
+            vec = [v / norm for v in vec]
+        return vec
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return [self._embed(text) for text in texts]
+
+    def embed_query(self, text: str) -> list[float]:
+        return self._embed(text)
+
+
+def _embedding_runtime_config():
+    settings = get_settings()
+    provider = (getattr(settings, "EMBEDDING_PROVIDER", "") or "openai_compatible").lower()
+    model = getattr(settings, "EMBEDDING_MODEL", "") or settings.ZHIPU_EMBEDDING_MODEL
+    base_url = getattr(settings, "EMBEDDING_BASE_URL", "") or settings.ZHIPU_BASE_URL
+    api_key = getattr(settings, "EMBEDDING_API_KEY", "") or settings.ZHIPU_API_KEY
+    dimensions = int(getattr(settings, "EMBEDDING_DIMENSIONS", 256) or 256)
+    return provider, model, base_url, api_key, dimensions
+
+
+def get_embedding_signature() -> str:
+    provider, model, base_url, _, dimensions = _embedding_runtime_config()
+    return f"{provider}|{model}|{base_url}|{dimensions}"
+
+
+def build_embeddings_client():
+    provider, model, base_url, api_key, dimensions = _embedding_runtime_config()
+
+    if provider == "local_hash":
+        print(f"✅ Embeddings initialized with local provider (model=local-hash-{dimensions})")
+        return LocalHashEmbeddings(dimensions=dimensions)
+
+    emb = OpenAIEmbeddings(
+        model=model,
+        openai_api_key=api_key,
+        openai_api_base=base_url,
+        chunk_size=64,
+    )
+    try:
+        emb.embed_query("embedding health check")
+        print(f"✅ Embeddings initialized (provider=openai_compatible, model={model})")
+        return emb
+    except Exception as exc:
+        print(
+            "⚠️ OpenAI-compatible embeddings probe failed; falling back to local hash embeddings: "
+            f"{type(exc).__name__}: {exc}"
+        )
+        return LocalHashEmbeddings(dimensions=dimensions)
 
 
 # ==========================================
@@ -72,10 +163,11 @@ def classify_query_type(extracted_entities: str) -> str:
 
 @lru_cache()
 def build_zhipu_llm() -> ChatOpenAI:
-    """构建 Zhipu GLM-4.7-Flash LLM 实例"""
+    """构建通用主 LLM 实例（默认 MiMo-v2.5）"""
     settings = get_settings()
+    model_name = _normalize_model_name(settings.ZHIPU_MODEL)
     return ChatOpenAI(
-        model_name=settings.ZHIPU_MODEL,
+        model_name=model_name,
         temperature=0,
         openai_api_key=settings.ZHIPU_API_KEY,
         openai_api_base=settings.ZHIPU_BASE_URL,
@@ -85,10 +177,11 @@ def build_zhipu_llm() -> ChatOpenAI:
 
 @lru_cache()
 def build_thinking_llm() -> ChatOpenAI:
-    """构建 LongCat-Flash-Thinking 深度推理实例"""
+    """构建深度推理 LLM 实例（默认 MiMo-v2.5）"""
     settings = get_settings()
+    model_name = _normalize_model_name(settings.LONGCAT_MODEL)
     return ChatOpenAI(
-        model_name=settings.LONGCAT_MODEL,
+        model_name=model_name,
         temperature=0,
         openai_api_key=settings.LONGCAT_API_KEY,
         openai_api_base=settings.LONGCAT_BASE_URL,
@@ -103,7 +196,7 @@ _structured_llm_cache: dict = {"result": None, "checked": False}
 def get_structured_reviewer_llm():
     """P2.5: 尝试构建支持 with_structured_output 的 Reviewer LLM
 
-    验证 GLM-4-Flash 是否支持 function calling / tool_choice。
+    验证当前模型（默认 MiMo-v2.5）是否支持 function calling / tool_choice。
     如果支持 → 返回结构化 LLM（直接输出 ReviewerVerdict）
     如果不支持 → 返回 None（调用方 fallback 到正则解析）
 
@@ -350,17 +443,38 @@ def _load_and_split_corpus() -> tuple:
 def _build_chroma_db():
     """Build or load the persisted ChromaDB vector store."""
     settings = get_settings()
-    embeddings = OpenAIEmbeddings(
-        model=settings.ZHIPU_EMBEDDING_MODEL,
-        openai_api_key=settings.ZHIPU_API_KEY,
-        openai_api_base=settings.ZHIPU_BASE_URL,
-        chunk_size=64,
-    )
+    embeddings = build_embeddings_client()
 
     persist_directory = os.path.join(
         settings.CORPUS_INDEX_DIR,
         f"chroma_{settings.CHROMA_COLLECTION}",
     )
+    signature_path = os.path.join(persist_directory, "embedding_signature.txt")
+    current_signature = get_embedding_signature()
+    existing_signature = None
+    if os.path.exists(signature_path):
+        try:
+            with open(signature_path, "r", encoding="utf-8") as sig_file:
+                existing_signature = sig_file.read().strip()
+        except Exception:
+            existing_signature = None
+
+    sqlite_path = os.path.join(persist_directory, "chroma.sqlite3")
+    needs_rebuild = False
+    if os.path.exists(sqlite_path):
+        if existing_signature is None:
+            needs_rebuild = True
+            print("♻️ Legacy Chroma index without embedding signature detected. Rebuilding index.")
+        elif existing_signature != current_signature:
+            needs_rebuild = True
+            print("♻️ Embedding config changed. Rebuilding Chroma vector index from scratch.")
+
+    if needs_rebuild:
+        abs_index_dir = os.path.abspath(settings.CORPUS_INDEX_DIR)
+        abs_persist_dir = os.path.abspath(persist_directory)
+        if abs_persist_dir.startswith(abs_index_dir):
+            shutil.rmtree(persist_directory, ignore_errors=True)
+
     if os.path.exists(os.path.join(persist_directory, "chroma.sqlite3")):
         db = Chroma(
             collection_name=settings.CHROMA_COLLECTION,
@@ -381,6 +495,11 @@ def _build_chroma_db():
         collection_name=settings.CHROMA_COLLECTION,
         persist_directory=persist_directory,
     )
+    try:
+        with open(signature_path, "w", encoding="utf-8") as sig_file:
+            sig_file.write(current_signature)
+    except Exception as exc:
+        print(f"⚠️ Unable to persist embedding signature: {exc}")
     print(f"ChromaDB vector store initialized and persisted to {persist_directory}")
     return db
 
@@ -420,7 +539,15 @@ def reciprocal_rank_fusion(
             score_map[doc_key] += weight / (k + rank)
 
     sorted_keys = sorted(score_map.keys(), key=lambda x: score_map[x], reverse=True)
-    return [doc_map[key] for key in sorted_keys]
+    fused_docs: List[Document] = []
+    for key in sorted_keys:
+        doc = doc_map[key]
+        if doc.metadata is None:
+            doc.metadata = {}
+        # P0: expose deterministic RRF score so downstream UI can show it.
+        doc.metadata["rrf_score"] = round(score_map[key], 6)
+        fused_docs.append(doc)
+    return fused_docs
 
 
 # ==========================================
@@ -442,19 +569,41 @@ class HybridRetriever(BaseRetriever):
     def _get_relevant_documents(
         self, query: str, *, run_manager: CallbackManagerForRetrieverRun
     ) -> List[Document]:
-        bm25_results = self.bm25_retriever.invoke(query)
-        dense_results = self.dense_retriever.invoke(query)
+        bm25_results: List[Document] = []
+        dense_results: List[Document] = []
+
+        try:
+            bm25_results = self.bm25_retriever.invoke(query)
+        except Exception as exc:
+            print(f"  ⚠️ BM25 retrieval failed: {type(exc).__name__}: {exc}")
+
+        try:
+            dense_results = self.dense_retriever.invoke(query)
+        except Exception as exc:
+            print(f"  ⚠️ Dense retrieval failed, fallback to available retriever: {type(exc).__name__}: {exc}")
 
         print(f"  🔤 BM25 returned {len(bm25_results)} docs")
         print(f"  🧠 Dense returned {len(dense_results)} docs")
 
-        fused = reciprocal_rank_fusion(
-            result_lists=[bm25_results, dense_results],
-            weights=[self.bm25_weight, self.dense_weight]
-        )
+        if bm25_results and dense_results:
+            fused = reciprocal_rank_fusion(
+                result_lists=[bm25_results, dense_results],
+                weights=[self.bm25_weight, self.dense_weight]
+            )
+            print(f"  🔀 RRF fused: {len(fused)} unique docs")
+            return fused
 
-        print(f"  🔀 RRF fused: {len(fused)} unique docs")
-        return fused
+        if bm25_results:
+            fallback = reciprocal_rank_fusion([bm25_results], [1.0])
+            print(f"  🔀 Fallback fused from BM25: {len(fallback)} docs")
+            return fallback
+
+        if dense_results:
+            fallback = reciprocal_rank_fusion([dense_results], [1.0])
+            print(f"  🔀 Fallback fused from Dense: {len(fallback)} docs")
+            return fallback
+
+        return []
 
 
 @lru_cache()

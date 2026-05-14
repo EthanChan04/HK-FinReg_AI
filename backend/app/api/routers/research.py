@@ -16,6 +16,7 @@ def analyze_research(request: ResearchRequest):
     return graph.invoke(
         {
             "original_query": request.query,
+            "request": request.model_dump(),
             "iteration": 0,
         }
     )

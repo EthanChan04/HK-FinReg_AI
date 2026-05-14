@@ -95,6 +95,25 @@ export interface DeepResearchResponse {
   citation_audit: CitationAudit | Record<string, unknown>;
 }
 
+export type EngineMode = "rag" | "rag_kag" | "deepresearch" | "human_review";
+
+export type BankBoardId =
+  | "dashboard"
+  | "customer-account"
+  | "transaction-payment"
+  | "product-launch"
+  | "regulatory-research"
+  | "human-review"
+  | "knowledge-base";
+
+export interface BankBoardConfig {
+  id: BankBoardId;
+  name: string;
+  nameZh: string;
+  description: string;
+  primaryUsers: string[];
+}
+
 export interface ModuleConfig {
   id: string;
   name: string;
@@ -102,6 +121,31 @@ export interface ModuleConfig {
   endpoint: string;
   icon: string;
   defaultInput: string;
+  status: "production" | "experimental";
+  requestKind?: "compliance" | "research" | "kag";
+  taskType?:
+    | "routine_review"
+    | "product_launch_review"
+    | "ai_governance_review"
+    | "cross_regulator_analysis"
+    | "regulatory_memo"
+    | "checklist_generation"
+    | "regulatory_change_impact";
+  outputFormat?: "report" | "checklist" | "memo" | "matrix";
+}
+
+export interface BankWorkflowConfig extends ModuleConfig {
+  boardId: BankBoardId;
+  engineMode: EngineMode;
+  description: string;
+  primaryUsers: string[];
+  scenarioType:
+    | "customer_review"
+    | "transaction_review"
+    | "product_launch"
+    | "regulatory_research"
+    | "human_review"
+    | "knowledge_management";
 }
 
 // Phase 1: 审查队列条目
@@ -117,4 +161,41 @@ export interface ReviewQueueItem {
   human_review_notes: string;
   reviewed_at: number | null;
   reviewed_by: string | null;
+}
+
+export interface CopilotMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: number;
+}
+
+export type CopilotIntent =
+  | "regulatory_qa"
+  | "case_explanation"
+  | "obligation_mapping"
+  | "workflow_recommendation"
+  | "deep_research"
+  | "human_review_help"
+  | "smalltalk_or_help";
+
+export interface CopilotCaseContext {
+  workspace_id?: string | null;
+  workflow_id?: string | null;
+  workflow_name?: string | null;
+  input_text?: string | null;
+  report_text?: string | null;
+  evidence_chunks?: EvidenceChunk[];
+  graph_paths?: Array<{ path: string[]; matched_node?: string; matched_topics?: string[] }>;
+  research_plan?: ResearchPlan | null;
+  confidence_data?: Record<string, unknown>;
+  workflow_run_id?: string | null;
+  current_gate?: string | null;
+  gate_message?: string | null;
+}
+
+export interface CopilotToolEvent {
+  tool: "rag" | "kag" | "deepresearch" | "human_review" | "workflow_router" | "mimo";
+  status: "running" | "done" | "error";
+  message?: string;
 }

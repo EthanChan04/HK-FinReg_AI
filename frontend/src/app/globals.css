@@ -1,18 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0a0a12;
-  --bg-secondary: #12121e;
-  --bg-card: #161625;
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --accent-blue: #667eea;
-  --accent-purple: #764ba2;
+  --bg-primary: #050b16;
+  --bg-secondary: #0b1426;
+  --bg-card: #101c31;
+  --bg-card-elevated: #142540;
+  --border-subtle: rgba(158, 184, 219, 0.18);
+  --accent-cyan: #2ec5e8;
+  --accent-blue: #4c7dff;
+  --accent-emerald: #4bd9b1;
+  --text-primary: #e8f0fb;
+  --text-secondary: #b5c6dd;
+  --text-muted: #7e94b4;
 }
 
 body {
-  background: var(--bg-primary);
-  color: #e0e0e0;
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(1200px 640px at 3% -10%, rgba(46, 197, 232, 0.14), transparent 52%),
+    radial-gradient(1000px 700px at 98% -15%, rgba(76, 125, 255, 0.14), transparent 56%),
+    linear-gradient(180deg, #060d1a 0%, var(--bg-primary) 52%, #081223 100%);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), "Avenir Next", "Segoe UI", sans-serif;
 }
 
 /* Scrollbar */
@@ -32,7 +40,7 @@ body {
 
 /* Gradient text utility */
 .text-gradient {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  background: linear-gradient(125deg, #9dd8ff 0%, var(--accent-cyan) 44%, #5b88ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -40,26 +48,26 @@ body {
 
 /* ===== Report Markdown Typography ===== */
 .prose-report {
-  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-family: var(--font-geist-sans), "Avenir Next", "Segoe UI", sans-serif;
   font-size: 0.875rem;
-  line-height: 1.75;
-  color: #c8ccd4;
+  line-height: 1.8;
+  color: var(--text-secondary);
 }
 
 .prose-report h1 {
   font-size: 1.35rem;
   font-weight: 700;
-  color: #e8ecf2;
+  color: #f1f6ff;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(186, 207, 233, 0.28);
 }
 
 .prose-report h2 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #d0d6e0;
+  color: #d6e4f6;
   margin-top: 1.4rem;
   margin-bottom: 0.5rem;
 }
@@ -67,7 +75,7 @@ body {
 .prose-report h3 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #b0b8c8;
+  color: #c0d3eb;
   margin-top: 1rem;
   margin-bottom: 0.4rem;
 }
@@ -77,7 +85,7 @@ body {
 }
 
 .prose-report strong {
-  color: #e0e4ec;
+  color: #f2f7ff;
   font-weight: 600;
 }
 
@@ -92,7 +100,7 @@ body {
 }
 
 .prose-report li::marker {
-  color: #667eea;
+  color: var(--accent-cyan);
 }
 
 /* Tables */
@@ -106,36 +114,36 @@ body {
 .prose-report thead th {
   text-align: left;
   font-weight: 600;
-  color: #a0a8b8;
+  color: #b9ccea;
   padding: 8px 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(186, 207, 233, 0.24);
+  background: rgba(96, 132, 189, 0.18);
 }
 
 .prose-report tbody td {
   padding: 8px 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  color: #b8bcc8;
+  border-bottom: 1px solid rgba(186, 207, 233, 0.14);
+  color: #c4d4e9;
 }
 
 .prose-report tbody tr:hover {
-  background: rgba(102,126,234,0.04);
+  background: rgba(76, 125, 255, 0.14);
 }
 
 /* Horizontal rule */
 .prose-report hr {
   border: none;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(186, 207, 233, 0.26), transparent);
   margin: 1.2rem 0;
 }
 
 /* Inline code */
 .prose-report code {
-  font-family: "Geist Mono", "Consolas", monospace;
+  font-family: var(--font-geist-mono), "JetBrains Mono", "Consolas", monospace;
   font-size: 0.8rem;
-  background: rgba(255,255,255,0.06);
+  background: rgba(98, 132, 186, 0.22);
   padding: 2px 6px;
   border-radius: 4px;
-  color: #a78bfa;
+  color: #95e3ff;
 }

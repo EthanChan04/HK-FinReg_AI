@@ -8,7 +8,7 @@ from typing import Dict, List, TypedDict
 from langgraph.graph import END, StateGraph
 
 from app.core.config import get_settings
-from app.schemas.deepresearch import ResearchPlan
+from app.schemas.deepresearch import ResearchPlan, ResearchRequest
 from app.schemas.evidence import EvidenceChunk
 from app.services.agents.builder import build_reranked_retriever
 from app.services.deepresearch.evidence_evaluator import evaluate_evidence_coverage
@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 class DeepResearchState(TypedDict, total=False):
     original_query: str
+    request: dict
     research_plan: dict
     evidence_by_subquestion: Dict[str, List[dict]]
     evidence_gaps: List[dict]
@@ -99,7 +100,9 @@ def build_deepresearch_graph():
     max_iterations = settings.DEEP_RESEARCH_MAX_ITERATIONS
 
     def planner_node(state: DeepResearchState):
-        plan = build_research_plan(state["original_query"])
+        request_payload = state.get("request") or {"query": state["original_query"]}
+        request = ResearchRequest(**request_payload)
+        plan = build_research_plan(state["original_query"], request=request)
         return {"research_plan": plan.model_dump(), "iteration": 0}
 
     def retrieval_node(state: DeepResearchState):

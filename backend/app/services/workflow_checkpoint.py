@@ -296,7 +296,8 @@ class CheckpointManager:
             return 0
 
         rebuilt = 0
-        for workflow_run_id, meta in registry.items():
+        stale_workflow_ids: List[str] = []
+        for workflow_run_id, meta in list(registry.items()):
             # 跳过已在内存队列中的
             if workflow_run_id in self._review_queue:
                 continue
@@ -322,12 +323,14 @@ class CheckpointManager:
                 else:
                     # 没有 interrupt，说明已经被处理但 registry 没清理
                     # 清理 registry
-                    registry.pop(workflow_run_id, None)
+                    stale_workflow_ids.append(workflow_run_id)
 
             except Exception as e:
                 print(f"[Checkpoint] Failed to rebuild {workflow_run_id}: {e}")
 
         # 清理失效条目
+        for workflow_run_id in stale_workflow_ids:
+            registry.pop(workflow_run_id, None)
         _save_registry(registry)
 
         if rebuilt:

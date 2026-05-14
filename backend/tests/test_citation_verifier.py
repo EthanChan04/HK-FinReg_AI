@@ -19,6 +19,8 @@ def test_citation_verifier_supports_existing_source_and_page():
     assert len(audit.supported_citations) == 1
     assert audit.unsupported_citations == []
     assert audit.unsupported_claim_rate == 0.0
+    assert "1 supported" in audit.summary
+    assert audit.supported_citations[0].explanation is not None
 
 
 def test_citation_verifier_flags_missing_source():
@@ -39,6 +41,7 @@ def test_citation_verifier_flags_missing_source():
     assert audit.supported_citations == []
     assert len(audit.unsupported_citations) == 1
     assert audit.unsupported_citations[0].reason == "source_not_found"
+    assert "not present" in (audit.unsupported_citations[0].explanation or "")
 
 
 def test_citation_verifier_flags_page_mismatch():
@@ -58,3 +61,4 @@ def test_citation_verifier_flags_page_mismatch():
 
     assert len(audit.unsupported_citations) == 1
     assert audit.unsupported_citations[0].reason == "page_mismatch"
+    assert "retrieved evidence is page 3" in (audit.unsupported_citations[0].explanation or "")

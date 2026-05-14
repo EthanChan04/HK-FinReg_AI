@@ -19,12 +19,16 @@ class SourceDocument(BaseModel):
     status: Literal["active", "superseded", "archived", "unknown"] = "active"
     sector: list[str] = Field(default_factory=list)
     topics: list[str] = Field(default_factory=list)
+    risk_tags: list[str] = Field(default_factory=list)
     module_tags: list[str] = Field(default_factory=list)
+    regulatory_functions: list[str] = Field(default_factory=list)
     file_path: str
     source_url: str | None = None
     priority: Literal["P0", "P1", "P2", "P3"] = "P1"
     language: str = "en"
     notes: str | None = None
+    supersedes: list[str] = Field(default_factory=list)
+    references: list[str] = Field(default_factory=list)
     resolved_path: Path | None = Field(default=None, exclude=True)
 
 

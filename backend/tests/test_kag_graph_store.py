@@ -51,6 +51,7 @@ def test_graph_builder_creates_document_regulator_and_topic_edges(tmp_path):
     assert store.graph.has_edge("doc_1", "regulator:HKMA")
     assert store.graph.has_edge("doc_1", "topic:AML")
     assert store.graph.has_edge("doc_1", "chunk:chunk_1")
+    assert store.graph.edges["doc_1", "regulator:HKMA"]["relation"] == "ISSUED_BY"
 
 
 def test_graph_retriever_returns_matching_paths(tmp_path):
@@ -75,6 +76,7 @@ def test_graph_retriever_returns_matching_paths(tmp_path):
 
     assert paths
     assert paths[0]["matched_doc_ids"] == ["doc_ai"]
+    assert "confidence" in paths[0]
 
 
 def test_graph_retriever_returns_regulator_document_topic_path(tmp_path):
@@ -98,3 +100,36 @@ def test_graph_retriever_returns_regulator_document_topic_path(tmp_path):
     paths = retriever.retrieve_paths("Which regulators apply to AI?")
 
     assert ["HKMA", "AI Circular", "AI"] in [item["path"] for item in paths]
+
+
+def test_graph_retriever_respects_metadata_filters(tmp_path):
+    from app.services.kag.graph_builder import build_graph_from_sources
+    from app.services.kag.graph_retriever import GraphRetriever
+
+    docs = [
+        SourceDocument(
+            doc_id="doc_hkma",
+            title="HKMA Circular",
+            regulator="HKMA",
+            doc_type="Circular",
+            topics=["AI"],
+            module_tags=["ai_regtech"],
+            file_path="hkma.pdf",
+        ),
+        SourceDocument(
+            doc_id="doc_sfc",
+            title="SFC Circular",
+            regulator="SFC",
+            doc_type="Circular",
+            topics=["AI"],
+            module_tags=["ai_regtech"],
+            file_path="sfc.pdf",
+        ),
+    ]
+    store = build_graph_from_sources(docs, [], graph_path=tmp_path / "graph.json")
+    retriever = GraphRetriever(store)
+
+    paths = retriever.retrieve_paths("AI obligations", filters={"regulator": "SFC"})
+
+    assert paths
+    assert all(path["matched_doc_ids"] == ["doc_sfc"] for path in paths)

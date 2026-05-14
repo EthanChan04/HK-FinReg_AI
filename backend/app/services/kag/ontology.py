@@ -1,22 +1,39 @@
-"""Constants for the first-pass regulatory graph ontology."""
+"""Ontology types for the regulatory knowledge graph."""
 
-NODE_TYPES = {
-    "Regulator",
-    "Document",
-    "Clause",
-    "Topic",
-    "Obligation",
-    "Risk",
-    "Product",
-    "InstitutionType",
-    "Chunk",
-}
+from __future__ import annotations
 
-RELATIONS = {
-    "issued_by",
-    "contains",
-    "related_to",
-    "applies_to",
-    "requires",
-    "supported_by",
-}
+from enum import Enum
+
+
+class NodeType(str, Enum):
+    REGULATOR = "Regulator"
+    DOCUMENT = "RegulatoryDocument"
+    CLAUSE = "Clause"
+    PRODUCT = "Product"
+    ACTIVITY = "Activity"
+    RISK = "Risk"
+    OBLIGATION = "Obligation"
+    CONTROL = "Control"
+    USE_CASE = "UseCase"
+    TOPIC = "Topic"
+    EVIDENCE_CHUNK = "EvidenceChunk"
+
+
+class RelationType(str, Enum):
+    ISSUED_BY = "ISSUED_BY"
+    CONTAINS = "CONTAINS"
+    APPLIES_TO = "APPLIES_TO"
+    GOVERNS = "GOVERNS"
+    IMPOSES = "IMPOSES"
+    MITIGATES = "MITIGATES"
+    REQUIRES = "REQUIRES"
+    TRIGGERS = "TRIGGERS"
+    SUPPORTED_BY = "SUPPORTED_BY"
+    REFERENCES = "REFERENCES"
+    SUPERSEDES = "SUPERSEDES"
+    RELATED_TO = "RELATED_TO"
+    HAS_JURISDICTION = "HAS_JURISDICTION"
+
+
+NODE_TYPES = {item.value for item in NodeType}
+RELATIONS = {item.value for item in RelationType}

@@ -1,0 +1,33 @@
+INFO:     127.0.0.1:51508 - "POST /api/v1/kag/obligation-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63574 - "OPTIONS /api/v1/bank-account/verify/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63574 - "POST /api/v1/bank-account/verify/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57658 - "OPTIONS /api/v1/kag/obligation-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57658 - "POST /api/v1/kag/obligation-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50427 - "POST /api/v1/kag/obligation-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50427 - "OPTIONS /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50427 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50427 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50427 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50427 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50427 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50427 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64893 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64893 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64893 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64893 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64893 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64893 - "POST /api/v1/kag/graph/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51648 - "OPTIONS /api/v1/copilot/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51648 - "POST /api/v1/copilot/chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53883 - "OPTIONS /api/v1/cross-border/assess/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53883 - "POST /api/v1/cross-border/assess/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65511 - "OPTIONS /api/v1/research/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65511 - "POST /api/v1/research/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49666 - "OPTIONS /api/v1/review-queue/pending HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49666 - "GET /api/v1/review-queue/pending HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54198 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54198 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54814 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /api/v1/review-queue/pending HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53465 - "GET /api/v1/review-queue/pending HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61197 - "GET /api/v1/health HTTP/1.1" 200 OK

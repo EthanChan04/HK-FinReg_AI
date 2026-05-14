@@ -6,13 +6,10 @@ import { useRef, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+const API_PROXY_BASE = "/api/backend";
+
 function buildApiHeaders(): HeadersInit {
-  const headers: HeadersInit = { "Content-Type": "application/json" };
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-  if (apiKey) {
-    headers.Authorization = `Bearer ${apiKey}`;
-  }
-  return headers;
+  return { "Content-Type": "application/json" };
 }
 
 interface Props {
@@ -215,8 +212,7 @@ export default function ReportPanel({
                     if (!workflowRunId) return;
                     setSubmitting(true);
                     try {
-                      const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000";
-                      const resp = await fetch(`${apiBase}/api/v1/review-queue/${workflowRunId}/resume`, {
+                      const resp = await fetch(`${API_PROXY_BASE}/api/v1/review-queue/${workflowRunId}/resume`, {
                         method: "POST",
                         headers: buildApiHeaders(),
                         body: JSON.stringify({ notes: reviewNotes, reviewed_by: "web_user" }),
@@ -244,8 +240,7 @@ export default function ReportPanel({
                     if (!workflowRunId) return;
                     setSubmitting(true);
                     try {
-                      const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000";
-                      const resp = await fetch(`${apiBase}/api/v1/review-queue/${workflowRunId}/reject`, {
+                      const resp = await fetch(`${API_PROXY_BASE}/api/v1/review-queue/${workflowRunId}/reject`, {
                         method: "POST",
                         headers: buildApiHeaders(),
                         body: JSON.stringify({ notes: reviewNotes || "駁回", reviewed_by: "web_user" }),

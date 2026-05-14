@@ -1,0 +1,16 @@
+{
+  "metrics": {
+    "regulator_coverage": 0.975,
+    "obligation_coverage": 0.983,
+    "evidence_support_rate": 1.0,
+    "structured_output_validity": 1.0
+  },
+  "thresholds": {
+    "regulator_coverage": 0.9,
+    "obligation_coverage": 0.85,
+    "evidence_support_rate": 0.9,
+    "structured_output_validity": 1.0
+  },
+  "failures": [],
+  "total_cases": 20
+}

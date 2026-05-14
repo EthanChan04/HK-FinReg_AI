@@ -21,6 +21,7 @@ def test_source_document_defaults_and_validation():
     assert doc.priority == "P1"
     assert doc.language == "en"
     assert doc.topics == []
+    assert doc.risk_tags == []
     assert doc.module_tags == []
 
     with pytest.raises(ValidationError):

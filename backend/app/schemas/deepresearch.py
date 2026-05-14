@@ -5,9 +5,31 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 
+class ProductProfile(BaseModel):
+    product_type: str | None = None
+    business_activity: list[str] = Field(default_factory=list)
+    target_customers: list[str] = Field(default_factory=list)
+    data_used: list[str] = Field(default_factory=list)
+    ai_used: bool = False
+    cross_border: bool = False
+    regulated_entities: list[str] = Field(default_factory=list)
+
+
 class ResearchRequest(BaseModel):
     query: str
     module: str | None = None
+    task_type: Literal[
+        "routine_review",
+        "product_launch_review",
+        "ai_governance_review",
+        "cross_regulator_analysis",
+        "regulatory_memo",
+        "checklist_generation",
+        "regulatory_change_impact",
+    ] = "routine_review"
+    product_profile: ProductProfile | None = None
+    forced_regulators: list[str] = Field(default_factory=list)
+    output_format: Literal["report", "checklist", "memo", "matrix"] = "report"
     max_iterations: int = 3
     language: str = "zh-HK"
 

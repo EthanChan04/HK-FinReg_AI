@@ -1,14 +1,18 @@
-// 主页面：4 模块 Dashboard + SSE 流式交互 — 200s UX 优化版
 "use client";
 
-import { useState } from "react";
-import { useAgentStream } from "@/hooks/useAgentStream";
+import { useMemo, useState } from "react";
+
 import AgentTimeline from "@/components/AgentTimeline";
-import ReportPanel from "@/components/ReportPanel";
+import ComplianceCopilot from "@/components/chat/ComplianceCopilot";
+import DeepResearchPlanPanel from "@/components/DeepResearchPlanPanel";
 import EvidencePanel from "@/components/EvidencePanel";
 import KnowledgeGraphPanel from "@/components/KnowledgeGraphPanel";
-import DeepResearchPlanPanel from "@/components/DeepResearchPlanPanel";
-import { modules } from "@/lib/modules";
+import ReportPanel from "@/components/ReportPanel";
+import WorkflowSelector from "@/components/WorkflowSelector";
+import WorkspaceNav from "@/components/WorkspaceNav";
+import { useAgentStream } from "@/hooks/useAgentStream";
+import { bankBoards, bankWorkflows, defaultWorkflow } from "@/lib/bankWorkspaces";
+import type { BankBoardId, BankWorkflowConfig, CopilotCaseContext } from "@/types";
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -17,227 +21,236 @@ function formatTime(seconds: number): string {
 }
 
 export default function Home() {
-  const [activeModule, setActiveModule] = useState(0);
-  const [inputText, setInputText] = useState(modules[0].defaultInput);
+  const [activeBoardId, setActiveBoardId] = useState<BankBoardId>(defaultWorkflow.boardId);
+  const [currentModule, setCurrentModule] = useState<BankWorkflowConfig>(defaultWorkflow);
+  const [inputText, setInputText] = useState(defaultWorkflow.defaultInput);
   const stream = useAgentStream();
 
-  const currentModule = modules[activeModule];
+  const workflowsForBoard = useMemo(
+    () => bankWorkflows.filter((workflow) => workflow.boardId === activeBoardId),
+    [activeBoardId]
+  );
+  const copilotCaseContext = useMemo<CopilotCaseContext>(
+    () => ({
+      workspace_id: activeBoardId,
+      workflow_id: currentModule.id,
+      workflow_name: currentModule.name,
+      input_text: inputText,
+      report_text: stream.reportText,
+      evidence_chunks: stream.evidenceChunks,
+      graph_paths: stream.graphPaths,
+      research_plan: stream.researchPlan,
+      confidence_data: {
+        retrieval: stream.confidenceScore,
+        reasoning: stream.reasoningConfidence,
+        reviewer: stream.reviewerConfidence,
+        cross_validation_passed: stream.crossValidationPassed,
+      },
+      workflow_run_id: stream.workflowRunId,
+      current_gate: stream.currentGate,
+      gate_message: stream.gateMessage,
+    }),
+    [activeBoardId, currentModule, inputText, stream]
+  );
 
-  const handleModuleSwitch = (idx: number) => {
+  const handleBoardSwitch = (boardId: BankBoardId) => {
     if (stream.isStreaming) return;
-    setActiveModule(idx);
-    setInputText(modules[idx].defaultInput);
+    const firstWorkflow = bankWorkflows.find((workflow) => workflow.boardId === boardId);
+    if (!firstWorkflow) return;
+    setActiveBoardId(boardId);
+    setCurrentModule(firstWorkflow);
+    setInputText(firstWorkflow.defaultInput);
+    stream.reset();
+  };
+
+  const handleWorkflowSwitch = (workflow: BankWorkflowConfig) => {
+    if (stream.isStreaming) return;
+    setCurrentModule(workflow);
+    setInputText(workflow.defaultInput);
     stream.reset();
   };
 
   const handleSubmit = () => {
     if (!inputText.trim() || stream.isStreaming) return;
-    stream.startStream(currentModule.endpoint, inputText);
+    stream.startStream(currentModule, inputText);
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* ===== Header ===== */}
-      <header className="border-b border-white/[0.06] px-6 py-5">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between">
+    <div className="flex min-h-screen flex-col">
+      <header className="border-b border-slate-300/10 bg-slate-950/40 px-4 py-5 backdrop-blur-sm md:px-6">
+        <div className="mx-auto flex max-w-[1500px] items-center justify-between">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-gradient">
-              HK-FinReg AI
-            </h1>
-            <p className="text-sm text-gray-400 mt-1 tracking-wide">
-              Multi-Agent Compliance Engine&ensp;·&ensp;Hybrid RAG + Cohere Reranker
+            <h1 className="text-gradient text-3xl font-extrabold tracking-tight md:text-4xl">HK-FinReg AI</h1>
+            <p className="mt-1 text-sm tracking-wide text-slate-400">
+              Regulatory Intelligence & Compliance Operations Platform
             </p>
           </div>
 
-          {/* Streaming indicator / timer */}
           {stream.isStreaming && (
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2.5 text-xs bg-blue-500/10 border border-blue-500/20 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2.5 rounded-full border border-cyan-300/30 bg-cyan-500/12 px-4 py-2 text-xs">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-300" />
                 </span>
-                <span className="text-blue-300 font-mono tabular-nums">
-                  {formatTime(stream.elapsedTime)}
-                </span>
-                <span className="text-blue-400/60">
+                <span className="font-mono tabular-nums text-cyan-100">{formatTime(stream.elapsedTime)}</span>
+                <span className="text-cyan-100/70">
                   {stream.phase === "agents" ? "Agent Processing" : "Streaming Report"}
                 </span>
               </div>
               <button
                 onClick={stream.cancelStream}
-                className="text-xs text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-500/50 px-3 py-2 rounded-full transition-all"
+                className="rounded-full border border-rose-400/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200 transition-all hover:border-rose-300/70"
               >
-                ✕ Cancel
+                Cancel
               </button>
             </div>
           )}
 
-          {/* Action Required indicator */}
           {stream.phase === "action_required" && !stream.isStreaming && (
-            <div className="flex items-center gap-2 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-full">
-              <span>🔍</span>
-              <span>等待人工審查 — {stream.currentGate === "low_confidence_gate" ? "低置信度" : stream.currentGate === "missing_evidence_gate" ? "證據不足" : "需人工批准"}</span>
+            <div className="flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-200">
+              <span>!</span>
+              <span>
+                Waiting for Human Review /{" "}
+                {stream.currentGate === "low_confidence_gate"
+                  ? "Low Confidence"
+                  : stream.currentGate === "missing_evidence_gate"
+                    ? "Missing Evidence"
+                    : "Manual Approval"}
+              </span>
             </div>
           )}
 
-          {/* Completed indicator */}
           {stream.phase === "done" && !stream.isStreaming && (
-            <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-full">
-              <span>✅</span>
+            <div className="flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-4 py-2 text-xs text-emerald-200">
+              <span>Done</span>
               <span>Completed in {formatTime(stream.elapsedTime)}</span>
             </div>
           )}
         </div>
       </header>
 
-      {/* ===== Module Tabs ===== */}
-      <nav className="border-b border-white/[0.06] px-6">
-        <div className="max-w-[1400px] mx-auto flex gap-1 py-2 overflow-x-auto">
-          {modules.map((mod, idx) => (
-            <button
-              key={mod.id}
-              onClick={() => handleModuleSwitch(idx)}
+      <WorkspaceNav
+        boards={bankBoards}
+        activeBoardId={activeBoardId}
+        disabled={stream.isStreaming}
+        onChange={handleBoardSwitch}
+      />
+
+      <main className="flex min-h-0 flex-1 overflow-hidden">
+        <div className="flex w-[430px] shrink-0 flex-col gap-4 border-r border-slate-300/10 bg-slate-950/35 p-5">
+          <div className="rounded-2xl border border-slate-300/15 bg-slate-900/45 p-3">
+            <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Workspace Workflows</h2>
+            <WorkflowSelector
+              workflows={workflowsForBoard}
+              activeWorkflowId={currentModule.id}
               disabled={stream.isStreaming}
-              className={`
-                flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap
-                ${
-                  idx === activeModule
-                    ? "bg-white/[0.08] text-white border border-white/[0.1]"
-                    : "text-gray-500 hover:text-gray-300 hover:bg-white/[0.03]"
-                }
-                disabled:opacity-40 disabled:cursor-not-allowed
-              `}
-            >
-              <span>{mod.icon}</span>
-              <span className="hidden sm:inline">{mod.nameZh}</span>
-              <span className="sm:hidden">{mod.name}</span>
-            </button>
-          ))}
-        </div>
-      </nav>
+              onChange={handleWorkflowSwitch}
+            />
+          </div>
 
-      {/* ===== Main: 2-Column ===== */}
-      <main className="flex-1 flex min-h-0">
-        {/* ── Left: Input ── */}
-        <div className="w-[400px] border-r border-white/[0.06] flex flex-col p-5 gap-4 shrink-0">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-300 mb-1">
-              📥 輸入: {currentModule.nameZh}
-            </h2>
-            <p className="text-xs text-gray-600">
-              輸入業務申請數據，點擊提交開始多智能體審查
+          <div className="rounded-2xl border border-slate-300/15 bg-slate-900/45 p-4">
+            <h2 className="mb-1 text-sm font-semibold text-slate-100">Input: {currentModule.nameZh}</h2>
+            <p className="text-xs text-slate-400">
+              Provide scenario details, then submit to start compliance analysis.
             </p>
+
+            <textarea
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              disabled={stream.isStreaming}
+              className="mt-3 h-[230px] w-full resize-none rounded-xl border border-slate-300/20 bg-slate-900/70 p-4 font-mono text-sm text-slate-200 outline-none transition-colors focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 disabled:opacity-50"
+              placeholder="Enter compliance scenario..."
+            />
+
+            <button
+              onClick={handleSubmit}
+              disabled={stream.isStreaming || !inputText.trim()}
+              className="mt-3 w-full rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(25,131,171,0.32)] transition-all disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {stream.isStreaming ? `Running... ${formatTime(stream.elapsedTime)}` : "Submit Analysis"}
+            </button>
           </div>
 
-          <textarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            disabled={stream.isStreaming}
-            className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-xl p-4 text-sm text-gray-300 font-mono resize-none outline-none focus:border-blue-500/40 transition-colors disabled:opacity-50"
-            placeholder="輸入業務數據..."
-          />
-
-          <button
-            onClick={handleSubmit}
-            disabled={stream.isStreaming || !inputText.trim()}
-            className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{
-              background: stream.isStreaming
-                ? "#333"
-                : "linear-gradient(135deg, #667eea, #764ba2)",
-            }}
-          >
-            {stream.isStreaming
-              ? `⏳ 智能體運行中... ${formatTime(stream.elapsedTime)}`
-              : "🚀 提交審查請求"}
-          </button>
-
-          {/* RAG Pipeline Info */}
-          <div className="text-[10px] text-gray-700 space-y-0.5 border-t border-white/[0.04] pt-3">
-            <p>🔍 BM25 + Dense Hybrid Retrieval (RRF)</p>
-            <p>🎯 Cohere Reranker v3.5 → Top-5</p>
-            <p>🛡️ Anti-Hallucination Prompt Chain</p>
+          <div className="space-y-1 rounded-2xl border border-slate-300/10 bg-slate-900/35 p-3 text-[10px] text-slate-500">
+            <p>Dynamic routing: RAG / KAG / Deep Research</p>
+            <p>Hybrid retrieval with citation-ready evidence</p>
+            <p>Human review queue for low-confidence cases</p>
           </div>
         </div>
 
-        {/* ── Right: Output ── */}
-        <div className="flex-1 flex flex-col min-h-0 p-5 gap-2">
-          <h2 className="text-sm font-semibold text-gray-300 shrink-0">
-            🛡️ 輸出: 合規審查報告
-          </h2>
+        <div className="flex min-w-0 flex-1 overflow-hidden">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 p-5">
+            <h2 className="shrink-0 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+              Output: Compliance Analysis Report
+            </h2>
 
-          {/* Error */}
-          {stream.error && (
-            <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs px-4 py-2.5 rounded-lg shrink-0">
-              ❌ {stream.error}
-            </div>
-          )}
+            {stream.error && (
+              <div className="shrink-0 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-2.5 text-xs text-rose-200">
+                {stream.error}
+              </div>
+            )}
 
-          {/* Scrollable content area with all panels */}
-          <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-2">
-            {/* Agent Pipeline Timeline */}
-            <div className="shrink-0 max-h-[320px] overflow-y-auto">
-              <AgentTimeline
-                agents={stream.agentStates}
-                currentAgent={stream.currentAgent}
-                isStreaming={stream.isStreaming}
-                elapsedTime={stream.elapsedTime}
-                phase={stream.phase}
-              />
-            </div>
+            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+              <div className="max-h-[320px] shrink-0 overflow-y-auto">
+                <AgentTimeline
+                  agents={stream.agentStates}
+                  currentAgent={stream.currentAgent}
+                  isStreaming={stream.isStreaming}
+                  elapsedTime={stream.elapsedTime}
+                  phase={stream.phase}
+                />
+              </div>
 
-            {/* Report Output */}
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl flex flex-col overflow-hidden min-h-[250px]">
-              <ReportPanel
-                text={stream.reportText}
-                isStreaming={stream.isStreaming}
-                phase={stream.phase}
-                elapsedTime={stream.elapsedTime}
-                confidenceScore={stream.confidenceScore}
-                confidenceWarning={stream.confidenceWarning}
-                reasoningConfidence={stream.reasoningConfidence}
-                reviewerConfidence={stream.reviewerConfidence}
-                crossValidationPassed={stream.crossValidationPassed}
-                workflowRunId={stream.workflowRunId}
-                humanReviewRequired={stream.humanReviewRequired}
-                currentGate={stream.currentGate}
-                gateMessage={stream.gateMessage}
-                onResumeResult={stream.setResumedResult}
-              />
+              <div className="flex min-h-[250px] flex-col overflow-hidden rounded-2xl border border-slate-300/12 bg-slate-950/35">
+                <ReportPanel
+                  text={stream.reportText}
+                  isStreaming={stream.isStreaming}
+                  phase={stream.phase}
+                  elapsedTime={stream.elapsedTime}
+                  confidenceScore={stream.confidenceScore}
+                  confidenceWarning={stream.confidenceWarning}
+                  reasoningConfidence={stream.reasoningConfidence}
+                  reviewerConfidence={stream.reviewerConfidence}
+                  crossValidationPassed={stream.crossValidationPassed}
+                  workflowRunId={stream.workflowRunId}
+                  humanReviewRequired={stream.humanReviewRequired}
+                  currentGate={stream.currentGate}
+                  gateMessage={stream.gateMessage}
+                  onResumeResult={stream.setResumedResult}
+                />
 
-              {/* Footer metrics */}
-              {(stream.phase === "done" || stream.phase === "action_required") && stream.reportText && (
-                <div className="border-t border-white/[0.06] px-4 py-2.5 text-[11px] text-gray-500 flex gap-4 shrink-0">
-                  <span>⏱️ {formatTime(stream.elapsedTime)}</span>
-                  <span>📝 {stream.reportText.length.toLocaleString()} chars</span>
-                  <span>🤖 {stream.agentStates.length} agent steps</span>
-                </div>
+                {(stream.phase === "done" || stream.phase === "action_required") && stream.reportText && (
+                  <div className="flex shrink-0 gap-4 border-t border-slate-300/12 px-4 py-2.5 text-[11px] text-slate-400">
+                    <span>Time: {formatTime(stream.elapsedTime)}</span>
+                    <span>Length: {stream.reportText.length.toLocaleString()} chars</span>
+                    <span>Steps: {stream.agentStates.length}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                <EvidencePanel
+                  evidence={stream.evidenceChunks}
+                  isLoading={stream.isStreaming && stream.phase === "agents"}
+                />
+                <KnowledgeGraphPanel
+                  paths={stream.graphPaths}
+                  isLoading={stream.isStreaming && stream.phase === "agents"}
+                />
+              </div>
+
+              {stream.researchPlan && (
+                <DeepResearchPlanPanel
+                  researchPlan={stream.researchPlan}
+                  evidenceBySubquestion={stream.evidenceBySubquestion}
+                  evidenceGaps={stream.evidenceGaps}
+                  isLoading={stream.isStreaming && stream.phase === "agents"}
+                />
               )}
             </div>
-
-            {/* Evidence + KnowledgeGraph side by side */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-              <EvidencePanel
-                evidence={stream.evidenceChunks}
-                isLoading={stream.isStreaming && stream.phase === "agents"}
-              />
-              <KnowledgeGraphPanel
-                paths={stream.graphPaths}
-                isLoading={stream.isStreaming && stream.phase === "agents"}
-              />
-            </div>
-
-            {/* DeepResearchPlanPanel (only when research plan data exists) */}
-            {stream.researchPlan && (
-              <DeepResearchPlanPanel
-                researchPlan={stream.researchPlan}
-                evidenceBySubquestion={stream.evidenceBySubquestion}
-                evidenceGaps={stream.evidenceGaps}
-                isLoading={stream.isStreaming && stream.phase === "agents"}
-              />
-            )}
           </div>
+          <ComplianceCopilot activeBoardId={activeBoardId} caseContext={copilotCaseContext} />
         </div>
       </main>
     </div>

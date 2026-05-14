@@ -5,12 +5,35 @@
     "regulator": "HKMA",
     "doc_type": "Annex",
     "issue_date": "2024-09",
-    "sector": ["Banking", "AML/CFT"],
-    "topics": ["AI", "AML", "CFT", "MLTF", "transaction_monitoring"],
-    "module_tags": ["aml", "ai_regtech", "deepresearch"],
+    "sector": [
+      "Banking",
+      "AML/CFT"
+    ],
+    "topics": [
+      "AI",
+      "AML",
+      "CFT",
+      "MLTF",
+      "transaction_monitoring"
+    ],
+    "module_tags": [
+      "aml",
+      "ai_regtech",
+      "deepresearch"
+    ],
     "file_path": "hkma_aml_ai/hkma_ai_monitoring_mltf_technologies_annex_2024.pdf",
     "priority": "P1",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft",
+      "model_risk"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_ai_suspicious_activity_monitoring_2024",
@@ -18,12 +41,36 @@
     "regulator": "HKMA",
     "doc_type": "Circular",
     "issue_date": "2024-09",
-    "sector": ["Banking", "AML/CFT"],
-    "topics": ["AI", "AML", "CFT", "suspicious_activity", "transaction_monitoring"],
-    "module_tags": ["aml", "ai_regtech", "deepresearch"],
+    "sector": [
+      "Banking",
+      "AML/CFT"
+    ],
+    "topics": [
+      "AI",
+      "AML",
+      "CFT",
+      "suspicious_activity",
+      "transaction_monitoring"
+    ],
+    "module_tags": [
+      "aml",
+      "ai_regtech",
+      "deepresearch"
+    ],
     "file_path": "hkma_aml_ai/hkma_ai_suspicious_activity_monitoring_2024.pdf",
     "priority": "P0",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft",
+      "model_risk",
+      "fraud"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_amlcft_surveillance_capability_digitalisation_2024",
@@ -31,12 +78,34 @@
     "regulator": "HKMA",
     "doc_type": "Circular",
     "issue_date": "2024",
-    "sector": ["Banking", "AML/CFT"],
-    "topics": ["AML", "CFT", "surveillance", "digitalisation", "regtech"],
-    "module_tags": ["aml", "surveillance", "deepresearch"],
+    "sector": [
+      "Banking",
+      "AML/CFT"
+    ],
+    "topics": [
+      "AML",
+      "CFT",
+      "surveillance",
+      "digitalisation",
+      "regtech"
+    ],
+    "module_tags": [
+      "aml",
+      "surveillance",
+      "deepresearch"
+    ],
     "file_path": "hkma_aml_ai/hkma_amlcft_surveillance_capability_digitalisation_2024.pdf",
     "priority": "P1",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_amlcft_surveillance_capability_svf_2024",
@@ -44,12 +113,35 @@
     "regulator": "HKMA",
     "doc_type": "Circular",
     "issue_date": "2024",
-    "sector": ["SVF", "Payment", "AML/CFT"],
-    "topics": ["SVF", "AML", "CFT", "surveillance", "regtech"],
-    "module_tags": ["svf", "aml", "surveillance"],
+    "sector": [
+      "SVF",
+      "Payment",
+      "AML/CFT"
+    ],
+    "topics": [
+      "SVF",
+      "AML",
+      "CFT",
+      "surveillance",
+      "regtech"
+    ],
+    "module_tags": [
+      "svf",
+      "aml",
+      "surveillance"
+    ],
     "file_path": "hkma_aml_ai/hkma_amlcft_surveillance_capability_svf_2024.pdf",
     "priority": "P1",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_supporting_ai_adoption_amlcft_2025",
@@ -57,12 +149,35 @@
     "regulator": "HKMA",
     "doc_type": "Circular",
     "issue_date": "2025",
-    "sector": ["Banking", "AML/CFT"],
-    "topics": ["AI", "AML", "CFT", "transaction_monitoring", "regtech"],
-    "module_tags": ["aml", "ai_regtech", "deepresearch"],
+    "sector": [
+      "Banking",
+      "AML/CFT"
+    ],
+    "topics": [
+      "AI",
+      "AML",
+      "CFT",
+      "transaction_monitoring",
+      "regtech"
+    ],
+    "module_tags": [
+      "aml",
+      "ai_regtech",
+      "deepresearch"
+    ],
     "file_path": "hkma_aml_ai/hkma_supporting_ai_adoption_amlcft_2025.pdf",
     "priority": "P1",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft",
+      "model_risk"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_tm_ai_thematic_review_2024",
@@ -70,12 +185,34 @@
     "regulator": "HKMA",
     "doc_type": "Thematic Review",
     "issue_date": "2024-04",
-    "sector": ["Banking", "AML/CFT"],
-    "topics": ["AI", "AML", "transaction_monitoring", "risk_management"],
-    "module_tags": ["aml", "ai_regtech", "deepresearch"],
+    "sector": [
+      "Banking",
+      "AML/CFT"
+    ],
+    "topics": [
+      "AI",
+      "AML",
+      "transaction_monitoring",
+      "risk_management"
+    ],
+    "module_tags": [
+      "aml",
+      "ai_regtech",
+      "deepresearch"
+    ],
     "file_path": "hkma_aml_ai/hkma_tm_ai_thematic_review_2024.pdf",
     "priority": "P0",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft",
+      "model_risk"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_tm_systems_insights_2024",
@@ -83,12 +220,33 @@
     "regulator": "HKMA",
     "doc_type": "Guidance",
     "issue_date": "2024-04",
-    "sector": ["Banking", "AML/CFT"],
-    "topics": ["AML", "transaction_monitoring", "system_design", "controls"],
-    "module_tags": ["aml", "transaction_monitoring", "deepresearch"],
+    "sector": [
+      "Banking",
+      "AML/CFT"
+    ],
+    "topics": [
+      "AML",
+      "transaction_monitoring",
+      "system_design",
+      "controls"
+    ],
+    "module_tags": [
+      "aml",
+      "transaction_monitoring",
+      "deepresearch"
+    ],
     "file_path": "hkma_aml_ai/hkma_tm_systems_insights_2024.pdf",
     "priority": "P0",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_high_end_money_laundering_guidance_2025",
@@ -96,12 +254,34 @@
     "regulator": "HKMA",
     "doc_type": "Guidance",
     "issue_date": "2025",
-    "sector": ["Banking", "Wealth", "AML/CFT"],
-    "topics": ["AML", "high_end_money_laundering", "wealth", "risk_based_approach"],
-    "module_tags": ["aml", "wealth", "deepresearch"],
+    "sector": [
+      "Banking",
+      "Wealth",
+      "AML/CFT"
+    ],
+    "topics": [
+      "AML",
+      "high_end_money_laundering",
+      "wealth",
+      "risk_based_approach"
+    ],
+    "module_tags": [
+      "aml",
+      "wealth",
+      "deepresearch"
+    ],
     "file_path": "hkma_aml_recent/hkma_high_end_money_laundering_guidance_2025.pdf",
     "priority": "P1",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_pep_risk_based_controls_2025",
@@ -109,12 +289,34 @@
     "regulator": "HKMA",
     "doc_type": "Guidance",
     "issue_date": "2025",
-    "sector": ["Banking", "AML/CFT"],
-    "topics": ["AML", "CDD", "EDD", "PEP", "risk_based_approach"],
-    "module_tags": ["aml", "kyc", "deepresearch"],
+    "sector": [
+      "Banking",
+      "AML/CFT"
+    ],
+    "topics": [
+      "AML",
+      "CDD",
+      "EDD",
+      "PEP",
+      "risk_based_approach"
+    ],
+    "module_tags": [
+      "aml",
+      "kyc",
+      "deepresearch"
+    ],
     "file_path": "hkma_aml_recent/hkma_pep_risk_based_controls_2025.pdf",
     "priority": "P1",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_genai_consumer_protection_2024",
@@ -122,12 +324,32 @@
     "regulator": "HKMA",
     "doc_type": "Circular",
     "issue_date": "2024-08",
-    "sector": ["Banking", "Consumer Protection"],
-    "topics": ["GenAI", "AI", "consumer_protection", "governance"],
-    "module_tags": ["ai_governance", "deepresearch"],
+    "sector": [
+      "Banking",
+      "Consumer Protection"
+    ],
+    "topics": [
+      "GenAI",
+      "AI",
+      "consumer_protection",
+      "governance"
+    ],
+    "module_tags": [
+      "ai_governance",
+      "deepresearch"
+    ],
     "file_path": "hkma_genai_consumer/hkma_genai_consumer_protection_2024.pdf",
     "priority": "P0",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "model_risk"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_svf_amlcft_guideline_2023",
@@ -136,12 +358,35 @@
     "doc_type": "Guideline",
     "issue_date": "2023-05",
     "effective_date": "2023-06-01",
-    "sector": ["SVF", "Payment", "AML/CFT"],
-    "topics": ["AML", "CFT", "CDD", "KYC", "transaction_monitoring"],
-    "module_tags": ["svf", "aml", "kyc"],
+    "sector": [
+      "SVF",
+      "Payment",
+      "AML/CFT"
+    ],
+    "topics": [
+      "AML",
+      "CFT",
+      "CDD",
+      "KYC",
+      "transaction_monitoring"
+    ],
+    "module_tags": [
+      "svf",
+      "aml",
+      "kyc"
+    ],
     "file_path": "hkma_svf/hkma_svf_amlcft_guideline_2023.pdf",
     "priority": "P0",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_svf_licensing_explanatory_notes_2019",
@@ -149,12 +394,31 @@
     "regulator": "HKMA",
     "doc_type": "Explanatory Notes",
     "issue_date": "2019-01",
-    "sector": ["SVF", "Payment"],
-    "topics": ["licensing", "application", "fitness_propriety"],
-    "module_tags": ["svf", "licensing"],
+    "sector": [
+      "SVF",
+      "Payment"
+    ],
+    "topics": [
+      "licensing",
+      "application",
+      "fitness_propriety"
+    ],
+    "module_tags": [
+      "svf",
+      "licensing"
+    ],
     "file_path": "hkma_svf/hkma_svf_licensing_explanatory_notes_2019.pdf",
     "priority": "P0",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "operational_risk"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_svf_mltf_risk_assessment_2019",
@@ -162,12 +426,34 @@
     "regulator": "HKMA",
     "doc_type": "Risk Assessment",
     "issue_date": "2019-07",
-    "sector": ["SVF", "Payment", "AML/CFT"],
-    "topics": ["SVF", "MLTF", "risk_assessment", "AML"],
-    "module_tags": ["svf", "aml", "risk_assessment"],
+    "sector": [
+      "SVF",
+      "Payment",
+      "AML/CFT"
+    ],
+    "topics": [
+      "SVF",
+      "MLTF",
+      "risk_assessment",
+      "AML"
+    ],
+    "module_tags": [
+      "svf",
+      "aml",
+      "risk_assessment"
+    ],
     "file_path": "hkma_svf/hkma_svf_mltf_risk_assessment_2019.pdf",
     "priority": "P1",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "aml_cft"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_svf_practice_note_2025",
@@ -175,12 +461,32 @@
     "regulator": "HKMA",
     "doc_type": "Practice Note",
     "issue_date": "2025-10",
-    "sector": ["SVF", "Payment"],
-    "topics": ["supervision", "governance", "operational_risk", "risk_management"],
-    "module_tags": ["svf", "supervision"],
+    "sector": [
+      "SVF",
+      "Payment"
+    ],
+    "topics": [
+      "supervision",
+      "governance",
+      "operational_risk",
+      "risk_management"
+    ],
+    "module_tags": [
+      "svf",
+      "supervision"
+    ],
     "file_path": "hkma_svf/hkma_svf_practice_note_2025.pdf",
     "priority": "P0",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "operational_risk"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "hkma_svf_supervision_guideline_2016",
@@ -188,12 +494,33 @@
     "regulator": "HKMA",
     "doc_type": "Guideline",
     "issue_date": "2016-09",
-    "sector": ["SVF", "Payment"],
-    "topics": ["supervision", "governance", "risk_management", "licensing"],
-    "module_tags": ["svf", "licensing", "supervision"],
+    "sector": [
+      "SVF",
+      "Payment"
+    ],
+    "topics": [
+      "supervision",
+      "governance",
+      "risk_management",
+      "licensing"
+    ],
+    "module_tags": [
+      "svf",
+      "licensing",
+      "supervision"
+    ],
     "file_path": "hkma_svf/hkma_svf_supervision_guideline_2016.pdf",
     "priority": "P0",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "operational_risk"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "pcpd_ai_model_personal_data_protection_framework_2024",
@@ -201,12 +528,35 @@
     "regulator": "PCPD",
     "doc_type": "Framework",
     "issue_date": "2024-06",
-    "sector": ["Privacy", "AI Governance"],
-    "topics": ["AI", "privacy", "personal_data", "risk_assessment", "human_oversight"],
-    "module_tags": ["ai_governance", "privacy", "deepresearch"],
+    "sector": [
+      "Privacy",
+      "AI Governance"
+    ],
+    "topics": [
+      "AI",
+      "privacy",
+      "personal_data",
+      "risk_assessment",
+      "human_oversight"
+    ],
+    "module_tags": [
+      "ai_governance",
+      "privacy",
+      "deepresearch"
+    ],
     "file_path": "pcpd_ai_privacy/pcpd_ai_model_personal_data_protection_framework_2024.pdf",
     "priority": "P0",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "data_privacy",
+      "model_risk"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "pcpd_ethical_ai_guidance_2021",
@@ -214,12 +564,33 @@
     "regulator": "PCPD",
     "doc_type": "Guidance",
     "issue_date": "2021-08",
-    "sector": ["Privacy", "AI Governance"],
-    "topics": ["ethical_ai", "AI", "privacy", "data_stewardship"],
-    "module_tags": ["ai_governance", "privacy"],
+    "sector": [
+      "Privacy",
+      "AI Governance"
+    ],
+    "topics": [
+      "ethical_ai",
+      "AI",
+      "privacy",
+      "data_stewardship"
+    ],
+    "module_tags": [
+      "ai_governance",
+      "privacy"
+    ],
     "file_path": "pcpd_ai_privacy/pcpd_ethical_ai_guidance_2021.pdf",
     "priority": "P1",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "data_privacy",
+      "model_risk"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   },
   {
     "doc_id": "pcpd_genai_employee_guidelines_checklist_2025",
@@ -227,11 +598,34 @@
     "regulator": "PCPD",
     "doc_type": "Checklist",
     "issue_date": "2025-03",
-    "sector": ["Privacy", "AI Governance"],
-    "topics": ["GenAI", "employee_use", "privacy", "data_security"],
-    "module_tags": ["ai_governance", "privacy", "deepresearch"],
+    "sector": [
+      "Privacy",
+      "AI Governance"
+    ],
+    "topics": [
+      "GenAI",
+      "employee_use",
+      "privacy",
+      "data_security"
+    ],
+    "module_tags": [
+      "ai_governance",
+      "privacy",
+      "deepresearch"
+    ],
     "file_path": "pcpd_ai_privacy/pcpd_genai_employee_guidelines_checklist_2025.pdf",
     "priority": "P1",
-    "language": "en"
+    "language": "en",
+    "risk_tags": [
+      "data_privacy",
+      "model_risk",
+      "cybersecurity"
+    ],
+    "regulatory_functions": [
+      "guidance"
+    ],
+    "source_url": null,
+    "supersedes": [],
+    "references": []
   }
 ]

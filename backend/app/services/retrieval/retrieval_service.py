@@ -18,7 +18,7 @@ def document_to_evidence(
     """Convert a LangChain Document into a structured EvidenceChunk."""
 
     metadata = doc.metadata or {}
-    score = metadata.get("rerank_score", metadata.get("score"))
+    score = metadata.get("rerank_score", metadata.get("rrf_score", metadata.get("score")))
     try:
         score = float(score) if score is not None else None
     except (TypeError, ValueError):
@@ -101,7 +101,7 @@ class RetrievalService:
 
         def score_for(doc: Document) -> float:
             metadata = doc.metadata or {}
-            base_score = metadata.get("rerank_score", metadata.get("score", 0.0))
+            base_score = metadata.get("rerank_score", metadata.get("rrf_score", metadata.get("score", 0.0)))
             try:
                 base = float(base_score)
             except (TypeError, ValueError):

@@ -19,6 +19,8 @@ Cohere Reranker 模块
   最终上下文 → Analyzer Agent
 """
 import builtins
+import time
+
 import cohere
 from functools import lru_cache
 from typing import List
@@ -41,6 +43,18 @@ def _safe_print(*args, **kwargs) -> None:
 
 
 print = _safe_print
+
+
+_COHERE_RATE_LIMITED_UNTIL = 0.0
+_RATE_LIMIT_COOLDOWN_SECONDS = 75
+
+
+def _is_rate_limit_error(exc: Exception) -> bool:
+    status = getattr(exc, "status_code", None)
+    if status == 429:
+        return True
+    message = str(exc).lower()
+    return "status_code: 429" in message or "limited to 10 api calls / minute" in message
 
 
 @lru_cache()
@@ -77,6 +91,16 @@ def rerank_documents(
     if not documents:
         return []
 
+    global _COHERE_RATE_LIMITED_UNTIL
+    now = time.time()
+    if now < _COHERE_RATE_LIMITED_UNTIL:
+        remaining = int(_COHERE_RATE_LIMITED_UNTIL - now)
+        print(
+            f"  ⚠️ Cohere rerank temporarily disabled due to recent rate limiting "
+            f"(cooldown {remaining}s). Using fallback top-{top_k}."
+        )
+        return list(documents[:top_k])
+
     doc_texts = [doc.page_content for doc in documents]
 
     try:
@@ -97,6 +121,7 @@ def rerank_documents(
             reranked.append(doc)
 
         scores_preview = [round(r.relevance_score, 3) for r in response.results[:3]]
+        _COHERE_RATE_LIMITED_UNTIL = 0.0
         print(
             f"  🎯 Cohere Reranker: {len(documents)} → {len(reranked)} docs "
             f"(top scores: {scores_preview}...)"
@@ -104,5 +129,12 @@ def rerank_documents(
         return reranked
 
     except Exception as e:
+        if _is_rate_limit_error(e):
+            _COHERE_RATE_LIMITED_UNTIL = time.time() + _RATE_LIMIT_COOLDOWN_SECONDS
+            print(
+                "  ⚠️ Cohere rate limited (429); entering cooldown and "
+                f"falling back to unranked top-{top_k}"
+            )
+            return list(documents[:top_k])
         print(f"  ⚠️ Cohere Rerank failed: {e}, falling back to unranked top-{top_k}")
         return list(documents[:top_k])

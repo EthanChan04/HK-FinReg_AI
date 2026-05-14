@@ -1,7 +1,7 @@
-"""
-环境变量集中管理模块 (Configuration)
-基于 Pydantic BaseSettings，自动从 .env 文件中加载配置。
-包含 LangSmith 全链路追踪、CORS 安全策略与 API Key 认证配置。
+﻿"""
+鐜鍙橀噺闆嗕腑绠＄悊妯″潡 (Configuration)
+鍩轰簬 Pydantic BaseSettings锛岃嚜鍔ㄤ粠 .env 鏂囦欢涓姞杞介厤缃€?
+鍖呭惈 LangSmith 鍏ㄩ摼璺拷韪€丆ORS 瀹夊叏绛栫暐涓?API Key 璁よ瘉閰嶇疆銆?
 """
 import json
 from pydantic_settings import BaseSettings
@@ -9,7 +9,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    """应用全局配置"""
+    """搴旂敤鍏ㄥ眬閰嶇疆"""
     # --- API Keys ---
     ZHIPU_API_KEY: str = ""
     LONGCAT_API_KEY: str = ""
@@ -23,19 +23,30 @@ class Settings(BaseSettings):
     # --- LangSmith Tracing ---
     LANGSMITH_API_KEY: str = ""
     LANGSMITH_PROJECT: str = "hk-finreg-ai"
-    LANGSMITH_TRACING: bool = True  # 总开关
+    LANGSMITH_TRACING: bool = True  # 鎬诲紑鍏?
     LANGCHAIN_TRACING_V2: str | None = None
     LANGCHAIN_ENDPOINT: str | None = None
     LANGCHAIN_API_KEY: str | None = None
     LANGCHAIN_PROJECT: str | None = None
 
     # --- Model Config ---
-    ZHIPU_MODEL: str = "glm-4.5-air"
-    ZHIPU_BASE_URL: str = "https://open.bigmodel.cn/api/paas/v4/"
+    ZHIPU_MODEL: str = "MiMo-v2.5"
+    ZHIPU_BASE_URL: str = "https://token-plan-cn.xiaomimimo.com/v1"
     ZHIPU_EMBEDDING_MODEL: str = "embedding-3"
-    LONGCAT_MODEL: str = "LongCat-Flash-Chat"
-    LONGCAT_BASE_URL: str = "https://api.longcat.chat/openai/v1"
-    LLM_TIMEOUT_SECONDS: int = 60  # LLM API 调用超时时间（秒）
+    EMBEDDING_PROVIDER: str = "openai_compatible"  # openai_compatible | local_hash
+    EMBEDDING_MODEL: str = "embedding-3"
+    EMBEDDING_BASE_URL: str = ""
+    EMBEDDING_API_KEY: str = ""
+    EMBEDDING_DIMENSIONS: int = 256
+    LONGCAT_MODEL: str = "MiMo-v2.5"
+    LONGCAT_BASE_URL: str = "https://token-plan-cn.xiaomimimo.com/v1"
+    LLM_TIMEOUT_SECONDS: int = 60  # LLM API timeout in seconds
+    COPILOT_MODEL: str = "MiMo-v2.5"
+    COPILOT_BASE_URL: str = "https://token-plan-cn.xiaomimimo.com/v1"
+    COPILOT_API_KEY: str = ""
+    COPILOT_TIMEOUT_SECONDS: int = 60
+    COPILOT_MAX_CONTEXT_CHARS: int = 16000
+    COPILOT_MAX_HISTORY_MESSAGES: int = 8
 
     # --- RAG Config ---
     # Legacy fallback. Used only when SOURCE_MANIFEST_PATH is missing or empty.
@@ -43,7 +54,7 @@ class Settings(BaseSettings):
     CHROMA_COLLECTION: str = "hk_finreg_corpus"
     CHUNK_SIZE: int = 1500
     CHUNK_OVERLAP: int = 200
-    PARSER_MODE: str = "hierarchy"  # "hierarchy" | "reg_aware" | "flat" — M5 解析模式开关
+    PARSER_MODE: str = "hierarchy"  # "hierarchy" | "reg_aware" | "flat" 鈥?M5 瑙ｆ瀽妯″紡寮€鍏?
     REG_DOC_DIR: str = "data/regulations"
     SOURCE_MANIFEST_PATH: str = "data/source_manifest.json"
     CORPUS_INDEX_DIR: str = "data/indexes"
@@ -61,38 +72,38 @@ class Settings(BaseSettings):
     SEMANTIC_CACHE_TTL_SECONDS: int = 3600
 
     # --- Confidence Config (P2) ---
-    CONFIDENCE_LOW_THRESHOLD: float = 0.5     # Rerank Top-1 < 0.5 → 低置信度警告
-    CONFIDENCE_MED_THRESHOLD: float = 0.7     # Rerank Top-1 < 0.7 → 中等置信度提示
-    CONFIDENCE_CROSS_VALIDATION_THRESHOLD: float = 0.3  # M3: retrieval vs reasoning 偏差阈值
+    CONFIDENCE_LOW_THRESHOLD: float = 0.5     # Rerank Top-1 < 0.5 鈫?浣庣疆淇″害璀﹀憡
+    CONFIDENCE_MED_THRESHOLD: float = 0.7     # Rerank Top-1 < 0.7 鈫?涓瓑缃俊搴︽彁绀?
+    CONFIDENCE_CROSS_VALIDATION_THRESHOLD: float = 0.3  # M3: retrieval vs reasoning 鍋忓樊闃堝€?
 
     # --- App Config ---
     APP_TITLE: str = "HK-FinReg AI Backend"
-    # CORS_ORIGINS: 支持从 .env 读取 JSON 数组字符串，如 '["https://your-domain.com"]'
-    # 默认仅允许本地开发地址；生产部署必须通过 CORS_ORIGINS 环境变量配置实际域名
+    # CORS_ORIGINS: 鏀寔浠?.env 璇诲彇 JSON 鏁扮粍瀛楃涓诧紝濡?'["https://your-domain.com"]'
+    # 榛樿浠呭厑璁告湰鍦板紑鍙戝湴鍧€锛涚敓浜ч儴缃插繀椤婚€氳繃 CORS_ORIGINS 鐜鍙橀噺閰嶇疆瀹為檯鍩熷悕
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
     DEBUG: bool = False
 
     # --- Input Validation ---
-    MAX_INPUT_LENGTH: int = 50000  # application_data 最大字符数
+    MAX_INPUT_LENGTH: int = 50000  # application_data 鏈€澶у瓧绗︽暟
 
     # --- Security Config ---
-    API_KEY_ENABLED: bool = True         # 设为 True 启用 API Key 认证（安全默认）
-    API_KEY: str = ""                    # 在 .env 中设置: API_KEY=your_secret_key
+    API_KEY_ENABLED: bool = True         # 璁句负 True 鍚敤 API Key 璁よ瘉锛堝畨鍏ㄩ粯璁わ級
+    API_KEY: str = ""                    # 鍦?.env 涓缃? API_KEY=your_secret_key
 
     # --- Workflow Checkpoint Config (Phase 1) ---
-    WORKFLOW_CHECKPOINT_ENABLED: bool = True   # 是否启用工作流持久化
-    WORKFLOW_DB_URL: str = ""                  # PostgreSQL 连接串，为空时 fallback 到 MemorySaver
-    WORKFLOW_THREAD_PREFIX: str = "svf"        # workflow_run_id 前缀
+    WORKFLOW_CHECKPOINT_ENABLED: bool = True   # 鏄惁鍚敤宸ヤ綔娴佹寔涔呭寲
+    WORKFLOW_DB_URL: str = ""                  # PostgreSQL 杩炴帴涓诧紝涓虹┖鏃?fallback 鍒?MemorySaver
+    WORKFLOW_THREAD_PREFIX: str = "svf"        # workflow_run_id 鍓嶇紑
 
     model_config = {
         "env_file": ".env", 
         "env_file_encoding": "utf-8",
-        "extra": "ignore"  # 允许 .env 存在冗余字段而不报错
+        "extra": "ignore"  # 鍏佽 .env 瀛樺湪鍐椾綑瀛楁鑰屼笉鎶ラ敊
     }
 
     @classmethod
     def _parse_cors_origins(cls, v):
-        """支持 JSON 数组字符串格式的 CORS_ORIGINS 环境变量"""
+        """鏀寔 JSON 鏁扮粍瀛楃涓叉牸寮忕殑 CORS_ORIGINS 鐜鍙橀噺"""
         if isinstance(v, str):
             try:
                 parsed = json.loads(v)
@@ -100,12 +111,14 @@ class Settings(BaseSettings):
                     return parsed
             except json.JSONDecodeError:
                 pass
-            # 逗号分隔 fallback
+            # 閫楀彿鍒嗛殧 fallback
             return [origin.strip() for origin in v.split(",") if origin.strip()]
         return v
 
 
 @lru_cache()
 def get_settings() -> Settings:
-    """获取全局唯一配置实例 (cached)"""
+    """鑾峰彇鍏ㄥ眬鍞竴閰嶇疆瀹炰緥 (cached)"""
     return Settings()
+
+
