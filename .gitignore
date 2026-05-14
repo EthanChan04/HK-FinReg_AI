@@ -74,6 +74,7 @@ plan
 
 # ----- Logs -----
 *.log
+logs_*.txt
 logs/
 backend/logs/
 Fintech/compliance_audit.log
@@ -103,6 +104,7 @@ build/
 coverage/
 .coverage
 htmlcov/
+output/
 
 
 # ----- Local Planning / Upgrade Docs (keep local only) -----

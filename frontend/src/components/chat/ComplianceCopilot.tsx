@@ -59,21 +59,24 @@ export default function ComplianceCopilot({ activeBoardId, caseContext }: Compli
   return (
     <>
       <aside
-        className={`hidden h-full shrink-0 border-l border-slate-300/10 bg-slate-950/40 backdrop-blur-sm transition-all duration-200 lg:flex lg:flex-col ${
+        className={`hidden h-full shrink-0 border-l border-slate-300/10 bg-slate-950/55 backdrop-blur-xl transition-all duration-200 lg:flex lg:flex-col ${
           collapsed ? "w-14" : "w-[380px]"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-slate-300/15 px-3 py-3">
+        <div className="flex items-center justify-between border-b border-slate-300/15 bg-slate-900/30 px-3 py-3">
           {!collapsed && (
-            <div>
-              <h3 className="text-sm font-semibold tracking-tight text-slate-100">Compliance Copilot</h3>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_14px_rgba(110,231,183,0.7)]" />
+                <h3 className="text-sm font-semibold tracking-tight text-slate-100">Compliance Copilot</h3>
+              </div>
               <p className="text-[10px] text-slate-400">Bilingual workflow-aware assistant</p>
             </div>
           )}
           <button
             aria-label={collapsed ? "Expand Copilot panel" : "Collapse Copilot panel"}
             onClick={() => setCollapsed((prev) => !prev)}
-            className="rounded-md border border-slate-300/20 bg-slate-900/60 px-2 py-1 text-[11px] font-medium text-slate-300 hover:border-cyan-300/40 hover:text-cyan-100"
+            className="rounded-md border border-slate-300/20 bg-slate-950/70 px-2 py-1 text-[11px] font-medium text-slate-300 hover:border-cyan-300/40 hover:text-cyan-100"
           >
             {collapsed ? "Open" : "Hide"}
           </button>
@@ -85,7 +88,7 @@ export default function ComplianceCopilot({ activeBoardId, caseContext }: Compli
       <button
         aria-label="Open Compliance Copilot"
         onClick={() => setMobileOpen(true)}
-        className="fixed bottom-4 right-4 z-40 rounded-full border border-cyan-300/40 bg-gradient-to-r from-cyan-500/25 to-blue-500/20 px-4 py-2 text-xs font-semibold text-cyan-100 shadow-[0_10px_24px_rgba(31,140,179,0.35)] lg:hidden"
+        className="fixed bottom-4 right-4 z-40 rounded-full border border-cyan-300/40 bg-gradient-to-r from-cyan-500/30 to-emerald-400/25 px-4 py-2 text-xs font-semibold text-cyan-50 shadow-[0_10px_24px_rgba(31,140,179,0.35)] lg:hidden"
       >
         Open Copilot
       </button>

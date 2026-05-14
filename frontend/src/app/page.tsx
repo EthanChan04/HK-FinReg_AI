@@ -77,13 +77,31 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b border-slate-300/10 bg-slate-950/40 px-4 py-5 backdrop-blur-sm md:px-6">
-        <div className="mx-auto flex max-w-[1500px] items-center justify-between">
-          <div>
-            <h1 className="text-gradient text-3xl font-extrabold tracking-tight md:text-4xl">HK-FinReg AI</h1>
-            <p className="mt-1 text-sm tracking-wide text-slate-400">
-              Regulatory Intelligence & Compliance Operations Platform
-            </p>
+      <header className="border-b border-slate-300/10 bg-slate-950/65 px-4 py-5 backdrop-blur-xl md:px-6">
+        <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-6">
+          <div className="min-w-0">
+            <div className="flex items-center gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-cyan-200/25 bg-cyan-300/10 text-sm font-black text-cyan-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+                HK
+              </div>
+              <div>
+                <h1 className="text-gradient text-3xl font-extrabold tracking-tight md:text-4xl">HK-FinReg AI</h1>
+                <p className="mt-1 text-sm tracking-wide text-slate-400">
+                  Regulatory Intelligence & Compliance Operations Platform
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 hidden items-center gap-3 text-[11px] text-slate-400 md:flex">
+              <span className="rounded-md border border-emerald-300/20 bg-emerald-400/10 px-2.5 py-1 text-emerald-100">
+                Evidence-first review
+              </span>
+              <span className="rounded-md border border-cyan-300/20 bg-cyan-400/10 px-2.5 py-1 text-cyan-100">
+                RAG + KAG + DeepResearch
+              </span>
+              <span className="rounded-md border border-slate-300/15 bg-slate-900/55 px-2.5 py-1">
+                Human review gates
+              </span>
+            </div>
           </div>
 
           {stream.isStreaming && (
@@ -137,9 +155,9 @@ export default function Home() {
         onChange={handleBoardSwitch}
       />
 
-      <main className="flex min-h-0 flex-1 overflow-hidden">
-        <div className="flex w-[430px] shrink-0 flex-col gap-4 border-r border-slate-300/10 bg-slate-950/35 p-5">
-          <div className="rounded-2xl border border-slate-300/15 bg-slate-900/45 p-3">
+      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
+        <div className="flex w-full shrink-0 flex-col gap-4 border-b border-slate-300/10 bg-slate-950/45 p-5 lg:w-[430px] lg:border-b-0 lg:border-r">
+          <div className="glass-panel rounded-xl p-3">
             <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Workspace Workflows</h2>
             <WorkflowSelector
               workflows={workflowsForBoard}
@@ -149,37 +167,44 @@ export default function Home() {
             />
           </div>
 
-          <div className="rounded-2xl border border-slate-300/15 bg-slate-900/45 p-4">
-            <h2 className="mb-1 text-sm font-semibold text-slate-100">Input: {currentModule.nameZh}</h2>
-            <p className="text-xs text-slate-400">
-              Provide scenario details, then submit to start compliance analysis.
-            </p>
+          <div className="glass-panel rounded-xl p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="mb-1 text-sm font-semibold text-slate-100">Input: {currentModule.nameZh}</h2>
+                <p className="text-xs leading-5 text-slate-400">
+                  Provide scenario details, then submit to start compliance analysis.
+                </p>
+              </div>
+              <span className="rounded-md border border-slate-300/15 bg-slate-950/60 px-2.5 py-1 text-[10px] text-slate-400">
+                {currentModule.status}
+              </span>
+            </div>
 
             <textarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               disabled={stream.isStreaming}
-              className="mt-3 h-[230px] w-full resize-none rounded-xl border border-slate-300/20 bg-slate-900/70 p-4 font-mono text-sm text-slate-200 outline-none transition-colors focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 disabled:opacity-50"
+              className="mt-3 h-[230px] w-full resize-none rounded-xl border border-slate-300/18 bg-slate-950/55 p-4 font-mono text-sm leading-6 text-slate-200 outline-none transition-colors placeholder:text-slate-600 focus:border-cyan-300/45 focus:ring-2 focus:ring-cyan-300/10 disabled:opacity-50"
               placeholder="Enter compliance scenario..."
             />
 
             <button
               onClick={handleSubmit}
               disabled={stream.isStreaming || !inputText.trim()}
-              className="mt-3 w-full rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(25,131,171,0.32)] transition-all disabled:cursor-not-allowed disabled:opacity-40"
+              className="mt-3 w-full rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-400 py-3 text-sm font-semibold text-slate-950 shadow-[0_14px_28px_rgba(25,131,171,0.28)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {stream.isStreaming ? `Running... ${formatTime(stream.elapsedTime)}` : "Submit Analysis"}
             </button>
           </div>
 
-          <div className="space-y-1 rounded-2xl border border-slate-300/10 bg-slate-900/35 p-3 text-[10px] text-slate-500">
+          <div className="space-y-1 rounded-xl border border-slate-300/10 bg-slate-950/35 p-3 text-[10px] text-slate-500">
             <p>Dynamic routing: RAG / KAG / Deep Research</p>
             <p>Hybrid retrieval with citation-ready evidence</p>
             <p>Human review queue for low-confidence cases</p>
           </div>
         </div>
 
-        <div className="flex min-w-0 flex-1 overflow-hidden">
+        <div className="flex min-h-[760px] min-w-0 flex-1 overflow-hidden lg:min-h-0">
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 p-5">
             <h2 className="shrink-0 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
               Output: Compliance Analysis Report
@@ -202,7 +227,7 @@ export default function Home() {
                 />
               </div>
 
-              <div className="flex min-h-[250px] flex-col overflow-hidden rounded-2xl border border-slate-300/12 bg-slate-950/35">
+              <div className="glass-panel flex min-h-[250px] flex-col overflow-hidden rounded-xl">
                 <ReportPanel
                   text={stream.reportText}
                   isStreaming={stream.isStreaming}

@@ -16,11 +16,24 @@
 
 body {
   background:
-    radial-gradient(1200px 640px at 3% -10%, rgba(46, 197, 232, 0.14), transparent 52%),
-    radial-gradient(1000px 700px at 98% -15%, rgba(76, 125, 255, 0.14), transparent 56%),
-    linear-gradient(180deg, #060d1a 0%, var(--bg-primary) 52%, #081223 100%);
+    linear-gradient(120deg, rgba(46, 197, 232, 0.08), transparent 34%),
+    linear-gradient(240deg, rgba(75, 217, 177, 0.07), transparent 30%),
+    linear-gradient(180deg, #07101f 0%, var(--bg-primary) 50%, #081220 100%);
   color: var(--text-primary);
   font-family: var(--font-geist-sans), "Avenir Next", "Segoe UI", sans-serif;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background-image:
+    linear-gradient(rgba(158, 184, 219, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(158, 184, 219, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.62), transparent 72%);
 }
 
 /* Scrollbar */
@@ -40,10 +53,20 @@ body {
 
 /* Gradient text utility */
 .text-gradient {
-  background: linear-gradient(125deg, #9dd8ff 0%, var(--accent-cyan) 44%, #5b88ff 100%);
+  background: linear-gradient(125deg, #f4fbff 0%, var(--accent-cyan) 42%, var(--accent-emerald) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.glass-panel {
+  border: 1px solid rgba(186, 207, 233, 0.13);
+  background: linear-gradient(180deg, rgba(18, 32, 54, 0.76), rgba(8, 18, 35, 0.7));
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.22);
+}
+
+.soft-divider {
+  background: linear-gradient(90deg, transparent, rgba(186, 207, 233, 0.24), transparent);
 }
 
 /* ===== Report Markdown Typography ===== */
