@@ -24,6 +24,23 @@ def _add_filter(filters: dict[str, list[str]], key: str, values: list[str]) -> N
             existing.append(value)
 
 
+def _has_any(text: str, pattern: str) -> bool:
+    return re.search(pattern, text) is not None
+
+
+def _is_ai_wealth_product_launch(text: str, reasons: list[str]) -> bool:
+    has_ai = "ai" in reasons or _has_any(text, r"\b(ai|artificial intelligence|genai)\b")
+    has_wealth = _has_any(
+        text,
+        r"\b(wealth|investment|investor|advisory|advisor|suitability|portfolio)\b",
+    )
+    has_launch_or_product = _has_any(
+        text,
+        r"\b(product|launch|launches|launching|pre[-\s]?launch|onboarding)\b",
+    )
+    return has_ai and has_wealth and has_launch_or_product
+
+
 def classify_query(query: str) -> QueryProfile:
     """Classify a query into RAG, KAG, or DeepResearch using conservative rules."""
 
@@ -54,6 +71,21 @@ def classify_query(query: str) -> QueryProfile:
         mode = "kag"
         confidence = max(confidence, 0.78)
         reasons.append("relationship_query")
+    if _is_ai_wealth_product_launch(text, reasons):
+        _add_filter(filters, "regulator", ["HKMA", "SFC", "PCPD"])
+        _add_filter(
+            filters,
+            "topics",
+            [
+                "wealth_management",
+                "consumer_protection",
+                "suitability",
+                "personal_data",
+            ],
+        )
+        mode = "kag"
+        confidence = max(confidence, 0.79)
+        reasons.append("ai_wealth_product_launch")
     if re.search(r"(分析|報告|报告|checklist|檢查清單|检查清单|上线前|上線前|合規風險|合规风险|research)", text):
         mode = "deep_research"
         confidence = 0.82

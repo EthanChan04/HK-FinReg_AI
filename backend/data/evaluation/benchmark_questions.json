@@ -3,6 +3,8 @@
     "id": "RAG_SVF_AML_001",
     "question": "What are the key CDD obligations for an SVF licensee?",
     "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": ["CDD", "customer due diligence", "SVF", "stored value facility", "HKMA"],
     "expected_topics": ["CDD", "AML", "SVF"],
     "expected_regulators": ["HKMA"]
   },
@@ -10,14 +12,18 @@
     "id": "KAG_AI_ADVISOR_001",
     "question": "Which regulators and obligations are relevant when a Hong Kong virtual bank launches an AI wealth advisory product?",
     "expected_retrieval_mode": "kag",
-    "expected_topics": ["AI", "wealth_management", "consumer_protection"],
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": ["AI", "GenAI", "governance", "product launch"],
+    "expected_topics": ["AI", "wealth_management", "consumer_protection", "suitability", "personal_data"],
     "expected_regulators": ["HKMA", "SFC", "PCPD"]
   },
   {
     "id": "DR_AI_ADVISOR_001",
     "question": "Analyze the compliance risks for a Hong Kong virtual bank launching an AI investment advisor and generate a pre-launch checklist.",
     "expected_retrieval_mode": "deep_research",
-    "expected_topics": ["AI", "AML", "CDD", "data_privacy", "consumer_protection"],
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": ["AI", "GenAI", "governance"],
+    "expected_topics": ["AI", "wealth_management", "consumer_protection", "suitability", "personal_data"],
     "expected_regulators": ["HKMA", "SFC", "PCPD"]
   }
 ]

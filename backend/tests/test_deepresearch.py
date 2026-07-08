@@ -59,3 +59,40 @@ def test_report_writer_creates_checklist_and_citation_audit():
 
     assert "Compliance Checklist" in result.final_report
     assert result.citation_audit is not None
+
+
+def test_deepresearch_regulator_diversity_gate_prioritizes_available_regulators():
+    from app.services.deepresearch.workflow import _apply_regulator_diversity_gate
+
+    evidence = [
+        {"evidence_id": "p1", "regulator": "PCPD", "text": "PCPD AI guidance"},
+        {"evidence_id": "p2", "regulator": "PCPD", "text": "PCPD personal data"},
+        {"evidence_id": "p3", "regulator": "PCPD", "text": "PCPD privacy"},
+        {"evidence_id": "h1", "regulator": "HKMA", "text": "HKMA governance"},
+        {"evidence_id": "s1", "regulator": "SFC", "text": "SFC suitability"},
+    ]
+
+    selected = _apply_regulator_diversity_gate(
+        evidence,
+        required_regulators=["HKMA", "SFC", "PCPD"],
+        top_k=3,
+    )
+
+    assert [item["regulator"] for item in selected] == ["HKMA", "SFC", "PCPD"]
+
+
+def test_deepresearch_regulator_diversity_gate_preserves_rank_when_no_alternative_exists():
+    from app.services.deepresearch.workflow import _apply_regulator_diversity_gate
+
+    evidence = [
+        {"evidence_id": "p1", "regulator": "PCPD", "text": "PCPD AI guidance"},
+        {"evidence_id": "p2", "regulator": "PCPD", "text": "PCPD personal data"},
+    ]
+
+    selected = _apply_regulator_diversity_gate(
+        evidence,
+        required_regulators=["HKMA", "SFC", "PCPD"],
+        top_k=3,
+    )
+
+    assert [item["evidence_id"] for item in selected] == ["p1", "p2"]

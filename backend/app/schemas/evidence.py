@@ -46,3 +46,5 @@ class EvidenceBundle(BaseModel):
     evidence_chunks: list[EvidenceChunk]
     graph_paths: list[dict[str, Any]] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+    query_plan: dict[str, Any] | None = None
+    retrieval_strategy: dict[str, Any] | None = None

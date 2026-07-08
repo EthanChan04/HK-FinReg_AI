@@ -37,6 +37,39 @@ def test_tool_router_regulatory_qa_uses_retrieval(monkeypatch):
     assert result.payload.evidence_chunks[0].regulator == "HKMA"
 
 
+def test_tool_router_regulatory_qa_uses_strategy_aware_router(monkeypatch):
+    from app.schemas.evidence import EvidenceBundle, EvidenceChunk
+
+    def fake_route_and_retrieve(query, retrieval_service, **kwargs):
+        return EvidenceBundle(
+            query=query,
+            retrieval_mode="rag",
+            evidence_chunks=[
+                EvidenceChunk(
+                    evidence_id="source_1",
+                    doc_id="doc_1",
+                    title="Doc",
+                    regulator="HKMA",
+                    page=1,
+                    text="strategy-aware evidence",
+                    retrieval_method="hybrid",
+                )
+            ],
+            retrieval_strategy={"strategy_id": "aml_kyc_balanced_rerank"},
+        )
+
+    monkeypatch.setattr("app.services.copilot.tool_router.build_reranked_retriever", lambda: _FakeRetriever())
+    monkeypatch.setattr("app.services.copilot.tool_router.route_and_retrieve", fake_route_and_retrieve)
+
+    request = CopilotChatRequest(message="What are SVF CDD requirements?")
+    decision = IntentDecision(intent="regulatory_qa", engine="rag", reason="default")
+
+    result = route_tools(decision, request, {"case_context": {}})
+
+    assert result.tool_name == "rag"
+    assert result.payload.evidence_chunks[0].metadata["retrieval_strategy"]["strategy_id"] == "aml_kyc_balanced_rerank"
+
+
 def test_tool_router_workflow_recommendation_returns_metadata():
     request = CopilotChatRequest(
         message="Which workflow should I use for product launch?",

@@ -15,7 +15,7 @@ It helps compliance, AML, KYC, product, legal, regulatory affairs, and audit tea
 
 The platform combines:
 
-- Hybrid regulatory retrieval with BM25, dense embeddings, reciprocal rank fusion, optional reranking, and citation audit metadata.
+- Hybrid regulatory retrieval with BM25, dense embeddings, reciprocal rank fusion, optional reranking, SIRA-style query planning, Experience-RAG strategy memory, and citation audit metadata.
 - KAG, a regulatory knowledge graph layer for obligation, risk, control, regulator, and product mapping.
 - DeepResearch workflows for multi-step planning, evidence gathering, gap analysis, and memo/report synthesis.
 - Compliance Copilot, a context-aware bilingual assistant that routes user intent across RAG, KAG, DeepResearch, workflow recommendations, and human review support.
@@ -56,6 +56,10 @@ Compliance Copilot is implemented as a streaming chat assistant:
 ### Engineering Upgrades
 
 - Evidence metadata includes RRF score and richer display fields for the Evidence Panel.
+- SIRA-style query planning and Experience-RAG strategy metadata can be enabled to expand regulatory aliases, select retrieval recipes, and audit retrieval decisions.
+- AI wealth advisory and product launch queries are expanded across HKMA, SFC, PCPD, consumer protection, suitability, and personal data signals.
+- Evaluation separates classifier-side regulator coverage from evidence-side regulator coverage, so retrieval recall can be assessed independently from query classification.
+- DeepResearch sub-question retrieval applies a regulator diversity gate to reduce PCPD-only evidence saturation when HKMA/SFC/PCPD evidence is available.
 - Citation verifier returns explanation fields and audit summaries.
 - KAG ontology and graph retrieval support obligation, risk, and control mapping.
 - KAG APIs expose obligation mapping and graph search.
@@ -69,16 +73,36 @@ Compliance Copilot is implemented as a streaming chat assistant:
 ```mermaid
 flowchart LR
   A["Next.js Frontend"] -->|"Server-side proxy + SSE"| B["FastAPI Backend"]
+  B --> I["SIRA Query Planner + Experience-RAG Strategy Router"]
   B --> C["Hybrid Retrieval: BM25 + Dense + RRF + Optional Rerank"]
   B --> D["KAG: Graph Store + Graph Retriever + Obligation Mapper"]
   B --> E["DeepResearch: Planner + Evidence Evaluator + Workflow"]
   B --> H["Human Review Queue + Workflow Checkpoints"]
+  I --> C
+  I --> D
   C --> F["Evidence + Citation Audit"]
   D --> F
   E --> F
   H --> G["Compliance Report / Memo / Mapping"]
   F --> G
 ```
+
+## Regulatory Retrieval and Research Quality
+
+The current retrieval stack is optimized for Hong Kong financial regulatory research where a user query often implies more than one regulator. For AI wealth advisory and product launch workflows, the classifier and query planner expand the query across:
+
+- Regulators: `HKMA`, `SFC`, `PCPD`
+- Topics: `AI`, `GenAI`, `ai_governance`, `wealth_management`, `consumer_protection`, `suitability`, `personal_data`
+- Retrieval terms: `consumer protection`, `suitability`, `personal data`, `wealth management`, and regulator aliases
+
+DeepResearch uses the same regulator intent when collecting sub-question evidence. After ranked retrieval, a regulator diversity gate selects available HKMA/SFC/PCPD evidence before filling the remaining slots by original rank. This keeps strong PCPD AI/privacy matches from crowding out banking, conduct, or suitability evidence when those sources exist.
+
+Evaluation reports both:
+
+- `classifier_regulator_coverage`: whether classifier filters include expected regulators.
+- `evidence_regulator_coverage`: whether retrieved evidence metadata actually represents those regulators.
+
+This split is intentional: classifier coverage can be healthy while evidence coverage reveals corpus, metadata, or retrieval diversity gaps.
 
 ## API Surface
 
@@ -91,7 +115,7 @@ flowchart LR
 
 These endpoints return SSE events such as `agent_state`, `token`, `confidence`, `checkpoint_saved`, `action_required`, `evidence_chunks`, `graph_paths`, `research_plan`, and `done`.
 
-### Compliance Copilot
+### Compliance Copilot API
 
 - `POST /api/v1/copilot/chat/stream`
 
@@ -172,7 +196,7 @@ Most business endpoints are protected by bearer-token API key validation when `A
 
 ## Installation
 
-### Backend
+### Backend Installation
 
 ```bash
 python -m pip install --upgrade pip
@@ -181,7 +205,7 @@ python -m pip install -r requirements.txt
 
 The root `requirements.txt` delegates to `backend/requirements.txt`, which is the canonical backend dependency list.
 
-### Frontend
+### Frontend Installation
 
 ```bash
 cd frontend
@@ -190,7 +214,7 @@ npm install
 
 ## Configuration
 
-### Backend
+### Backend Configuration
 
 Create `backend/.env` from `backend/.env.example`:
 
@@ -205,12 +229,13 @@ Configure at least:
 - `ZHIPU_BASE_URL`, `LONGCAT_BASE_URL`, `ZHIPU_MODEL`, and `LONGCAT_MODEL`
 - Embedding settings: `EMBEDDING_PROVIDER`, `EMBEDDING_MODEL`, `EMBEDDING_BASE_URL`, `EMBEDDING_API_KEY`, `EMBEDDING_DIMENSIONS`
 - Copilot settings: `COPILOT_MODEL`, `COPILOT_BASE_URL`, `COPILOT_API_KEY`, `COPILOT_TIMEOUT_SECONDS`, `COPILOT_MAX_CONTEXT_CHARS`, `COPILOT_MAX_HISTORY_MESSAGES`
+- Optional retrieval planning settings: `SIRA_QUERY_PLANNER_ENABLED`, `SIRA_TERM_STATS_PATH`, `EXPERIENCE_RAG_ENABLED`, `EXPERIENCE_RAG_MEMORY_PATH`, `EXPERIENCE_RAG_RECORDING_ENABLED`, `EXPERIENCE_RAG_MAX_RECORDS`
 - `API_KEY_ENABLED` and `API_KEY`
 - Optional `COHERE_API_KEY`
 - Optional LangSmith variables: `LANGCHAIN_TRACING_V2`, `LANGCHAIN_ENDPOINT`, `LANGCHAIN_API_KEY`, `LANGCHAIN_PROJECT`
 - CORS settings for deployed frontend origins
 
-### Frontend
+### Frontend Configuration
 
 Create `frontend/.env.local` from `frontend/.env.example`:
 
@@ -271,6 +296,37 @@ npm run build
 cd backend
 python -m app.services.evaluation.run_eval
 ```
+
+The deterministic evaluation summary includes:
+
+- `retrieval_mode_accuracy`
+- `avg_topic_coverage`
+- `avg_classifier_regulator_coverage`
+- `avg_evidence_regulator_coverage`
+- `strategy_accuracy`
+- `avg_expansion_term_coverage`
+- `avg_citation_supported_rate`
+- `avg_unsupported_claim_rate`
+- `avg_deepresearch_gap_count`
+
+See [docs/evaluation_protocol.md](./docs/evaluation_protocol.md) for metric definitions and interpretation.
+
+### Regulatory Optimization Tests
+
+```bash
+cd backend
+python -m pytest tests/test_query_classifier.py tests/test_query_planner.py tests/test_deepresearch.py tests/test_evaluation_error_reporting.py tests/test_regulatory_optimization_pipeline.py -q
+```
+
+These tests cover:
+
+- AI wealth advisory/product launch regulator and topic expansion.
+- Query planner expansion for HKMA/SFC/PCPD, consumer protection, suitability, personal data, and wealth management.
+- Separate classifier and evidence regulator coverage metrics.
+- DeepResearch regulator diversity gate behavior.
+- Concurrency determinism for the optimized classifier/planner/gate path.
+- Retrieval recall under PCPD-heavy ranking using a deterministic fake retriever.
+- Fallback report generation preserving diverse regulator evidence and supported citations.
 
 ### Obligation Mapper Regression Gate
 

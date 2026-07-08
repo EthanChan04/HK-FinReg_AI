@@ -8,7 +8,10 @@ from functools import lru_cache
 from pathlib import Path
 
 from app.services.evaluation.benchmark_loader import load_benchmark_questions
+from app.services.deepresearch.planner import build_research_plan
 from app.services.retrieval.query_classifier import classify_query
+from app.services.retrieval.query_planner import build_query_plan
+from app.services.retrieval.strategy_router import select_retrieval_strategy
 
 
 def _metric_error(question_id: str, metric: str, exc: Exception) -> dict:
@@ -40,6 +43,10 @@ def _coverage(expected: list[str], actual: list[str]) -> float:
     return round(matched / len(expected), 3)
 
 
+def _casefold_values(values: list[str]) -> list[str]:
+    return [str(value).casefold() for value in values]
+
+
 def _tokens(text: str) -> set[str]:
     return {
         token
@@ -68,6 +75,18 @@ def _metadata_matches(metadata: dict, filters: dict) -> bool:
         if expected_normalized and not _metadata_values(metadata, key).intersection(expected_normalized):
             return False
     return True
+
+
+def _document_regulators(docs: list) -> list[str]:
+    regulators: list[str] = []
+    for doc in docs:
+        metadata = getattr(doc, "metadata", {}) or {}
+        value = metadata.get("regulator")
+        values = value if isinstance(value, list) else [value]
+        for item in values:
+            if item and str(item) not in regulators:
+                regulators.append(str(item))
+    return regulators
 
 
 @lru_cache()
@@ -122,6 +141,12 @@ def _compute_evidence_count(item: dict) -> int:
     return len(_retrieve_eval_documents(item["question"], top_k=10))
 
 
+def _compute_evidence_regulator_coverage(item: dict) -> float:
+    """Measure expected regulator coverage in retrieved evidence metadata."""
+    docs = _retrieve_eval_documents(item["question"], top_k=10)
+    return _coverage(item.get("expected_regulators", []), _document_regulators(docs))
+
+
 def _compute_graph_path_count(item: dict) -> int:
     """Retrieve graph paths for the benchmark question."""
     try:
@@ -166,7 +191,7 @@ def _compute_deepresearch_gap_count(item: dict) -> int:
         from app.services.deepresearch.evidence_evaluator import (
             evaluate_evidence_coverage,
         )
-        from app.services.deepresearch.planner import build_research_plan
+        from app.services.deepresearch.workflow import _apply_regulator_diversity_gate
         from app.services.retrieval.retrieval_service import document_to_evidence
 
         plan = build_research_plan(item["question"])
@@ -178,7 +203,15 @@ def _compute_deepresearch_gap_count(item: dict) -> int:
                 document_to_evidence(doc, index + 1)
                 for index, doc in enumerate(docs)
             )
-            evidence_by_subquestion[sq.id] = [chunk.model_dump() for chunk in evidence]
+            dumped_evidence = [chunk.model_dump() for chunk in evidence]
+            required_regulators = [
+                topic for topic in sq.required_topics if topic in {"HKMA", "SFC", "PCPD"}
+            ]
+            evidence_by_subquestion[sq.id] = _apply_regulator_diversity_gate(
+                dumped_evidence,
+                required_regulators,
+                top_k=sq.evidence_min_count + 3,
+            )
 
         gaps = evaluate_evidence_coverage(plan, evidence_by_subquestion)
         return len(gaps)
@@ -194,11 +227,16 @@ def run_eval() -> dict:
     metric_errors: list[dict] = []
     for item in questions:
         profile = classify_query(item["question"])
+        query_plan = build_query_plan(item["question"], profile=profile)
+        strategy = select_retrieval_strategy(profile, query_plan)
         filters = profile.filters
         actual_topics = filters.get("topics", [])
         actual_regulators = filters.get(
             "regulator",
             ["HKMA"] if "svf" in filters.get("module_tags", []) else [],
+        )
+        classifier_regulator_coverage = _coverage(
+            item.get("expected_regulators", []), actual_regulators
         )
 
         question_id = item["id"]
@@ -230,6 +268,13 @@ def run_eval() -> dict:
             lambda: _compute_deepresearch_gap_count(item),
             0,
         )
+        evidence_regulator_coverage = _run_metric(
+            question_id,
+            "evidence_regulator_coverage",
+            metric_errors,
+            lambda: _compute_evidence_regulator_coverage(item),
+            0.0,
+        )
 
         rows.append(
             {
@@ -239,9 +284,18 @@ def run_eval() -> dict:
                 "topic_coverage": _coverage(
                     item.get("expected_topics", []), actual_topics
                 ),
-                "regulator_coverage": _coverage(
-                    item.get("expected_regulators", []), actual_regulators
+                "classifier_regulator_coverage": classifier_regulator_coverage,
+                "regulator_coverage": classifier_regulator_coverage,
+                "evidence_regulator_coverage": evidence_regulator_coverage,
+                "strategy_id": strategy.strategy_id,
+                "strategy_correct": strategy.strategy_id
+                == item.get("expected_strategy_id"),
+                "expansion_term_coverage": _coverage(
+                    _casefold_values(item.get("expected_expansion_terms", [])),
+                    _casefold_values(query_plan.expansion_terms),
                 ),
+                "query_plan_drift": query_plan.dense_query
+                != query_plan.scrubbed_query,
                 "graph_path_count": graph_path_count,
                 "evidence_count": evidence_count,
                 "citation_supported_rate": citation_supported_rate,
@@ -259,8 +313,23 @@ def run_eval() -> dict:
         "avg_topic_coverage": round(
             sum(row["topic_coverage"] for row in rows) / total, 3
         ),
+        "avg_classifier_regulator_coverage": round(
+            sum(row["classifier_regulator_coverage"] for row in rows) / total, 3
+        ),
         "avg_regulator_coverage": round(
-            sum(row["regulator_coverage"] for row in rows) / total, 3
+            sum(row["classifier_regulator_coverage"] for row in rows) / total, 3
+        ),
+        "avg_evidence_regulator_coverage": round(
+            sum(row["evidence_regulator_coverage"] for row in rows) / total, 3
+        ),
+        "strategy_accuracy": round(
+            sum(1 for row in rows if row["strategy_correct"]) / total, 3
+        ),
+        "avg_expansion_term_coverage": round(
+            sum(row["expansion_term_coverage"] for row in rows) / total, 3
+        ),
+        "query_plan_drift_rate": round(
+            sum(1 for row in rows if row["query_plan_drift"]) / total, 3
         ),
         "avg_evidence_count": round(
             sum(row["evidence_count"] for row in rows) / total, 3
@@ -303,7 +372,13 @@ def main() -> None:
                 print(f"  [{row['id']}]")
                 print(f"    mode_correct: {row['mode_correct']}")
                 print(f"    topic_coverage: {row['topic_coverage']}")
+                print(f"    classifier_regulator_coverage: {row['classifier_regulator_coverage']}")
                 print(f"    regulator_coverage: {row['regulator_coverage']}")
+                print(f"    evidence_regulator_coverage: {row['evidence_regulator_coverage']}")
+                print(f"    strategy_id: {row['strategy_id']}")
+                print(f"    strategy_correct: {row['strategy_correct']}")
+                print(f"    expansion_term_coverage: {row['expansion_term_coverage']}")
+                print(f"    query_plan_drift: {row['query_plan_drift']}")
                 print(f"    evidence_count: {row['evidence_count']}")
                 print(f"    graph_path_count: {row['graph_path_count']}")
                 print(f"    citation_supported_rate: {row['citation_supported_rate']}")

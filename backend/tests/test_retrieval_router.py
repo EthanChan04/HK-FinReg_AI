@@ -2,7 +2,7 @@ from app.schemas.evidence import EvidenceChunk
 
 
 class StubRetrievalService:
-    def retrieve(self, query, filters=None, retrieval_mode="rag", top_k=5):
+    def retrieve(self, query, filters=None, retrieval_mode="rag", top_k=5, **kwargs):
         return [
             EvidenceChunk(
                 evidence_id="source_1",
@@ -66,3 +66,45 @@ def test_retrieval_router_does_not_execute_deepresearch_for_svf_path():
     assert bundle.retrieval_mode in {"rag", "kag"}
     assert bundle.evidence_chunks
     assert any("DeepResearch" in warning for warning in bundle.warnings)
+
+
+class RecordingRetrievalService:
+    def __init__(self):
+        self.kwargs = None
+
+    def retrieve(self, query, filters=None, retrieval_mode="rag", top_k=5, **kwargs):
+        self.kwargs = kwargs
+        return [
+            EvidenceChunk(
+                evidence_id="source_1",
+                doc_id="doc_1",
+                title="Doc",
+                regulator="HKMA",
+                page=1,
+                text="SVF CDD evidence",
+                retrieval_method="hybrid",
+            )
+        ]
+
+
+def test_retrieval_router_attaches_sira_strategy_metadata_when_enabled(monkeypatch):
+    from app.services.retrieval import retrieval_router
+    from app.services.retrieval.retrieval_router import route_and_retrieve
+
+    class Settings:
+        SIRA_QUERY_PLANNER_ENABLED = True
+        EXPERIENCE_RAG_ENABLED = True
+        EXPERIENCE_RAG_MEMORY_PATH = "unused.jsonl"
+        EXPERIENCE_RAG_MAX_RECORDS = 100
+
+    monkeypatch.setattr(retrieval_router, "get_settings", lambda: Settings())
+    service = RecordingRetrievalService()
+
+    bundle = route_and_retrieve("What are SVF CDD requirements?", retrieval_service=service)
+
+    assert service.kwargs["query_plan"].expansion_terms
+    assert service.kwargs["strategy"].strategy_id == "aml_kyc_balanced_rerank"
+    assert bundle.query_plan["expansion_terms"]
+    assert bundle.retrieval_strategy["strategy_id"] == "aml_kyc_balanced_rerank"
+    assert bundle.evidence_chunks[0].metadata["query_plan"]["expansion_terms"]
+    assert bundle.evidence_chunks[0].metadata["retrieval_strategy"]["strategy_id"] == "aml_kyc_balanced_rerank"

@@ -86,13 +86,17 @@ class RetrievalService:
         filters: dict[str, Any] | None = None,
         retrieval_mode: str = "rag",
         top_k: int = 5,
+        *,
+        query_plan: Any | None = None,
+        strategy: Any | None = None,
     ) -> list[EvidenceChunk]:
         """Retrieve and normalize evidence chunks."""
 
         if self.retriever is None:
             return []
 
-        docs = self.retriever.invoke(query)
+        effective_query = getattr(query_plan, "bm25_query", None) or query
+        docs = self.retriever.invoke(effective_query)
         filtered_docs = [
             doc for doc in docs if metadata_matches_filters(getattr(doc, "metadata", {}) or {}, filters)
         ]
@@ -110,4 +114,10 @@ class RetrievalService:
 
         ranked = sorted(filtered_docs, key=score_for, reverse=True)[:top_k]
         method = "graph" if retrieval_mode == "kag" else "hybrid"
-        return [document_to_evidence(doc, index + 1, method) for index, doc in enumerate(ranked)]
+        evidence = [document_to_evidence(doc, index + 1, method) for index, doc in enumerate(ranked)]
+        for chunk in evidence:
+            if query_plan is not None:
+                chunk.metadata["query_plan"] = query_plan.model_dump()
+            if strategy is not None:
+                chunk.metadata["retrieval_strategy"] = strategy.model_dump()
+        return evidence

@@ -16,6 +16,7 @@ from app.services.copilot.intent_classifier import classify_intent
 from app.services.copilot.model import build_copilot_llm
 from app.services.copilot.response_writer import write_bilingual_response
 from app.services.copilot.tool_router import route_tools
+from app.services.utils import pii_scrubber
 
 router = APIRouter(prefix="/copilot", tags=["Compliance Copilot"])
 
@@ -32,9 +33,12 @@ def _chunk_text(text: str, size: int = 120):
 async def _stream_chat(request: CopilotChatRequest):
     conversation_id = request.conversation_id or f"copilot-{uuid4().hex[:10]}"
 
+    # PII 脱敏：在进入 LLM 处理前统一脱敏用户输入
+    safe_message = pii_scrubber(request.message)
+
     try:
         compact_context = build_case_context(request)
-        decision = classify_intent(request.message)
+        decision = classify_intent(safe_message)
 
         yield _sse("intent", {"intent": decision.intent, "engine": decision.engine, "reason": decision.reason})
 

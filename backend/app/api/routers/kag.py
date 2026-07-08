@@ -11,6 +11,7 @@ from app.services.kag.graph_retriever import GraphRetriever
 from app.services.kag.graph_store import NetworkXGraphStore
 from app.services.kag.obligation_mapper import ObligationMapper
 from app.services.retrieval.retrieval_service import RetrievalService
+from app.services.utils import pii_scrubber
 
 router = APIRouter(prefix="/kag", tags=["KAG"])
 
@@ -27,8 +28,10 @@ def map_obligations(request: ObligationMapRequest) -> ObligationMapResponse:
     graph_retriever = _build_graph_retriever()
     retrieval = RetrievalService(retriever=build_reranked_retriever())
     mapper = ObligationMapper()
+    # PII 脱敏
+    safe_query = pii_scrubber(request.query)
     return mapper.map_obligations(
-        query=request.query,
+        query=safe_query,
         product_profile=request.product_profile,
         graph_retriever=graph_retriever,
         retrieval_service=retrieval,
@@ -38,5 +41,7 @@ def map_obligations(request: ObligationMapRequest) -> ObligationMapResponse:
 @router.post("/graph/search")
 def search_graph(request: ObligationMapRequest):
     graph_retriever = _build_graph_retriever()
-    return {"paths": graph_retriever.retrieve_paths(request.query, limit=8)}
+    # PII 脱敏
+    safe_query = pii_scrubber(request.query)
+    return {"paths": graph_retriever.retrieve_paths(safe_query, limit=8)}
 

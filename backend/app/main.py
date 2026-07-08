@@ -20,6 +20,8 @@ import traceback
 from app.core.config import get_settings
 from app.core.monitoring import get_tracker, setup_langsmith
 from app.core.security import verify_api_key
+from app.core.rate_limit import RateLimitMiddleware
+from app.core.startup_checks import run_startup_checks
 from app.schemas.requests import HealthResponse
 
 from app.api.routers import svf, bank_account, cross_border, sme_lending, review_queue, research, kag, copilot
@@ -38,6 +40,9 @@ app = FastAPI(
     redoc_url="/redoc" if settings.DEBUG else None,
 )
 
+# --- 启动安全检查 ---
+startup_warnings = run_startup_checks(settings)
+
 # --- CORS 配置 (已移除 * 通配符) ---
 app.add_middleware(
     CORSMiddleware,
@@ -45,6 +50,13 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "Accept"],
+)
+
+# --- 速率限制中间件 ---
+app.add_middleware(
+    RateLimitMiddleware,
+    requests_per_minute=settings.RATE_LIMIT_RPM,
+    requests_per_hour=settings.RATE_LIMIT_RPH,
 )
 
 # --- 挂载业务路由 (受 API Key 保护) ---

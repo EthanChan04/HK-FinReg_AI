@@ -1,12 +1,12 @@
-﻿"""
-SVF 鍚堣瀹℃煡璺敱 (Agentic RAG + 鍙嶆濆惊鐜?
-杩佺Щ鑷?core_logic.py 涓殑 generate_risk_report 澶氭櫤鑳戒綋
+"""
+SVF 合规审查路由 (Agentic RAG + 反思循环)
+迁移自 core_logic.py 中的 generate_risk_report 多智能体
 
-P1 鍗囩骇锛?
-  - 瑙勫垯鍖?SubQueryPlanner锛堥浂 LLM 璋冪敤锛?
-  - 璺ㄨ疆鏂囨。绱Н鍘婚噸锛坈ontent_hash 鏇夸唬瀛楃涓叉嫾鎺ワ級
-  - 涓夎矾鏉′欢杈癸紙APPROVED / revise / re_retrieve锛?
-  - asyncio.to_thread 淇鍚屾闃诲
+P1 升级：
+  - 规则化 SubQueryPlanner（零 LLM 调用）
+  - 跨轮文档累积去重（content_hash 替代字符串拼接）
+  - 三路条件边（APPROVED / revise / re_retrieve）
+  - asyncio.to_thread 修复同步阻塞
 """
 import asyncio
 import hashlib
@@ -68,40 +68,40 @@ class SVFState(TypedDict, total=False):
     final_report: str
     format_retry_count: int
     validation_errors: str
-    # P1 鏂板锛氬弽鎬濆惊鐜?
-    retrieval_round: int              # 褰撳墠妫绱㈣疆娆★紙0=棣栨锛?=鍙嶆濅簩娆℃绱級
-    sub_queries: List[str]            # 瑙勫垯鍖栧瓙鏌ヨ鍒楄〃
-    accumulated_docs: List[Dict]      # 璺ㄨ疆绱Н鏂囨。锛堢粨鏋勫寲锛屾浛浠ｅ瓧绗︿覆鎷兼帴锛?
+    reviewer_confidence: float        # Reviewer 独立置信度打分
+    cross_validation_passed: bool     # 偏差检测是否通过
+    # 结构化拒绝类型
+    accumulated_docs: List[Dict]      # 跨轮累积文档（结构化，替代字符串拼接）
     # P2 棰勭暀锛氱疆淇″害
-    confidence_score: float           # 妫绱㈢疆淇″害锛圧erank Top-1 鍒嗘暟锛?
-    confidence_warning: str           # 缃俊搴﹁鍛婃爣璁?
+    confidence_score: float           # 检索置信度（Rerank Top-1 分数）
+    confidence_warning: str           # 置信度警告标识
     # 深度研究与知识图谱字段
     research_plan: Dict
     evidence_by_subquestion: Dict
     evidence_gaps: List[Dict]
-    # M2: Analyzer 鎺ㄧ悊缃俊搴?
-    reasoning_confidence: float       # Analyzer 鑷瘎鎺ㄧ悊缃俊搴?
-    low_confidence_areas: str         # 浣庣疆淇″害棰嗗煙 JSON
-    high_confidence_areas: str        # 楂樼疆淇″害棰嗗煙 JSON
-    # M3: Reviewer 浜ゅ弶楠岃瘉
-    reviewer_confidence: float        # Reviewer 鐙珛缃俊搴︽墦鍒?
-    cross_validation_passed: bool     # 鍋忓樊妫娴嬫槸鍚﹂氳繃
-    # 缁撴瀯鍖栨嫆缁濈被鍨?
+    # M2: Analyzer 推理置信度
+    reasoning_confidence: float       # Analyzer 自评推理置信度
+    low_confidence_areas: str         # 低置信度领域 JSON
+    high_confidence_areas: str        # 高置信度领域 JSON
+    # M3: Reviewer 交叉验证
+    reviewer_confidence: float        # Reviewer 独立置信度打分
+    cross_validation_passed: bool     # 偏差检测是否通过
+    # 结构化拒绝类型
     rejection_type: str               # "insufficient_info" | "quality_issue" | ""
-    # Phase 1: 宸ヤ綔娴佹寔涔呭寲涓?HITL
-    workflow_run_id: str              # 涓娆″鏌ヤ换鍔＄殑涓婚敭
-    saved_checkpoint_id: str          # Checkpoint 鏍囪瘑
-    human_review_required: bool       # 鏄惁闇瑕佷汉宸ュ鏌?
+    # Phase 1: 工作流持久化与 HITL
+    workflow_run_id: str              # 一次审查任务的主键
+    saved_checkpoint_id: str          # Checkpoint 标识
+    human_review_required: bool       # 是否需要人工复核
     human_review_status: str          # "pending" | "approved" | "rejected"
-    human_review_notes: str           # 浜哄伐鎵规敞
-    resume_token: str                 # 鎭㈠鎵ц浠ょ墝
-    current_gate: str                 # 瑙﹀彂鏆傚仠鐨?gate 绫诲瀷
-    total_steps: int                  # 鍏ㄥ眬姝ユ暟璁℃暟鍣?
+    human_review_notes: str           # 人工批注
+    resume_token: str                 # 恢复执行令牌
+    current_gate: str                 # 触发暂停的 gate 类型
+    total_steps: int                  # 全局步骤计数器
 
 
-# ---- 鍙嶆濆惊鐜父閲?----
-MAX_REVISIONS = 2       # 鏈澶т慨璁㈡鏁?
-MAX_RETRIEVAL = 1       # 鏈澶т簩娆℃绱㈡鏁?
+# ---- 节点完成 ----
+MAX_REVISIONS = 2       # 最大修订次数
+MAX_RETRIEVAL = 1       # 最大二次检索次数
 
 SOURCE_CITATION_PATTERN = re.compile(
     r"\[(?:Source:\s*)?(?:Source\s*)?(\d+),\s*p\.?\s*(\d+)\]",
@@ -153,7 +153,7 @@ def _extract_title(markdown_text: str) -> str:
 
 
 def _extract_report_date(markdown_text: str) -> str:
-    match = re.search(r"\*\*[^*]*(?:鍫卞憡鏃ユ湡|鎶ュ憡鏃ユ湡)[^*]*\*\*\s*:\s*(.+)", markdown_text)
+    match = re.search(r"\*\*[^*]*(?:報告日期|报告日期)[^*]*\*\*\s*:\s*(.+)", markdown_text)
     if match:
         return match.group(1).strip()
     match = re.search(r"(?:鍫卞憡鏃ユ湡|鎶ュ憡鏃ユ湡)\s*:\s*(.+)", markdown_text)
@@ -304,7 +304,7 @@ def _normalize_extracted_entities(raw_text: str) -> str:
     if not text:
         return ""
 
-    # 铏曠悊 markdown code block: 鍘绘帀 ```json 鍜?```
+    # 清理 markdown code block: 去掉 ```json 鍜?```
     if text.startswith("```"):
         lines = text.splitlines()
         if len(lines) >= 2:
@@ -325,18 +325,18 @@ def _normalize_extracted_entities(raw_text: str) -> str:
 
 
 def _compute_content_hash(content: str) -> str:
-    """璁＄畻鏂囨。鍐呭鍝堝笇鐢ㄤ簬璺ㄨ疆鍘婚噸"""
+    """计算文档内容哈希用于跨轮去重"""
     normalized = re.sub(r'\s+', ' ', content.strip().lower())
     return hashlib.md5(normalized.encode()).hexdigest()[:12]
 
 
 def _compute_retrieval_confidence(docs_or_accumulated: list) -> tuple:
-    """璁＄畻妫绱㈢疆淇″害锛堜笁缁存寚鏍囷細Rerank Top-1 + Top-5 gap + 璀﹀憡锛?
+    """计算检索置信度（三维指标：Rerank Top-1 + Top-5 gap + 警告）
 
-    鏀寔 Document 鍒楄〃鍜?accumulated_docs 瀛楀吀鍒楄〃涓ょ杈撳叆銆?
+    支持 Document 列表和 accumulated_docs 字典列表两种输入。
 
     Returns:
-        (top1_score, top5_gap, warning): 妫绱㈢疆淇″害鍒嗘暟銆乀op-5 gap銆佽鍛婁俊鎭?
+        (top1_score, top5_gap, warning): 检索置信度分数、Top-5 gap、警告信息
     """
     from app.core.config import get_settings
     settings = get_settings()
@@ -344,7 +344,7 @@ def _compute_retrieval_confidence(docs_or_accumulated: list) -> tuple:
     if not docs_or_accumulated:
         return 0.0, 0.0, "Low confidence warning: no relevant regulatory documents were retrieved."
 
-    # 鍏煎 Document 鍜?dict 涓ょ绫诲瀷
+    # 兼容 Document 和 dict 两种类型
     first = docs_or_accumulated[0]
     if isinstance(first, dict):
         metadata = first.get("metadata", {})
@@ -355,7 +355,7 @@ def _compute_retrieval_confidence(docs_or_accumulated: list) -> tuple:
 
     top1_score = float(metadata.get("rerank_score", 0.0))
 
-    # 璁＄畻 Top-5 gap锛圱op-1 涓?Top-5 鍧囧肩殑宸窛锛?
+    # 计算 Top-5 gap（Top-1 与 Top-5 均值的差距）
     top5_scores = []
     for i, item in enumerate(docs_or_accumulated[:5]):
         if isinstance(item, dict):
@@ -391,21 +391,21 @@ NODE_DISPLAY_MAP = {
     "analyzer":         ("Analyzer Agent",          "正在基于检索结果起草合规风险报告初稿..."),
     "format_validator": ("Format Validator Agent",  "正在验证报告结构与引用格式..."),
     "citation_verifier":("Citation Verifier Agent", "正在逐句验证引用准确性..."),
-    "reviewer":         ("Reviewer Agent",          "正在执行本地引用审查与置信度校验..."),
+    "reviewer":         ("Reviewer Agent",          "正在执行红蓝对抗审查，验证法规引用与逻辑自洽性..."),
     "sub_query_planner":("Sub-Query Planner",       "反思循环：正在规划二次检索策略..."),
 }
 
 
 def _evaluate_hitl_gate(state: SVFState) -> str:
-    """璇勪及宸ヤ綔娴佹槸鍚﹀簲瑙﹀彂 HITL gate
+    """评估工作流是否应触发 HITL gate
 
-    涓夌被 gate 浼樺厛绾э細
-      1. low_confidence_gate: 鏁翠綋缃俊搴︿綆浜庨槇鍊?
-      2. missing_evidence_gate: 璇佹嵁涓嶈冻涓斿凡杈惧埌妫绱笂闄?
-      3. manual_approval_gate: 楂橀闄╁満鏅紙榛樿鏈惎鐢紝鐢变笟鍔￠厤缃Е鍙戯級
+    三类 gate 优先级：
+      1. low_confidence_gate: 整体置信度低于阈值
+      2. missing_evidence_gate: 证据不足且已达到检索上限
+      3. manual_approval_gate: 高风险场景（默认未启用，由业务配置触发）
 
     Returns:
-        Gate 绫诲瀷瀛楃涓诧紝鎴栫┖瀛楃涓诧紙鏃?gate 瑙﹀彂锛?
+        Gate 类型字符串，或空字符串（无 gate 触发）
     """
     from app.core.config import get_settings
     settings = get_settings()
@@ -416,20 +416,20 @@ def _evaluate_hitl_gate(state: SVFState) -> str:
     rejection_type = state.get("rejection_type", "")
     retrieval_round = state.get("retrieval_round", 0)
 
-    # 璁＄畻 overall confidence锛堜笌 ConfidenceScore.overall_confidence 閫昏緫涓鑷达級
+    # 计算 overall confidence（与 ConfidenceScore.overall_confidence 逻辑一致）
     overall = retrieval_conf * 0.4 + reasoning_conf * 0.6
     if not cross_validated:
         overall = max(0.0, overall - 0.2)
 
-    # Gate 1: 浣庣疆淇″害
+    # Gate 1: 低置信度
     if overall < settings.CONFIDENCE_LOW_THRESHOLD:
         return "low_confidence_gate"
 
-    # Gate 2: 璇佹嵁涓嶈冻涓斿凡杈惧埌妫绱笂闄?
+    # Gate 2: 证据不足且已达到检索上限
     if rejection_type == "insufficient_info" and retrieval_round >= MAX_RETRIEVAL:
         return "missing_evidence_gate"
 
-    # Gate 3: 浜ゅ弶楠岃瘉澶辫触锛堥珮椋庨櫓淇″彿锛?
+    # Gate 3: 交叉验证失败（高风险信号）
     if not cross_validated and overall < settings.CONFIDENCE_MED_THRESHOLD:
         return "manual_approval_gate"
 
@@ -440,11 +440,11 @@ NODE_DISPLAY_MAP["hitl_gate"] = ("HITL Gate", "Evaluating whether human review i
 
 
 def _build_svf_graph(checkpointer=None):
-    """鏋勫缓 SVF 澶氭櫤鑳戒綋鍥撅紙鍚弽鎬濆惊鐜級锛岃繑鍥炵紪璇戝悗鐨?CompiledGraph
+    """构建 SVF 多智能体图（含反思循环），返回编译后的 CompiledGraph
 
     Args:
-        checkpointer: LangGraph checkpointer 瀹炰緥锛圥ostgresSaver / MemorySaver锛夛紝
-                      涓?None 鏃朵笉鍚敤鎸佷箙鍖?
+        checkpointer: LangGraph checkpointer 实例（PostgresSaver / MemorySaver），
+                      为 None 时不用持久化
     """
     llm = build_zhipu_llm()
     base_retriever = build_reranked_retriever()
@@ -491,7 +491,7 @@ def _build_svf_graph(checkpointer=None):
         is_re_retrieve = state.get("retrieval_round", 0) > 0
 
         if is_re_retrieve:
-            # ---- 鍙嶆濅簩娆℃绱細瀵规瘡涓瓙鏌ヨ鍒嗗埆妫绱?----
+            # ---- 反思二次检索：对每个子查询分别检索 ----
             sub_queries = state.get("sub_queries", [])
             new_docs_raw: List = []
             existing_hashes = {
@@ -522,7 +522,7 @@ def _build_svf_graph(checkpointer=None):
                         new_docs_raw.append(doc)
                         existing_hashes.add(chash)
 
-            # 鍚堝苟鍒扮疮绉枃妗?
+            # 合并到累积文档
             accumulated = list(state.get("accumulated_docs", []))
             for doc in new_docs_raw:
                 chash = _compute_content_hash(doc.page_content)
@@ -532,7 +532,7 @@ def _build_svf_graph(checkpointer=None):
                     "content_hash": chash,
                 })
 
-            # 閲嶆柊鏍煎紡鍖栦笂涓嬫枃
+            # 重新格式化上下文
             context_parts = []
             for i, d in enumerate(accumulated):
                 page = d["metadata"].get("page", "?")
@@ -555,7 +555,7 @@ def _build_svf_graph(checkpointer=None):
 
             print(f"[SVF][RETRIEVER] Re-retrieval: {len(new_docs_raw)} new docs, {len(accumulated)} total accumulated.")
 
-            # P2: 閲嶆柊璁＄畻缃俊搴︼紙鍩轰簬鍏ㄩ噺绱Н鏂囨。锛?
+            # P2: 重新计算置信度（基于全量累积文档）
             score, top5_gap, warning = _compute_retrieval_confidence(accumulated)
             return {
                 "retrieved_docs": context,
@@ -567,7 +567,7 @@ def _build_svf_graph(checkpointer=None):
             }
 
         else:
-            # ---- 棣栨妫绱?----
+            # ---- 首轮检索 ----
             query = state.get("extracted_entities", state["original_input"])
             retrieval_mode = state.get("retrieval_mode", "rag")
             query_type = classify_query_type(query)
@@ -622,7 +622,7 @@ def _build_svf_graph(checkpointer=None):
 
             print(f"[SVF][RETRIEVER] Initial: selected {len(top_docs)} top docs for Analyzer.")
 
-            # P2: 璁＄畻缃俊搴?
+            # P2: 计算置信度
             score, top5_gap, warning = _compute_retrieval_confidence(top_docs)
             print(f"[SVF][RETRIEVER] Confidence: score={score:.2f}, top5_gap={top5_gap:.2f}, warning={'Yes' if warning else 'None'}")
             return {
@@ -660,7 +660,7 @@ def _build_svf_graph(checkpointer=None):
         resp = llm.invoke([HumanMessage(content=prompt)])
         content = resp.content
 
-        # M2: 瑙ｆ瀽 Analyzer 缃俊搴﹁嚜璇?JSON 鍧?
+        # M2: 解析 Analyzer 置信度自评 JSON 块
         reasoning_confidence = 0.5
         low_confidence_areas = "[]"
         high_confidence_areas = "[]"
@@ -669,7 +669,7 @@ def _build_svf_graph(checkpointer=None):
             content, re.DOTALL,
         )
         if not confidence_match:
-            # Fallback: 灏濊瘯鍖归厤瑁?JSON
+            # Fallback: 尝试匹配裸 JSON
             confidence_match = re.search(
                 r'(\{[^{}]*"overall_confidence"\s*:\s*[\d.]+[^{}]*\})',
                 content,
@@ -690,12 +690,12 @@ def _build_svf_graph(checkpointer=None):
             except (ValueError, TypeError) as e:
                 print(f"[SVF][ANALYZER] Failed to parse confidence JSON: {e}")
 
-        # 浠庢姤鍛婁腑绉婚櫎缃俊搴?JSON 鍧楋紙閬垮厤鍑虹幇鍦ㄦ渶缁堟姤鍛婁腑锛?
+        # 从报告中移除置信度 JSON 块（避免出现在最终报告中）
         content = re.sub(
             r'```json\s*\n?\s*\{[^`]*?"overall_confidence"[^}]*\}\s*\n?\s*```',
             '', content, flags=re.DOTALL,
         ).rstrip()
-        # 涔熺Щ闄よ８ JSON 鍧?
+        # 也移除裸 JSON 块
         content = re.sub(
             r'\n\s*\{[^{}]*"overall_confidence"\s*:\s*[\d.]+[^{}]*\}\s*$',
             '', content,
@@ -762,7 +762,7 @@ def _build_svf_graph(checkpointer=None):
             failed_checks=[],
             reviewer_confidence=reviewer_confidence,
         )
-        raw_content = None  # 淇濆瓨 LLM 鍘熷杈撳嚭锛岄伩鍏嶉噸澶嶈皟鐢?
+        raw_content = None  # 保存 LLM 原始输出，避免重复调用
 
         # Use a single plain reviewer call. Some compatible endpoints expose
         # structured-output wrappers but hang or time out before falling back,
@@ -774,27 +774,27 @@ def _build_svf_graph(checkpointer=None):
                 if isinstance(result, ReviewerVerdict):
                     verdict = result
                 else:
-                    # structured output 杩斿洖浜嗗師濮嬪唴瀹硅岄潪 ReviewerVerdict锛?
-                    # 淇濆瓨浠ヤ緵 fallback 姝ｅ垯瑙ｆ瀽澶嶇敤锛岄伩鍏嶅啀璋冧竴娆?LLM
+                    # structured output 返回了原始内容而非 ReviewerVerdict；
+                    # 保存供 fallback 正则解析复用，避免再调一次 LLM
                     raw_content = str(result) if result else None
             except Exception as e:
                 print(f"[SVF][REVIEWER] structured output failed, falling back: {e}")
 
-        # Fallback: 姝ｅ垯瑙ｆ瀽锛堝鐢?structured_llm 鐨勫師濮嬭緭鍑猴紝閬垮厤浜屾 LLM 璋冪敤锛?
+        # Fallback: 正则解析（复用 structured_llm 的原始输出，避免二次 LLM 调用）
         reviewer_confidence = 0.5
         if verdict is None:
             if raw_content is None:
-                # 鍙湪娌℃湁 structured_llm 鎴?structured_llm 鎶涘紓甯告椂鎵嶈皟 LLM
+                # 只在没有 structured_llm 或 structured_llm 抛异常时才调 LLM
                 resp = llm.invoke([HumanMessage(content=REVIEWER_SYSTEM_PROMPT.format(draft_report=draft))])
                 raw_content = resp.content.strip()
 
             content = raw_content.strip()
-            # 鍘婚櫎 markdown 浠ｇ爜鍧楀寘瑁癸紙LLM 鏈夋椂杩斿洖 ```...\n```锛?
+            # 去除 markdown 代码块包装（LLM 有时返回 ```...\n```锛?
             if content.startswith("```"):
                 lines = content.splitlines()
                 inner = [l for l in lines[1:] if not l.strip().startswith("```")]
                 content = "\n".join(inner).strip()
-            # M3: 鎻愬彇 Reviewer Confidence 鎵撳垎
+            # M3: 提取 Reviewer Confidence 打分
             rc_match = re.search(
                 r'Reviewer Confidence:\s*([\d.]+)', content, re.IGNORECASE
             )
@@ -816,10 +816,10 @@ def _build_svf_graph(checkpointer=None):
                     rejection_type=rejection_type,
                 )
         else:
-            # M3: 浠庣粨鏋勫寲杈撳嚭涓幏鍙?reviewer_confidence
+            # M3: 从结构化输出中获取 reviewer_confidence
             reviewer_confidence = verdict.reviewer_confidence or 0.5
 
-        # M3: 浜ゅ弶楠岃瘉 鈥?妫娴?retrieval 涓?reasoning 缃俊搴﹀亸宸?
+        # M3: 交叉验证 — 检测 retrieval 与 reasoning 置信度偏差
         from app.core.config import get_settings
         settings = get_settings()
         retrieval_conf = state.get("confidence_score", 0.0)
@@ -834,9 +834,9 @@ def _build_svf_graph(checkpointer=None):
                 f"(deviation={deviation:.2f} > {settings.CONFIDENCE_CROSS_VALIDATION_THRESHOLD})"
             )
 
-        # 鏋勫缓 ConfidenceScore 涓夌淮妯″瀷
+        # 构建 ConfidenceScore 三维模型
         from app.schemas.requests import ConfidenceScore
-        top5_gap = 0.0  # top5_gap 瀛樺湪浜?retriever 浣嗕笉鍦?state 涓紝鐢?0 鍗犱綅
+        top5_gap = 0.0  # top5_gap 存在于 retriever 但不在 state 中，用 0 占位
         confidence_model = ConfidenceScore(
             retrieval_confidence=retrieval_conf,
             top5_gap=top5_gap,
@@ -854,12 +854,12 @@ def _build_svf_graph(checkpointer=None):
             f"reviewer={reviewer_confidence:.2f}, deviation={deviation:.2f})"
         )
 
-        # 淇锛氬綋鍗冲皢杈惧埌淇涓婇檺鏃朵篃杈撳嚭 final_report
-        # 鍘熼昏緫 rev_count >= MAX_REVISIONS 姘歌繙涓嶄細涓虹湡锛?
-        # 鍥犱负 route_after_review 浼氬湪 rev_count 杈惧埌涓婇檺鏃舵嫤鎴矾鐢卞埌 "end"銆?
-        # 鏀逛负 rev_count >= MAX_REVISIONS - 1锛岀‘淇濇渶鍚庝竴杞?Reviewer 杈撳嚭 final_report銆?
+        # 检查是否有 final_report（终态）
+        # 原逻辑 rev_count >= MAX_REVISIONS 永远不会为真；
+        # 因为 route_after_review 会在 rev_count 达到上限时拦截路由到 "end"。
+        # 改为 rev_count >= MAX_REVISIONS - 1，确保最后一轮 Reviewer 输出 final_report。
         if verdict.decision == "APPROVED" or rev_count >= MAX_REVISIONS - 1:
-            # P2: 缃俊搴﹂潤鎬佹爣璁帮紙鍙锛屼笉鍙備笌鎺у埗娴侊級
+            # P2: 置信度静态标记（只读，不参与控制流）
             confidence_warning = state.get("confidence_warning", "")
             final = draft
             warning_parts = []
@@ -910,7 +910,7 @@ def _build_svf_graph(checkpointer=None):
         feedback = state.get("reviewer_feedback", "")
         sub_queries = []
 
-        # 鎻愬彇娉曟潯寮曠敤
+        # 提取法条引用
         clause_refs = re.findall(
             r'(Chapter|Section|Paragraph|Clause)\s+[\d.]+',
             feedback, re.IGNORECASE
@@ -918,7 +918,7 @@ def _build_svf_graph(checkpointer=None):
         for ref in clause_refs[:2]:
             sub_queries.append(f"{ref} requirements and compliance obligations")
 
-        # 鎻愬彇鍏抽敭鏈锛堝弻寮曞彿鍐呯殑鍐呭锛?
+        # 提取关键词（双引号内的内容）
         key_terms = re.findall(r'"([^"]{3,40})"', feedback)
         for term in key_terms[:2]:
             sub_queries.append(term)
@@ -927,7 +927,7 @@ def _build_svf_graph(checkpointer=None):
         if not sub_queries:
             sub_queries.append(feedback[:100].strip())
 
-        # 闄愬埗鏈澶?3 涓瓙鏌ヨ
+        # 限制最多 3 个子查询
         sub_queries = sub_queries[:3]
 
         new_round = state.get("retrieval_round", 0) + 1
@@ -938,7 +938,7 @@ def _build_svf_graph(checkpointer=None):
             "total_steps": state.get("total_steps", 0) + 1,
         }
 
-    # ---- 鏉′欢杈?----
+    # ---- 条件边 ----
 
     def should_retry_format(state: SVFState):
         validation_errors = state.get("validation_errors", "").strip()
@@ -971,12 +971,12 @@ def _build_svf_graph(checkpointer=None):
         if final_report:
             gate = _evaluate_hitl_gate(state)
             if gate:
-                print(f"[SVF][ROUTE] Final report ready but HITL gate triggered: {gate} 鈫?hitl_gate")
+                print(f"[SVF][ROUTE] Final report ready but HITL gate triggered: {gate} →hitl_gate")
                 return "hitl_gate"
             print("[SVF][ROUTE] Final report ready 鈫?end")
             return "end"
 
-        # 瀹夊叏鍏滃簳锛氫换涓寰幆杈惧埌涓婇檺鎴栨绘鏁拌秴闄愰兘寮哄埗缁撴潫
+        # 安全兜底：任一循环达到上限或总次数超限都强制结束
         if rev_count >= MAX_REVISIONS:
             print(f"[SVF][ROUTE] Revision limit reached (rev={rev_count}) 鈫?end")
             return "end"
@@ -987,7 +987,7 @@ def _build_svf_graph(checkpointer=None):
             print(f"[SVF][ROUTE] Total steps limit reached (steps={total_steps}) 鈫?end")
             return "end"
 
-        # 闇瑕佷慨璁細缁х画鍙嶆濆惊鐜?
+        # 需要修改：继续反思循环
         if feedback and rev_count < MAX_REVISIONS:
             # ---- 涓昏矾寰勶細鍩轰簬缁撴瀯鍖?rejection_type ----
             if rejection_type == "insufficient_info" and retrieval_round < MAX_RETRIEVAL:
@@ -1011,16 +1011,16 @@ def _build_svf_graph(checkpointer=None):
             print(f"[SVF][ROUTE] Default 鈫?revise (round {rev_count})")
             return "revise"
 
-        # 鍗冲皢缁撴潫锛氭鏌?HITL gate
+        # 即将结束：检查 HITL gate
         gate = _evaluate_hitl_gate(state)
         if gate:
             print(f"[SVF][ROUTE] HITL gate triggered: {gate} 鈫?hitl_gate")
             return "hitl_gate"
 
-        # 鏃?gate 瑙﹀彂锛屾甯哥粨鏉?
+        # 无 gate 触发，正常结束
         return "end"
 
-    # ---- 鏋勫缓鍥?----
+    # ---- 构建图 ----
 
     def hitl_gate_node(state: SVFState):
         """Pause the workflow for human review when a HITL gate is triggered."""
@@ -1047,7 +1047,7 @@ def _build_svf_graph(checkpointer=None):
         workflow_run_id = state.get("workflow_run_id", "")
         print(f"[SVF][HITL_GATE] Gate triggered: {gate}, workflow_run_id={workflow_run_id}")
 
-        # 鏋勫缓瀹屾暣鐨?interrupt payload锛堟惡甯︾湡瀹炶瘉鎹拰缃俊搴︼級
+        # 构建完整的 interrupt payload（携带真实证据和置信度）
         evidence_snapshot = {
             "accumulated_docs_count": len(state.get("accumulated_docs", [])),
             "retrieval_round": state.get("retrieval_round", 0),
@@ -1079,7 +1079,7 @@ def _build_svf_graph(checkpointer=None):
             "latest_draft_report": state.get("draft_report", "")[:500],
         }
 
-        # 鍔犲叆瀹℃煡闃熷垪锛堝唴瀛樼储寮曪紝checkpoint 鐢?checkpointer 鎸佷箙鍖栵級
+        # 加入审查队列（内存索引，checkpoint 由 checkpointer 持久化）
         manager = get_checkpoint_manager()
         item = ReviewQueueItem(
             workflow_run_id=workflow_run_id,
@@ -1092,13 +1092,13 @@ def _build_svf_graph(checkpointer=None):
         )
         manager.add_to_review_queue(item)
 
-        # ===== 鐪熸鐨?interrupt锛氬浘鎵ц鍦ㄦ鏆傚仠 =====
-        # interrupt() 鎶涘嚭 GraphInterrupt锛宑heckpointer 淇濆瓨褰撳墠鐘舵?
-        # 鎭㈠鏃惰皟鐢ㄦ柟浼犲叆 Command(resume=human_decision)
-        # interrupt() 杩斿洖 human_decision锛岃妭鐐圭户缁墽琛?
+        # ===== 真正的 interrupt：图执行在此暂停 =====
+        # interrupt() 抛出 GraphInterrupt，checkpointer 保存当前状态
+        # 恢复时调用方传入 Command(resume=human_decision)
+        # interrupt() 返回 human_decision，节点继续执行
         human_decision = interrupt(interrupt_payload)
 
-        # ===== 鎭㈠鍚庝粠杩欓噷缁х画 =====
+        # ===== 恢复后从这里继续 =====
         action = "reject"
         notes = ""
         additional_context = None
@@ -1111,7 +1111,7 @@ def _build_svf_graph(checkpointer=None):
 
         print(f"[SVF][HITL_GATE] Resumed with action={action}, workflow_run_id={workflow_run_id}")
 
-        # 鏇存柊瀹℃煡闃熷垪鐘舵?
+        # 更新审查队列状态
         manager.update_review_status(
             workflow_run_id=workflow_run_id,
             status="approved" if action == "approve" else "rejected",
@@ -1119,20 +1119,20 @@ def _build_svf_graph(checkpointer=None):
         )
 
         if action == "approve":
-            # 娑堣垂 additional_context锛氭敞鍏ュ埌 original_input 涓緵涓嬫父鑺傜偣寮曠敤
+            # 消费 additional_context：注入到 original_input 供下游节点引用
             updated_input = state.get("original_input", "")
             if additional_context and additional_context.strip():
                 updated_input += f"\n\n[Human additional context]: {additional_context.strip()}"
                 print(f"[SVF][HITL_GATE] Additional context injected ({len(additional_context)} chars)")
 
-            # 鎵瑰噯鍚庢彁鍗囩疆淇″害锛堜汉宸ヨ儗涔︼級锛屾竻闄?gate 鏍囪
+            # 批准后提升置信度（人工背书），清除 gate 标记
             return {
                 "human_review_required": False,
                 "human_review_status": "approved",
                 "human_review_notes": notes,
                 "current_gate": "",
                 "original_input": updated_input,
-                "confidence_warning": "",  # 浜哄伐鎵瑰噯鍚庢竻闄よ鍛?
+                "confidence_warning": "",  # 人工批准后清除警告
                 "final_report": state.get("final_report", "") or state.get("draft_report", ""),
                 "total_steps": state.get("total_steps", 0) + 1,
             }
@@ -1188,7 +1188,7 @@ def _build_svf_graph(checkpointer=None):
     return workflow.compile(checkpointer=checkpointer)
 
 
-# 鍒濆鐘舵佹ā鏉?
+# 初始状态模板
 _INITIAL_STATE = {
     "original_input": "",
     "revision_count": 0,
@@ -1214,7 +1214,7 @@ _INITIAL_STATE = {
     "high_confidence_areas": "[]",
     "reviewer_confidence": 0.5,
     "cross_validation_passed": True,
-    # Phase 1: 鎸佷箙鍖栦笌 HITL
+    # Phase 1: 持久化与 HITL
     "workflow_run_id": "",
     "saved_checkpoint_id": "",
     "human_review_required": False,
@@ -1293,8 +1293,8 @@ def _run_svf_graph(safe_input: str, workflow_run_id: str = "") -> str:
         first_interrupt = interrupts[0]
         return getattr(first_interrupt, "value", None)
 
-    # 妫娴?interrupt锛歩nvoke() 鍦?interrupt() 澶勮繑鍥炲綋鍓?state
-    # 姝ゆ椂 state.next 涓嶄负绌猴紙杩樻湁寰呮墽琛岃妭鐐癸級锛宼asks 涓湁 interrupt 淇℃伅
+    # 检测 interrupt：invoke() 在 interrupt() 处返回当前 state
+    # 此时 state.next 不为空（还有待执行节点），tasks 中有 interrupt 信息
     state_snapshot = app_graph.get_state(config)
     for task in state_snapshot.tasks:
         interrupt_value = _extract_interrupt_value(task)
@@ -1312,7 +1312,7 @@ def _run_svf_graph(safe_input: str, workflow_run_id: str = "") -> str:
     return final_state.get("final_report", "Report generation failed.")
 
 
-# ---- SSE Streaming Generator (astream_events 鐪熷紓姝? ----
+# ---- SSE Streaming Generator (astream_events 真异步) ----
 def _sse_event(event: str, payload: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
 
@@ -1368,7 +1368,7 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
     
     print(f"[SVF][STREAM] Workflow Run ID: {workflow_run_id}")
 
-    # Phase 1: 鎺ㄩ?workflow_run_id锛屼緵鍓嶇淇濆瓨
+    # Phase 1: 推送 workflow_run_id，供前端保存
     yield (
         f"event: checkpoint_saved\n"
         f"data: {json.dumps({'workflow_run_id': workflow_run_id, 'status': 'started'}, ensure_ascii=False)}\n\n"
@@ -1387,7 +1387,7 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
 
     config = {"configurable": {"thread_id": workflow_run_id}, "recursion_limit": 100}
 
-    # 宸插彂閫?done 鐨勮妭鐐归泦鍚堬紙閬垮厤閲嶅鍙戦侊級
+    # 已发送 done 的节点集合（避免重复发送）
     completed_nodes: set = set()
     report_text = ""
     latest_draft_report = ""
@@ -1417,7 +1417,7 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
             continue
         print(f"[SVF][STREAM] Received event: {kind}")
 
-        # ---- 鑺傜偣寮濮?----
+        # ---- 节点开始 ----
         if kind == "on_chain_start":
             tags = event.get("tags", [])
             node_name = event.get("name", "")
@@ -1430,17 +1430,17 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
                     f"data: {json.dumps({'agent': agent_name, 'status': 'running', 'message': msg}, ensure_ascii=False)}\n\n"
                 )
 
-        # ---- 鑺傜偣瀹屾垚 ----
+        # ---- 节点完成 ----
         elif kind == "on_chain_end":
             node_name = event.get("name", "")
             if node_name in NODE_DISPLAY_MAP and node_name not in completed_nodes:
                 completed_nodes.add(node_name)
                 agent_name, _ = NODE_DISPLAY_MAP[node_name]
 
-                # 妫鏌ユ槸鍚︽湁 final_report锛堢粓鎬侊級
+                # 检查是否有 final_report（终态）
                 output_data = event.get("data", {}).get("output", {})
                 if isinstance(output_data, dict):
-                    # P2: 浠?retriever 鑺傜偣鎹曡幏妫绱㈢疆淇″害
+                    # P2: 从 retriever 节点捕获检索置信度
                     if node_name == "retriever":
                         evidence_chunks = output_data.get("evidence_chunks")
                         if isinstance(evidence_chunks, list):
@@ -1457,13 +1457,13 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
                         if cs is not None:
                             retrieval_confidence = cs
                             confidence_warning = cw
-                            # 瀹炴椂鎺ㄩ佹绱㈢疆淇″害浜嬩欢
+                            # 实时推送检索置信度事件
                             yield (
                                 f"event: confidence\n"
                                 f"data: {json.dumps({'score': cs, 'warning': cw or None, 'dimension': 'retrieval'}, ensure_ascii=False)}\n\n"
                             )
 
-                    # M2: 浠?analyzer 鑺傜偣鎹曡幏鎺ㄧ悊缃俊搴?
+                    # M2: 从 analyzer 节点捕获推理置信度
                     if node_name == "analyzer":
                         rc = output_data.get("reasoning_confidence")
                         if rc is not None:
@@ -1473,7 +1473,7 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
                                 f"data: {json.dumps({'score': rc, 'dimension': 'reasoning'}, ensure_ascii=False)}\n\n"
                             )
 
-                    # M3: 浠?reviewer 鑺傜偣鎹曡幏浜ゅ弶楠岃瘉缁撴灉
+                    # M3: 从 reviewer 节点捕获交叉验证结果
                     if node_name == "reviewer":
                         rvc = output_data.get("reviewer_confidence")
                         cvp = output_data.get("cross_validation_passed")
@@ -1505,9 +1505,9 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
                     f"data: {json.dumps({'agent': agent_name, 'status': 'done', 'message': ''}, ensure_ascii=False)}\n\n"
                 )
 
-    # ===== interrupt 妫娴?=====
-    # hitl_gate 鑺傜偣璋冪敤 interrupt() 鍚庯紝astream_events 娴佹甯哥粨鏉燂紝
-    # 浣?hitl_gate 涓嶄細鏈?on_chain_end 浜嬩欢銆傞氳繃妫娴?graph state 鍒ゆ柇鏄惁琚腑鏂?
+    # ===== interrupt 检测 =====
+    # hitl_gate 节点调用 interrupt() 后，astream_events 流正常结束，
+    # 但 hitl_gate 不会有 on_chain_end 事件。通过检测 graph state 判断是否被中断
     if hitl_gate_started and "hitl_gate" not in completed_nodes:
         try:
             state_snapshot = await asyncio.to_thread(app_graph.get_state, config)
@@ -1522,7 +1522,7 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
                         interrupt_value = getattr(interrupts[0], "value", None)
 
                 if interrupt_value:
-                    # 浠?interrupt payload 涓幏鍙栧畬鏁寸殑 evidence / confidence 鏁版嵁
+                    # 从 interrupt payload 中获取完整的 evidence / confidence 数据
                     action_payload = {
                         "workflow_run_id": workflow_run_id,
                         "gate_type": interrupt_value.get("gate_type", ""),
@@ -1535,7 +1535,7 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
                         f"event: action_required\n"
                         f"data: {json.dumps(action_payload, ensure_ascii=False)}\n\n"
                     )
-                    # 涓柇鎬侊細涓嶆帹閫?token 鍜?done锛屾祦缁撴潫
+                    # 中断态：不推送 token 和 done，流结束
                     return
         except Exception as e:
             print(f"[SVF][STREAM] Failed to check interrupt state: {e}")
@@ -1546,7 +1546,7 @@ async def _stream_svf_impl(safe_input: str, workflow_run_id: str = "") -> AsyncG
             "Please retry with more applicant details or review the server logs."
         )
 
-    # 閫愯鍙戦佹姤鍛?token
+    # 逐行发送报告 token
     formatted = format_output(report_text)
     for line in formatted.split("\n"):
         yield f"event: token\ndata: {json.dumps({'text': line + chr(10)}, ensure_ascii=False)}\n\n"

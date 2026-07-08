@@ -59,12 +59,52 @@ def _build_retrieval_service() -> RetrievalService | None:
         return None
 
 
+def _evidence_regulator(item: dict) -> str | None:
+    value = item.get("regulator") or (item.get("metadata") or {}).get("regulator")
+    return str(value).upper() if value else None
+
+
+def _apply_regulator_diversity_gate(
+    evidence: list[dict],
+    required_regulators: list[str],
+    top_k: int,
+) -> list[dict]:
+    """Select ranked evidence with one available item per required regulator first."""
+    if top_k <= 0 or not evidence:
+        return []
+
+    required = [reg.upper() for reg in required_regulators if reg]
+    selected: list[dict] = []
+    selected_ids: set[int] = set()
+
+    for regulator in required:
+        for index, item in enumerate(evidence):
+            if index in selected_ids:
+                continue
+            if _evidence_regulator(item) == regulator:
+                selected.append(item)
+                selected_ids.add(index)
+                break
+        if len(selected) >= top_k:
+            return selected[:top_k]
+
+    for index, item in enumerate(evidence):
+        if index in selected_ids:
+            continue
+        selected.append(item)
+        if len(selected) >= top_k:
+            break
+
+    return selected
+
+
 def _retrieve_for_sub_question(
     retrieval_service: RetrievalService | None,
     question: str,
     sub_question_id: str,
     retrieval_mode: str,
     evidence_min_count: int,
+    required_regulators: list[str] | None = None,
 ) -> list[dict]:
     """Retrieve evidence for a single sub-question, falling back to synthetic on failure."""
     if retrieval_service is None:
@@ -80,7 +120,12 @@ def _retrieve_for_sub_question(
             top_k=top_k,
         )
         if evidence:
-            return [chunk.model_dump() for chunk in evidence]
+            dumped = [chunk.model_dump() for chunk in evidence]
+            return _apply_regulator_diversity_gate(
+                dumped,
+                required_regulators or [],
+                top_k=top_k,
+            )
         logger.warning("DeepResearch: empty evidence for sub-question %s, using synthetic", sub_question_id)
         return [_synthetic_evidence(question, sub_question_id).model_dump()]
     except Exception as exc:
@@ -111,12 +156,17 @@ def build_deepresearch_graph():
 
         evidence: Dict[str, List[dict]] = {}
         for sq in plan.sub_questions:
+            profile = classify_query(sq.question)
+            required_regulators = [
+                topic for topic in sq.required_topics if topic in {"HKMA", "SFC", "PCPD"}
+            ] or profile.filters.get("regulator", [])
             evidence[sq.id] = _retrieve_for_sub_question(
                 retrieval_service=retrieval_service,
                 question=sq.question,
                 sub_question_id=sq.id,
                 retrieval_mode=sq.retrieval_mode,
                 evidence_min_count=sq.evidence_min_count,
+                required_regulators=required_regulators,
             )
         return {"evidence_by_subquestion": evidence}
 
@@ -147,6 +197,7 @@ def build_deepresearch_graph():
                 sub_question_id=f"{sub_question_id}_gap_{state.get('iteration', 0)}",
                 retrieval_mode="rag",  # broader retrieval mode for gap-filling
                 evidence_min_count=1,
+                required_regulators=classify_query(followup_query).filters.get("regulator", []),
             )
             existing = evidence.get(sub_question_id, [])
             evidence[sub_question_id] = existing + new_evidence

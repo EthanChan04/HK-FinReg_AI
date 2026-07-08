@@ -35,13 +35,40 @@ We will acknowledge receipt within 48 hours and provide a timeline for a fix.
 
 ### Data Privacy
 - PII (Personally Identifiable Information) is scrubbed before being sent to LLM providers
-- HKID numbers and phone numbers are automatically redacted via regex filters
+- HKID numbers, phone numbers, and email addresses are automatically redacted via regex filters
+- PII scrubbing is applied globally across all business endpoints (SVF, Bank Account, Cross-Border, SME, Copilot, Research, KAG)
 - Review-queue runtime registry files must not persist raw user submissions or be committed to the repository
+
+### Rate Limiting
+- API rate limiting is enforced via `RateLimitMiddleware`
+- Default limits: 60 requests/minute, 500 requests/hour per client IP
+- Health check endpoint (`/api/v1/health`) is exempt from rate limiting
+- Configure via `RATE_LIMIT_RPM` and `RATE_LIMIT_RPH` in `.env`
+
+### Startup Security Checks
+- The application performs security configuration checks on startup
+- Warnings are printed for: disabled API key auth, empty API key, DEBUG mode, wildcard CORS, disabled rate limiting
 
 ### Production Deployment Recommendations
 - Keep `API_KEY_ENABLED=True` and set a strong `API_KEY` in `.env`
 - Set `DEBUG=False` to disable Swagger documentation endpoints
 - Configure `CORS_ORIGINS` to only include your production frontend domain
 - Use HTTPS for all API communications
-- Consider adding rate limiting middleware
-- Regularly rotate all API keys and tokens
+- Configure rate limiting (`RATE_LIMIT_RPM`, `RATE_LIMIT_RPH`) appropriately
+- Regularly rotate all API keys and tokens (see Key Rotation Policy below)
+
+### Key Rotation Policy
+
+| Key | Rotation Frequency | Where to Rotate |
+| --- | --- | --- |
+| `API_KEY` (backend bearer) | Every 90 days | Generate new: `python -c "import secrets; print(secrets.token_urlsafe(32))"`, update `backend/.env` and `frontend/.env.local` |
+| `ZHIPU_API_KEY` / `LONGCAT_API_KEY` | Every 90 days | Provider dashboard |
+| `COHERE_API_KEY` | Every 90 days | [Cohere dashboard](https://dashboard.cohere.com/api-keys) |
+| `LANGCHAIN_API_KEY` | Every 90 days | [LangSmith settings](https://smith.langchain.com) |
+| `EMBEDDING_API_KEY` | Every 90 days | Provider dashboard |
+
+After rotation:
+1. Update the `.env` file on the server
+2. Restart the backend service
+3. Verify with `GET /api/v1/health`
+4. Revoke old keys at the provider dashboard immediately

@@ -37,3 +37,33 @@ def test_query_classifier_identifies_privacy_regulator():
 
     assert profile.filters["regulator"] == ["PCPD"]
     assert "privacy" in [topic.lower() for topic in profile.filters["topics"]]
+
+
+def test_query_classifier_expands_ai_wealth_advisory_regulators_and_topics():
+    from app.services.retrieval.query_classifier import classify_query
+
+    profile = classify_query(
+        "Which regulators and obligations are relevant when a Hong Kong virtual bank launches an AI wealth advisory product?"
+    )
+
+    assert profile.retrieval_mode == "kag"
+    assert profile.filters["regulator"] == ["HKMA", "SFC", "PCPD"]
+    assert "wealth_management" in profile.filters["topics"]
+    assert "consumer_protection" in profile.filters["topics"]
+    assert "suitability" in profile.filters["topics"]
+    assert "personal_data" in profile.filters["topics"]
+    assert "ai_wealth_product_launch" in profile.reasons
+
+
+def test_query_classifier_keeps_deepresearch_mode_with_ai_launch_regulatory_expansion():
+    from app.services.retrieval.query_classifier import classify_query
+
+    profile = classify_query(
+        "Analyze compliance risks for launching an AI investment advisor and generate a pre-launch checklist."
+    )
+
+    assert profile.retrieval_mode == "deep_research"
+    assert profile.filters["regulator"] == ["HKMA", "SFC", "PCPD"]
+    assert "consumer_protection" in profile.filters["topics"]
+    assert "suitability" in profile.filters["topics"]
+    assert "personal_data" in profile.filters["topics"]

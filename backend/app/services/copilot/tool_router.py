@@ -14,6 +14,7 @@ from app.services.deepresearch.workflow import build_deepresearch_graph
 from app.services.kag.graph_retriever import GraphRetriever
 from app.services.kag.graph_store import NetworkXGraphStore
 from app.services.kag.obligation_mapper import ObligationMapper
+from app.services.retrieval.retrieval_router import route_and_retrieve
 from app.services.retrieval.retrieval_service import RetrievalService
 
 
@@ -78,7 +79,14 @@ def route_tools(intent: IntentDecision, request: CopilotChatRequest, compact_con
     if intent.intent == "regulatory_qa":
         try:
             retrieval = _build_retrieval_service()
-            payload.evidence_chunks = retrieval.retrieve(message, retrieval_mode="rag", top_k=6)
+            bundle = route_and_retrieve(message, retrieval_service=retrieval, top_k=6)
+            payload.evidence_chunks = bundle.evidence_chunks
+            if bundle.retrieval_strategy:
+                for chunk in payload.evidence_chunks:
+                    chunk.metadata.setdefault("retrieval_strategy", bundle.retrieval_strategy)
+            if bundle.query_plan:
+                for chunk in payload.evidence_chunks:
+                    chunk.metadata.setdefault("query_plan", bundle.query_plan)
             return ToolRouteResult(payload=payload, tool_name="rag")
         except Exception as exc:
             payload.notes.append(f"RAG retrieval unavailable, fallback to MiMo direct answer: {type(exc).__name__}")
@@ -100,7 +108,13 @@ def route_tools(intent: IntentDecision, request: CopilotChatRequest, compact_con
                 retrieval_service=retrieval,
             )
             payload.graph_paths = mapping.graph_paths
-            payload.evidence_chunks = retrieval.retrieve(message, retrieval_mode="kag", top_k=6)
+            bundle = route_and_retrieve(
+                message,
+                retrieval_service=retrieval,
+                graph_retriever=graph_retriever,
+                top_k=6,
+            )
+            payload.evidence_chunks = bundle.evidence_chunks
             payload.notes.append(
                 f"Mapped regulators: {', '.join(mapping.applicable_regulators) if mapping.applicable_regulators else 'N/A'}"
             )
@@ -145,7 +159,8 @@ def route_tools(intent: IntentDecision, request: CopilotChatRequest, compact_con
         if not payload.evidence_chunks:
             try:
                 retrieval = _build_retrieval_service()
-                payload.evidence_chunks = retrieval.retrieve(message, retrieval_mode="rag", top_k=4)
+                bundle = route_and_retrieve(message, retrieval_service=retrieval, top_k=4)
+                payload.evidence_chunks = bundle.evidence_chunks
                 payload.notes.append("Case context had no evidence; augmented with RAG retrieval.")
                 return ToolRouteResult(payload=payload, tool_name="rag")
             except Exception as exc:
