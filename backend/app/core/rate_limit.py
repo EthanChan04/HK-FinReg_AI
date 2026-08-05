@@ -1,71 +1,142 @@
-"""
-API 速率限制中间件 (Rate Limiting)
+"""Identity-aware rate limiting with an optional Redis-backed store."""
 
-基于滑动窗口算法的内存限流器。
-防止 API 滥用和 LLM 调用成本失控。
+from __future__ import annotations
 
-生产环境建议替换为 Redis-backed 方案以支持多实例部署。
-"""
+import hashlib
+import logging
 import time
 from collections import defaultdict
+from threading import Lock
 
-from fastapi import Request, HTTPException, status
+from fastapi import Request
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+
+logger = logging.getLogger(__name__)
+
+
+def _stable_digest(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()[:32]
+
+
+def rate_limit_identity(request: Request) -> str:
+    """Prefer authenticated identities, falling back to a client address."""
+
+    authorization = request.headers.get("authorization")
+    if authorization:
+        return f"credential:{_stable_digest(authorization)}"
+    api_key = request.headers.get("x-api-key")
+    if api_key:
+        return f"credential:{_stable_digest(api_key)}"
+    tenant = request.headers.get("x-tenant-id")
+    if tenant:
+        return f"tenant:{_stable_digest(tenant)}"
+    user = request.headers.get("x-user-id")
+    if user:
+        return f"user:{_stable_digest(user)}"
+
+    settings = getattr(request.app.state, "settings", None)
+    if settings and getattr(settings, "TRUSTED_PROXY_HEADERS", False):
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            return f"ip:{forwarded.split(',')[0].strip()}"
+    host = request.client.host if request.client else "unknown"
+    return f"ip:{host}"
+
+
+class InMemoryRateLimitStore:
+    """Process-local fallback store used for development and single replicas."""
+
+    def __init__(self):
+        self._windows: dict[str, list[float]] = defaultdict(list)
+        self._lock = Lock()
+
+    async def allow(self, key: str, now: float, rpm: int, rph: int) -> bool:
+        with self._lock:
+            window = [timestamp for timestamp in self._windows[key] if now - timestamp < 3600]
+            self._windows[key] = window
+            if sum(now - timestamp < 60 for timestamp in window) >= rpm:
+                return False
+            if len(window) >= rph:
+                return False
+            window.append(now)
+            return True
+
+
+class RedisRateLimitStore:
+    """Atomic sliding-window store shared by all application replicas."""
+
+    _SCRIPT = """
+    local now = tonumber(ARGV[1])
+    local rpm = tonumber(ARGV[2])
+    local rph = tonumber(ARGV[3])
+    redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', now - 3600)
+    local minute = redis.call('ZCOUNT', KEYS[1], now - 60, '+inf')
+    local hour = redis.call('ZCARD', KEYS[1])
+    if minute >= rpm or hour >= rph then
+      return 0
+    end
+    local sequence = redis.call('INCR', KEYS[1] .. ':sequence')
+    redis.call('ZADD', KEYS[1], now, tostring(now) .. '-' .. tostring(sequence))
+    redis.call('EXPIRE', KEYS[1], 3700)
+    redis.call('EXPIRE', KEYS[1] .. ':sequence', 3700)
+    return 1
+    """
+
+    def __init__(self, redis_url: str):
+        from redis import asyncio as redis
+
+        # redis.from_url() is lazy: it does not connect. Connection failures
+        # surface on the first eval() call, so allow() must degrade at call time.
+        self._client = redis.from_url(redis_url, decode_responses=True)
+        self._fallback = InMemoryRateLimitStore()
+        self._degraded = False
+
+    async def allow(self, key: str, now: float, rpm: int, rph: int) -> bool:
+        if self._degraded:
+            return await self._fallback.allow(key, now, rpm, rph)
+        try:
+            result = await self._client.eval(self._SCRIPT, 1, f"rate-limit:{key}", now, rpm, rph)
+            return bool(result)
+        except Exception as exc:
+            # Redis unreachable: fall back to the process-local store and warn once.
+            self._degraded = True
+            logger.warning(
+                "Redis rate limit store unavailable (%s); degraded to in-memory store "
+                "for the rest of this process. Counts are no longer shared across replicas.",
+                exc,
+            )
+            return await self._fallback.allow(key, now, rpm, rph)
+
+
+def build_rate_limit_store(storage_url: str | None):
+    if not storage_url:
+        return InMemoryRateLimitStore()
+    try:
+        return RedisRateLimitStore(storage_url)
+    except Exception as exc:
+        logger.warning("Redis rate limit unavailable; using local fallback: %s", exc)
+        return InMemoryRateLimitStore()
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """按客户端 IP 的滑动窗口限流中间件。
+    """Apply per-identity minute/hour limits, shared through Redis when configured."""
 
-    配置项（通过 Settings 注入）：
-        requests_per_minute: 每分钟最大请求数
-        requests_per_hour: 每小时最大请求数
-
-    跳过限流的端点：
-        /api/v1/health — 健康检查不计入限流
-    """
-
-    def __init__(
-        self,
-        app,
-        requests_per_minute: int = 60,
-        requests_per_hour: int = 500,
-    ):
+    def __init__(self, app, requests_per_minute: int = 60, requests_per_hour: int = 500, storage_url: str | None = None):
         super().__init__(app)
         self.rpm = requests_per_minute
         self.rph = requests_per_hour
-        self._windows: dict[str, list[float]] = defaultdict(list)
+        self.store = build_rate_limit_store(storage_url)
 
     async def dispatch(self, request: Request, call_next):
-        # 健康检查端点不限流
-        if request.url.path == "/api/v1/health":
+        if request.url.path.startswith("/api/v1/health"):
             return await call_next(request)
 
-        client_ip = request.client.host if request.client else "unknown"
-        now = time.time()
-
-        # 清理过期记录（保留最近 1 小时）
-        self._windows[client_ip] = [
-            t for t in self._windows[client_ip] if now - t < 3600
-        ]
-
-        window = self._windows[client_ip]
-
-        # 检查每分钟限制
-        recent_minute = [t for t in window if now - t < 60]
-        if len(recent_minute) >= self.rpm:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Rate limit exceeded: too many requests per minute. Please retry later.",
+        allowed = await self.store.allow(rate_limit_identity(request), time.time(), self.rpm, self.rph)
+        if not allowed:
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Rate limit exceeded. Please retry later."},
+                headers={"Retry-After": "60"},
             )
-
-        # 检查每小时限制
-        if len(window) >= self.rph:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Rate limit exceeded: too many requests per hour. Please retry later.",
-            )
-
-        # 记录本次请求
-        window.append(now)
-
         return await call_next(request)
