@@ -5,6 +5,8 @@
 ```bash
 cd backend
 python -m app.services.evaluation.run_eval
+python -m app.services.corpus.build_cache
+python -m app.services.kag.build_graph_cache
 ```
 
 This runs a deterministic, real-retrieval benchmark against the questions in `data/evaluation/benchmark_questions.json`. No LLM-as-judge is required -- metrics are computed from router output, retrieval counts, and citation verification.
@@ -26,6 +28,15 @@ This runs a deterministic, real-retrieval benchmark against the questions in `da
 | `citation_supported_rate` | Fraction of citations that match the retrieved evidence (via `citation_verifier`). |
 | `unsupported_claim_rate` | Fraction of citations flagged as unsupported by the citation audit. |
 | `deepresearch_gap_count` | Average number of evidence gaps found by DeepResearch's `evidence_evaluator` (only for `deep_research` mode questions). |
+| `claim_recall` | Fraction of expected claims supported by at least one retrieved evidence chunk. **Retrieval-quality metric.** |
+| `context_precision` | Fraction of retrieved chunks that support at least one expected claim. **Retrieval-quality metric.** |
+| `faithfulness` | **Generation-faithfulness metric (measured independently since 2026-08-05).** Fraction of claims in the *generator's actual response* supported by the retrieved context. `None` when no generator response was evaluated — never silently equal to `claim_recall`. |
+| `hallucination_rate` | One minus generation faithfulness. `None` when faithfulness was not measured. |
+| `noise_sensitivity` | Loss in claim support when unrelated evidence is introduced. **Retrieval-quality metric.** |
+| `context_utilization` | Alias for deterministic claim support used to report generator use of retrieved context. |
+| `claim_diagnostics` | Per-claim support result, evidence indexes, and deterministic evaluation reason. |
+
+Metrics are grouped in three tiers (see report section 3.2): **retrieval quality** (`claim_recall`, `context_precision`, `noise_sensitivity`), **generation faithfulness** (`faithfulness`, `hallucination_rate` — only meaningful once a generator response is evaluated), and **citation correctness** (`citation_supported_rate`, `unsupported_claim_rate`). The release gate only blocks on retrieval-quality floors until generation faithfulness is independently measured on a real generator response.
 
 ## Adding New Benchmark Questions
 
@@ -39,7 +50,11 @@ Edit `data/evaluation/benchmark_questions.json` and add an object:
   "expected_strategy_id": "aml_kyc_balanced_rerank",
   "expected_expansion_terms": ["AML", "CDD", "HKMA"],
   "expected_topics": ["AML", "transaction_monitoring", "SVF"],
-  "expected_regulators": ["HKMA"]
+  "expected_regulators": ["HKMA"],
+  "expected_claims": ["An SVF licensee must perform customer due diligence."],
+  "language": "en",
+  "task_type": "obligation_extraction",
+  "noise_documents": []
 }
 ```
 
@@ -60,4 +75,4 @@ Re-run `python -m app.services.evaluation.run_eval` -- the new question is picke
 - **unsupported_claim_rate > 0.3**: the system is generating claims not grounded in retrieved evidence.
 - **deepresearch_gap_count > 2**: sub-questions are not producing enough evidence -- consider broadening retrieval or adding sources.
 
-This benchmark is a smoke test. Future releases should add answer faithfulness scores, regression tests with expected source doc IDs, and cross-lingual coverage checks.
+The checked-in benchmark contains 53 auditable cases across HKMA, SFC, PCPD, cross-regulatory, English/Traditional Chinese, validity-conflict and refusal scenarios. The release gate requires complete provenance metadata, 100% evidence regulator coverage for the AI-advisor anchor cases, and the calibrated baseline floors (`claim_recall >= 0.45`, `context_precision >= 0.15`, `faithfulness >= 0.45`, `unsupported_claim_rate <= 0.1`). The recommended tightening targets are `0.90`, `0.75`, `0.95`, and `0.05` respectively after the human-reviewed golden set is expanded.

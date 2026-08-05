@@ -67,3 +67,42 @@ def test_query_classifier_keeps_deepresearch_mode_with_ai_launch_regulatory_expa
     assert "consumer_protection" in profile.filters["topics"]
     assert "suitability" in profile.filters["topics"]
     assert "personal_data" in profile.filters["topics"]
+
+
+def test_query_classifier_matches_chinese_ai_terms_without_word_boundaries():
+    """CJK characters are \\w in Python regex, so \\b never fires between
+    them. Chinese AI / privacy terms must match by substring, not boundary."""
+    from app.services.retrieval.query_classifier import classify_query
+
+    profile = classify_query("機構使用人工智能時，私隱專員公署建議建立甚麼管治架構？")
+
+    assert profile.retrieval_mode == "kag"
+    assert "AI" in profile.filters["topics"]
+    assert "PCPD" in profile.filters["regulator"]
+
+
+def test_query_classifier_matches_latin_terms_embedded_in_chinese_text():
+    """Terms like GenAI / AML embedded inside a CJK sentence have no
+    \\b boundary either; they must still trigger routing rules."""
+    from app.services.retrieval.query_classifier import classify_query
+
+    profile = classify_query("香港銀行在GenAI客戶服務情境下需要哪些跨監管控制？")
+
+    assert profile.retrieval_mode == "kag"
+    assert "AI" in profile.filters["topics"]
+
+
+def test_query_classifier_matches_chinese_research_terms():
+    from app.services.retrieval.query_classifier import classify_query
+
+    profile = classify_query("為在香港推出虛擬資產交易平台擬備推出前檢查清單。")
+
+    assert profile.retrieval_mode == "deep_research"
+
+
+def test_query_classifier_matches_chinese_aml_terms():
+    from app.services.retrieval.query_classifier import classify_query
+
+    profile = classify_query("儲值支付工具持牌人須遵守甚麼打擊洗錢規定？")
+
+    assert "AML" in profile.filters["topics"]

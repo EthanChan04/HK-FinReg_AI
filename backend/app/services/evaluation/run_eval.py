@@ -2,16 +2,27 @@
 
 from __future__ import annotations
 
-import pickle
 import re
 from functools import lru_cache
 from pathlib import Path
 
+from langchain_core.documents import Document
+
 from app.services.evaluation.benchmark_loader import load_benchmark_questions
+from app.services.evaluation.rag_eval import evaluate_claim_level_metrics
 from app.services.deepresearch.planner import build_research_plan
 from app.services.retrieval.query_classifier import classify_query
 from app.services.retrieval.query_planner import build_query_plan
 from app.services.retrieval.strategy_router import select_retrieval_strategy
+
+
+def _backend_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
+def _resolve_backend_path(path_value: str | Path) -> Path:
+    path = Path(path_value)
+    return path if path.is_absolute() else _backend_root() / path
 
 
 def _metric_error(question_id: str, metric: str, exc: Exception) -> dict:
@@ -20,9 +31,17 @@ def _metric_error(question_id: str, metric: str, exc: Exception) -> dict:
     return {
         "question_id": question_id,
         "metric": metric,
-        "error_type": type(exc).__name__,
-        "error": str(exc),
+        "error": f"{type(exc).__name__}: {exc}",
     }
+
+
+def _avg_optional(values) -> float | None:
+    """Average only non-None values; None when nothing was measured."""
+
+    measured = [value for value in values if value is not None]
+    if not measured:
+        return None
+    return round(sum(measured) / len(measured), 3)
 
 
 def _run_metric(question_id: str, metric: str, errors: list[dict], fn, default):
@@ -96,12 +115,17 @@ def _load_cached_corpus_documents() -> tuple:
     from app.core.config import get_settings
 
     settings = get_settings()
-    cache_path = Path(settings.CORPUS_INDEX_DIR) / "corpus_documents.pkl"
-    if not cache_path.exists():
-        return ()
-    with cache_path.open("rb") as cache_file:
-        docs = pickle.load(cache_file)
-    return tuple(docs or ())
+    from app.services.corpus.cache import manifest_digest, read_corpus_cache
+
+    cache_path = _resolve_backend_path(settings.CORPUS_INDEX_DIR) / "corpus_documents.json"
+    manifest_path = _backend_root() / "data" / "source_manifest.json"
+    return tuple(
+        read_corpus_cache(
+            cache_path,
+            manifest_digest=manifest_digest(manifest_path),
+            parser_version="hierarchy-v1",
+        )
+    )
 
 
 def _retrieve_eval_documents(question: str, top_k: int = 10) -> list:
@@ -132,8 +156,39 @@ def _retrieve_eval_documents(question: str, top_k: int = 10) -> list:
             overlap = len(query_tokens.intersection(content_tokens | metadata_tokens))
             scored.append((overlap, doc))
 
-    ranked = [doc for score, doc in sorted(scored, key=lambda item: item[0], reverse=True) if score > 0]
-    return ranked[:top_k]
+    expected_regulators = profile.filters.get("regulator", [])
+    if len(expected_regulators) > 1:
+        scored_docs = {id(doc) for _, doc in scored}
+        for doc in docs:
+            metadata = getattr(doc, "metadata", {}) or {}
+            if str(metadata.get("regulator", "")).casefold() not in {
+                str(value).casefold() for value in expected_regulators
+            } or id(doc) in scored_docs:
+                continue
+            content_tokens = _tokens(getattr(doc, "page_content", ""))
+            metadata_tokens = _tokens(" ".join(str(value) for value in metadata.values()))
+            overlap = len(query_tokens.intersection(content_tokens | metadata_tokens))
+            if overlap > 0:
+                scored.append((overlap, doc))
+    ranked_pairs = [item for item in sorted(scored, key=lambda item: item[0], reverse=True) if item[0] > 0]
+    if len(expected_regulators) > 1:
+        selected = []
+        for regulator in expected_regulators:
+            candidates = [
+                (score, doc)
+                for score, doc in ranked_pairs
+                if str((getattr(doc, "metadata", {}) or {}).get("regulator", "")).casefold()
+                == str(regulator).casefold()
+            ]
+            if candidates and candidates[0][1] not in selected:
+                selected.append(candidates[0][1])
+        for _, doc in ranked_pairs:
+            if len(selected) >= top_k:
+                break
+            if doc not in selected:
+                selected.append(doc)
+        return selected[:top_k]
+    return [doc for _, doc in ranked_pairs[:top_k]]
 
 
 def _compute_evidence_count(item: dict) -> int:
@@ -151,17 +206,30 @@ def _compute_graph_path_count(item: dict) -> int:
     """Retrieve graph paths for the benchmark question."""
     try:
         from app.core.config import get_settings
-        from app.services.kag.graph_store import NetworkXGraphStore
-        from app.services.kag.graph_retriever import GraphRetriever
 
         settings = get_settings()
-        store = NetworkXGraphStore(settings.GRAPH_STORE_PATH)
-        store.load()
-        retriever = GraphRetriever(store)
-        paths = retriever.retrieve_paths(item["question"], limit=5)
+        graph_path = _resolve_backend_path(settings.GRAPH_STORE_PATH)
+        retriever = _get_cached_graph_retriever(str(graph_path))
+        paths = retriever.retrieve_paths(
+            item["question"],
+            limit=5,
+            include_provenance=False,
+        )
         return len(paths)
     except Exception:
         return 0
+
+
+@lru_cache()
+def _get_cached_graph_retriever(graph_path: str):
+    """Load the immutable graph once per evaluation process."""
+
+    from app.services.kag.graph_retriever import GraphRetriever
+    from app.services.kag.graph_store import NetworkXGraphStore
+
+    store = NetworkXGraphStore(graph_path)
+    store.load()
+    return GraphRetriever(store)
 
 
 def _compute_citation_audit(item: dict) -> tuple[float, float]:
@@ -217,6 +285,20 @@ def _compute_deepresearch_gap_count(item: dict) -> int:
         return len(gaps)
     except Exception:
         return 0
+
+
+def _evaluate_claim_metrics(item: dict) -> dict:
+    evidence = _retrieve_eval_documents(item["question"], top_k=10)
+    noise_documents = [
+        Document(page_content=str(noise), metadata={"doc_id": str(noise)})
+        for noise in item.get("noise_documents", [])
+    ]
+    noisy_evidence = evidence + noise_documents if noise_documents else None
+    return evaluate_claim_level_metrics(
+        item.get("expected_claims", []),
+        evidence,
+        noisy_evidence_chunks=noisy_evidence,
+    )
 
 
 def run_eval() -> dict:
@@ -275,6 +357,24 @@ def run_eval() -> dict:
             lambda: _compute_evidence_regulator_coverage(item),
             0.0,
         )
+        claim_metrics = _run_metric(
+            question_id,
+            "claim_level_metrics",
+            metric_errors,
+            lambda: _evaluate_claim_metrics(item),
+            {
+                "claim_recall": 0.0,
+                "context_precision": 0.0,
+                # Faithfulness is never defaulted to 0.0: an unmeasured
+                # generator response must stay None so aggregates do not
+                # treat a collection failure as a zero score.
+                "faithfulness": None,
+                "hallucination_rate": None,
+                "noise_sensitivity": 0.0,
+                "context_utilization": 0.0,
+                "claim_diagnostics": [],
+            },
+        )
 
         rows.append(
             {
@@ -301,6 +401,7 @@ def run_eval() -> dict:
                 "citation_supported_rate": citation_supported_rate,
                 "unsupported_claim_rate": unsupported_claim_rate,
                 "deepresearch_gap_count": deepresearch_gap_count,
+                **claim_metrics,
             }
         )
 
@@ -346,6 +447,14 @@ def run_eval() -> dict:
         "avg_deepresearch_gap_count": round(
             sum(row["deepresearch_gap_count"] for row in rows) / total, 3
         ),
+        "avg_claim_recall": round(sum(row["claim_recall"] for row in rows) / total, 3),
+        "avg_context_precision": round(sum(row["context_precision"] for row in rows) / total, 3),
+        # Generation faithfulness is None unless a generator response was
+        # evaluated; aggregate only measured rows to avoid treating a
+        # missing measurement as a zero score.
+        "avg_faithfulness": _avg_optional(row["faithfulness"] for row in rows),
+        "avg_hallucination_rate": _avg_optional(row["hallucination_rate"] for row in rows),
+        "avg_noise_sensitivity": round(sum(row["noise_sensitivity"] for row in rows) / total, 3),
         "metric_errors": metric_errors,
         "rows": rows,
     }
@@ -384,6 +493,11 @@ def main() -> None:
                 print(f"    citation_supported_rate: {row['citation_supported_rate']}")
                 print(f"    unsupported_claim_rate: {row['unsupported_claim_rate']}")
                 print(f"    deepresearch_gap_count: {row['deepresearch_gap_count']}")
+                print(f"    claim_recall: {row['claim_recall']}")
+                print(f"    context_precision: {row['context_precision']}")
+                print(f"    faithfulness: {row['faithfulness']}")
+                print(f"    hallucination_rate: {row['hallucination_rate']}")
+                print(f"    noise_sensitivity: {row['noise_sensitivity']}")
         else:
             print(f"- {key}: {value}")
 

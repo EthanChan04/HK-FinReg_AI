@@ -4,26 +4,2840 @@
     "question": "What are the key CDD obligations for an SVF licensee?",
     "expected_retrieval_mode": "rag",
     "expected_strategy_id": "aml_kyc_balanced_rerank",
-    "expected_expansion_terms": ["CDD", "customer due diligence", "SVF", "stored value facility", "HKMA"],
-    "expected_topics": ["CDD", "AML", "SVF"],
-    "expected_regulators": ["HKMA"]
+    "expected_expansion_terms": [
+      "CDD",
+      "customer due diligence",
+      "SVF",
+      "stored value facility",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "CDD",
+      "AML",
+      "SVF"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "An SVF licensee must perform customer due diligence."
+    ]
   },
   {
     "id": "KAG_AI_ADVISOR_001",
     "question": "Which regulators and obligations are relevant when a Hong Kong virtual bank launches an AI wealth advisory product?",
     "expected_retrieval_mode": "kag",
     "expected_strategy_id": "ai_governance_kag",
-    "expected_expansion_terms": ["AI", "GenAI", "governance", "product launch"],
-    "expected_topics": ["AI", "wealth_management", "consumer_protection", "suitability", "personal_data"],
-    "expected_regulators": ["HKMA", "SFC", "PCPD"]
+    "expected_expansion_terms": [
+      "AI",
+      "GenAI",
+      "governance",
+      "product launch"
+    ],
+    "expected_topics": [
+      "AI",
+      "wealth_management",
+      "consumer_protection",
+      "suitability",
+      "personal_data"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory_analysis",
+    "expected_claims": [
+      "The product launch requires controls across HKMA, SFC and PCPD obligations."
+    ]
   },
   {
     "id": "DR_AI_ADVISOR_001",
     "question": "Analyze the compliance risks for a Hong Kong virtual bank launching an AI investment advisor and generate a pre-launch checklist.",
     "expected_retrieval_mode": "deep_research",
     "expected_strategy_id": "ai_governance_kag",
-    "expected_expansion_terms": ["AI", "GenAI", "governance"],
-    "expected_topics": ["AI", "wealth_management", "consumer_protection", "suitability", "personal_data"],
-    "expected_regulators": ["HKMA", "SFC", "PCPD"]
+    "expected_expansion_terms": [
+      "AI",
+      "GenAI",
+      "governance"
+    ],
+    "expected_topics": [
+      "AI",
+      "wealth_management",
+      "consumer_protection",
+      "suitability",
+      "personal_data"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory_analysis",
+    "expected_claims": [
+      "The product launch requires controls across HKMA, SFC and PCPD obligations."
+    ]
+  },
+  {
+    "id": "EXP_001",
+    "question": "What HKMA requirements apply to AI wealth advice for a Hong Kong bank?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "HKMA requires documented risk-based controls for AI wealth advice."
+    ],
+    "language": "en",
+    "task_type": "regulatory_obligation",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_002",
+    "question": "What HKMA requirements apply to customer due diligence for a Hong Kong bank?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "HKMA requires documented risk-based controls for customer due diligence."
+    ],
+    "language": "en",
+    "task_type": "regulatory_obligation",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_003",
+    "question": "What HKMA requirements apply to model governance for a Hong Kong bank?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "HKMA requires documented risk-based controls for model governance."
+    ],
+    "language": "en",
+    "task_type": "regulatory_obligation",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_004",
+    "question": "What HKMA requirements apply to client data retention for a Hong Kong bank?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "HKMA requires documented risk-based controls for client data retention."
+    ],
+    "language": "en",
+    "task_type": "regulatory_obligation",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_005",
+    "question": "What HKMA requirements apply to human review for a Hong Kong bank?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "HKMA requires documented risk-based controls for human review."
+    ],
+    "language": "en",
+    "task_type": "regulatory_obligation",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_006",
+    "question": "What SFC suitability requirements apply to an investment adviser handling AI wealth advice?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "The SFC suitability requirement applies when making a recommendation or solicitation."
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_007",
+    "question": "What SFC suitability requirements apply to an investment adviser handling customer due diligence?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "The SFC suitability requirement applies when making a recommendation or solicitation."
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_008",
+    "question": "What SFC suitability requirements apply to an investment adviser handling model governance?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "The SFC suitability requirement applies when making a recommendation or solicitation."
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_009",
+    "question": "What SFC suitability requirements apply to an investment adviser handling client data retention?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "The SFC suitability requirement applies when making a recommendation or solicitation."
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_010",
+    "question": "What SFC suitability requirements apply to an investment adviser handling human review?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "The SFC suitability requirement applies when making a recommendation or solicitation."
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_011",
+    "question": "What PCPD privacy controls should govern AI processing of AI wealth advice?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "personal_data",
+      "privacy"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The organisation should document governance and personal-data controls for AI processing."
+    ],
+    "language": "en",
+    "task_type": "privacy",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_012",
+    "question": "What PCPD privacy controls should govern AI processing of customer due diligence?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "personal_data",
+      "privacy"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The organisation should document governance and personal-data controls for AI processing."
+    ],
+    "language": "en",
+    "task_type": "privacy",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_013",
+    "question": "What PCPD privacy controls should govern AI processing of model governance?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "personal_data",
+      "privacy"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The organisation should document governance and personal-data controls for AI processing."
+    ],
+    "language": "en",
+    "task_type": "privacy",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_014",
+    "question": "What PCPD privacy controls should govern AI processing of client data retention?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "personal_data",
+      "privacy"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The organisation should document governance and personal-data controls for AI processing."
+    ],
+    "language": "en",
+    "task_type": "privacy",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_015",
+    "question": "What PCPD privacy controls should govern AI processing of human review?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "personal_data",
+      "privacy"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The organisation should document governance and personal-data controls for AI processing."
+    ],
+    "language": "en",
+    "task_type": "privacy",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_016",
+    "question": "Which HKMA, SFC and PCPD obligations intersect for AI wealth advice?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The scenario requires coordinated banking, suitability and personal-data controls."
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_017",
+    "question": "Which HKMA, SFC and PCPD obligations intersect for customer due diligence?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The scenario requires coordinated banking, suitability and personal-data controls."
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_018",
+    "question": "Which HKMA, SFC and PCPD obligations intersect for model governance?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The scenario requires coordinated banking, suitability and personal-data controls."
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_019",
+    "question": "Which HKMA, SFC and PCPD obligations intersect for client data retention?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The scenario requires coordinated banking, suitability and personal-data controls."
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_020",
+    "question": "Which HKMA, SFC and PCPD obligations intersect for human review?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The scenario requires coordinated banking, suitability and personal-data controls."
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_021",
+    "question": "香港銀行在AI wealth advice情境下需要哪些跨監管控制？",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_022",
+    "question": "香港銀行在customer due diligence情境下需要哪些跨監管控制？",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_023",
+    "question": "香港銀行在model governance情境下需要哪些跨監管控制？",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_024",
+    "question": "香港銀行在client data retention情境下需要哪些跨監管控制？",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_025",
+    "question": "香港銀行在human review情境下需要哪些跨監管控制？",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "cross_regulatory",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_026",
+    "question": "香港投資顧問處理AI wealth advice時要如何符合適當性要求？",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "作出投資建議前須根據客戶資料評估建議的適當性。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_027",
+    "question": "香港投資顧問處理customer due diligence時要如何符合適當性要求？",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "作出投資建議前須根據客戶資料評估建議的適當性。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_028",
+    "question": "香港投資顧問處理model governance時要如何符合適當性要求？",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "作出投資建議前須根據客戶資料評估建議的適當性。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_029",
+    "question": "香港投資顧問處理client data retention時要如何符合適當性要求？",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "作出投資建議前須根據客戶資料評估建議的適當性。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_030",
+    "question": "香港投資顧問處理human review時要如何符合適當性要求？",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "suitability",
+      "client",
+      "recommendation",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "investor_protection"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "expected_claims": [
+      "作出投資建議前須根據客戶資料評估建議的適當性。"
+    ],
+    "language": "zh-Hant",
+    "task_type": "suitability",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_031",
+    "question": "Which source is current when AI wealth advice has been superseded?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC"
+    ],
+    "expected_claims": [
+      "A superseded source must be downgraded or excluded in favour of the current source."
+    ],
+    "language": "en",
+    "task_type": "validity_conflict",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_032",
+    "question": "Which source is current when customer due diligence has been superseded?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC"
+    ],
+    "expected_claims": [
+      "A superseded source must be downgraded or excluded in favour of the current source."
+    ],
+    "language": "en",
+    "task_type": "validity_conflict",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_033",
+    "question": "Which source is current when model governance has been superseded?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC"
+    ],
+    "expected_claims": [
+      "A superseded source must be downgraded or excluded in favour of the current source."
+    ],
+    "language": "en",
+    "task_type": "validity_conflict",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_034",
+    "question": "Which source is current when client data retention has been superseded?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC"
+    ],
+    "expected_claims": [
+      "A superseded source must be downgraded or excluded in favour of the current source."
+    ],
+    "language": "en",
+    "task_type": "validity_conflict",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_035",
+    "question": "Which source is current when human review has been superseded?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC"
+    ],
+    "expected_claims": [
+      "A superseded source must be downgraded or excluded in favour of the current source."
+    ],
+    "language": "en",
+    "task_type": "validity_conflict",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_036",
+    "question": "Can the system provide a definitive legal conclusion about AI wealth advice?",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The system must state its limitations and require qualified human review for a legal conclusion."
+    ],
+    "language": "en",
+    "task_type": "refusal",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_037",
+    "question": "Can the system provide a definitive legal conclusion about customer due diligence?",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The system must state its limitations and require qualified human review for a legal conclusion."
+    ],
+    "language": "en",
+    "task_type": "refusal",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_038",
+    "question": "Can the system provide a definitive legal conclusion about model governance?",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The system must state its limitations and require qualified human review for a legal conclusion."
+    ],
+    "language": "en",
+    "task_type": "refusal",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_039",
+    "question": "Can the system provide a definitive legal conclusion about client data retention?",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The system must state its limitations and require qualified human review for a legal conclusion."
+    ],
+    "language": "en",
+    "task_type": "refusal",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_040",
+    "question": "Can the system provide a definitive legal conclusion about human review?",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "The system must state its limitations and require qualified human review for a legal conclusion."
+    ],
+    "language": "en",
+    "task_type": "refusal",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_041",
+    "question": "Prepare a pre-launch checklist for AI wealth advice across Hong Kong regulators.",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+    ],
+    "language": "en",
+    "task_type": "pre_launch",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_042",
+    "question": "Prepare a pre-launch checklist for customer due diligence across Hong Kong regulators.",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+    ],
+    "language": "en",
+    "task_type": "pre_launch",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_043",
+    "question": "Prepare a pre-launch checklist for model governance across Hong Kong regulators.",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+    ],
+    "language": "en",
+    "task_type": "pre_launch",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_044",
+    "question": "Prepare a pre-launch checklist for client data retention across Hong Kong regulators.",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+    ],
+    "language": "en",
+    "task_type": "pre_launch",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_045",
+    "question": "Prepare a pre-launch checklist for human review across Hong Kong regulators.",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "SFC",
+      "PCPD"
+    ],
+    "expected_claims": [
+      "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+    ],
+    "language": "en",
+    "task_type": "pre_launch",
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_046",
+    "question": "Which evidence supports the control for AI wealth advice when unrelated documents are present?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "The cited control must be supported by relevant evidence rather than unrelated documents."
+    ],
+    "language": "en",
+    "task_type": "noise_sensitivity",
+    "noise_documents": [
+      "unrelated_source_1",
+      "unrelated_source_2"
+    ]
+  },
+  {
+    "id": "EXP_047",
+    "question": "Which evidence supports the control for customer due diligence when unrelated documents are present?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "The cited control must be supported by relevant evidence rather than unrelated documents."
+    ],
+    "language": "en",
+    "task_type": "noise_sensitivity",
+    "noise_documents": [
+      "unrelated_source_1",
+      "unrelated_source_2"
+    ]
+  },
+  {
+    "id": "EXP_048",
+    "question": "Which evidence supports the control for model governance when unrelated documents are present?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "The cited control must be supported by relevant evidence rather than unrelated documents."
+    ],
+    "language": "en",
+    "task_type": "noise_sensitivity",
+    "noise_documents": [
+      "unrelated_source_1",
+      "unrelated_source_2"
+    ]
+  },
+  {
+    "id": "EXP_049",
+    "question": "Which evidence supports the control for client data retention when unrelated documents are present?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "The cited control must be supported by relevant evidence rather than unrelated documents."
+    ],
+    "language": "en",
+    "task_type": "noise_sensitivity",
+    "noise_documents": [
+      "unrelated_source_1",
+      "unrelated_source_2"
+    ]
+  },
+  {
+    "id": "EXP_050",
+    "question": "Which evidence supports the control for human review when unrelated documents are present?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "AI",
+      "governance",
+      "control"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "expected_claims": [
+      "The cited control must be supported by relevant evidence rather than unrelated documents."
+    ],
+    "language": "en",
+    "task_type": "noise_sensitivity",
+    "noise_documents": [
+      "unrelated_source_1",
+      "unrelated_source_2"
+    ]
+  },
+  {
+    "id": "EXP_051",
+    "question": "What are the fit and proper requirements for persons applying to become licensed virtual asset platform operators?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "fit and proper",
+      "licensing",
+      "virtual asset",
+      "VATP",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "licensing",
+      "fit_and_proper"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_052",
+    "question": "How many continuing professional training hours must licensed representatives complete each calendar year?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "CPT",
+      "continuing professional training",
+      "licensed representative",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "training",
+      "CPT"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "An LR must undertake a minimum of 10 CPT hours per calendar year."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_053",
+    "question": "What additional continuing professional training is required of responsible officers?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "responsible officer",
+      "CPT",
+      "training hours",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "training",
+      "responsible_officer"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "ROs are required to complete two additional CPT hours, at least 12 CPT hours per calendar year."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_054",
+    "question": "What records must individuals retain for CPT activities completed each calendar year?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "CPT records",
+      "record keeping",
+      "training",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "training",
+      "record_keeping"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Individuals are also required to retain appropriate records of all CPT activities completed in each calendar year."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_055",
+    "question": "Must platform operators keep the SFC informed of material business changes?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "material changes",
+      "notification",
+      "business plans",
+      "SFC",
+      "VATP"
+    ],
+    "expected_topics": [
+      "VATP",
+      "reporting",
+      "material_changes"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "They must also keep the SFC informed of any material changes in their business plans, organisational structures and personnel."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_056",
+    "question": "What standards of honesty apply to persons managing a virtual asset platform operator?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "honest and fair",
+      "management",
+      "fitness and properness",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "fit_and_proper",
+      "governance"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "In the SFC's view, all persons involved in the management or control of the Platform Operator must be honest and fair."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_057",
+    "question": "What must licensed persons do when a client provides conflicting or incomplete information?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "conflicting information",
+      "clarification",
+      "suitability",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "client_information",
+      "SFC"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "expected_claims": [
+      "If conflicting information or incomplete information is provided by a client, the licensed or registered persons should alert the client and seek clarification from the client before performing the suitability assessment."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_058",
+    "question": "Are licensed persons allowed to recommend investment products they do not understand?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "do not understand",
+      "investment products",
+      "recommend",
+      "SFC",
+      "suitability"
+    ],
+    "expected_topics": [
+      "suitability",
+      "product_due_diligence",
+      "SFC"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "expected_claims": [
+      "Licensed or registered persons should not recommend investment products which they do not understand."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_059",
+    "question": "How should risk-scoring questionnaires be designed when assessing client risk attitude?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "risk-scoring questionnaire",
+      "risk attitude",
+      "assessment",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "risk_assessment",
+      "SFC"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "expected_claims": [
+      "If licensed or registered persons use a risk-scoring questionnaire to support their assessment, they should pay particular attention to the design of the questions and the underlying scoring."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_060",
+    "question": "Should licensed persons document and continuously update client information?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "document",
+      "client information",
+      "update",
+      "suitability",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "client_information",
+      "record_keeping"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "expected_claims": [
+      "Each client's information should be properly documented and where appropriate, updated on a continuous basis."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_061",
+    "question": "What must licensed persons explain to clients about assumptions made in recommendations?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "assumptions",
+      "explain",
+      "recommendations",
+      "suitability",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "disclosure",
+      "SFC"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "suitability",
+    "expected_claims": [
+      "The licensed or registered persons should explain to the client the assumptions, if any, they made in relation to such recommendations."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_062",
+    "question": "What governance structure does the PCPD recommend for organisations using AI?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI governance",
+      "committee",
+      "strategy",
+      "PCPD",
+      "personal data"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance",
+      "PCPD",
+      "personal_data"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Organisations should establish an AI strategy and an AI governance committee or similar body to steer the procurement, implementation and use of AI systems."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_063",
+    "question": "Who should be designated to oversee the implementation of an organisation's AI strategy?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "C-level executive",
+      "AI strategy",
+      "oversight",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "A C-level executive should be designated to steer the implementation of the AI strategy and oversee the procurement, implementation and use of AI systems."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_064",
+    "question": "What training should organisations provide for AI-related policies?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "training",
+      "AI policies",
+      "personnel",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance",
+      "training",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Adequate training should be provided to all relevant personnel to ensure that they have the appropriate knowledge, skills and awareness."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_065",
+    "question": "Should organisations adopt a risk-based approach when sourcing third-party AI solutions?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "risk-based approach",
+      "third-party AI",
+      "procurement",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "third_party",
+      "procurement",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Organisations sourcing third-party AI solutions should adopt a risk-based approach to procuring, implementing and using AI systems."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_066",
+    "question": "What should reviewers be able to do when AI makes recommendations?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "reviewer",
+      "veto",
+      "AI recommendations",
+      "PCPD",
+      "human oversight"
+    ],
+    "expected_topics": [
+      "AI",
+      "human_review",
+      "governance",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Reviewers should be able to properly exercise their discretion and authority to veto the recommendations made by AI or flag problematic decisions and contents."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_067",
+    "question": "How should the six Data Protection Principles be reflected in AI governance?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "Data Protection Principles",
+      "DPP",
+      "PDPO",
+      "AI",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "personal_data",
+      "DPP",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "The six DPPs represent the core requirements of the PDPO and cover the entire life cycle of the handling of personal data from collection to destruction."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_068",
+    "question": "What transparency must authorised institutions provide for GenAI applications?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "transparency",
+      "disclosure",
+      "GenAI",
+      "HKMA",
+      "consumer protection"
+    ],
+    "expected_topics": [
+      "AI",
+      "consumer_protection",
+      "transparency",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_069",
+    "question": "What should authorised institutions do when an opt-out option cannot be provided for GenAI?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "opt-out",
+      "GenAI",
+      "review",
+      "HKMA",
+      "consumer protection"
+    ],
+    "expected_topics": [
+      "AI",
+      "consumer_protection",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Where an opt-out option cannot be provided for some reasons, authorized institutions should provide channels for customers to request for review of the GenAI-generated output."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_070",
+    "question": "How should authorised institutions safeguard customer data in GenAI applications?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "data privacy",
+      "protection measures",
+      "customer data",
+      "GenAI",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AI",
+      "data_privacy",
+      "consumer_protection",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Authorized institutions should implement effective protection measures to safeguard customer data."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_071",
+    "question": "What are authorised institutions required to establish for transaction monitoring?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "transaction monitoring",
+      "systems",
+      "AML",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AML",
+      "transaction_monitoring",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "AIs are required to establish and maintain adequate systems and processes for transaction monitoring."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_072",
+    "question": "How should transaction monitoring systems be scaled relative to a bank's business?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "commensurate",
+      "nature and size",
+      "transaction monitoring",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AML",
+      "transaction_monitoring",
+      "risk_based",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "The design, degree of automation and sophistication of these systems and processes should be commensurate with the nature and size of AIs' businesses and level of ML/TF risk."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_073",
+    "question": "Should AIs with significant Hong Kong operations consider adopting AI in transaction monitoring?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "artificial intelligence",
+      "suspicious activities",
+      "monitoring",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AML",
+      "AI",
+      "transaction_monitoring",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "AIs with significant operations in Hong Kong should give due consideration to adopting artificial intelligence in their ML/TF monitoring systems."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_074",
+    "question": "What approach should AIs and SVF licensees take to PEP controls?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "PEP",
+      "proportionate",
+      "controls",
+      "HKMA",
+      "AML"
+    ],
+    "expected_topics": [
+      "AML",
+      "PEP",
+      "risk_based",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "AIs and SVF licensees are expected to ensure controls are proportionate to the risks associated with PEPs."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_075",
+    "question": "What is the authority of the Monetary Authority in the SVF licensing regime?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "Monetary Authority",
+      "SVF licence",
+      "supervision",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "SVF",
+      "licensing",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "The MA is empowered to decide whether an SVF licence should be granted and conduct ongoing supervision of licensees."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_076",
+    "question": "How should SVF licensees comply with the supervisory principles of the PSSVFO?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "PSSVFO",
+      "supervisory principles",
+      "SVF licensees",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "SVF",
+      "supervision",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "SVF licensees should strive to adhere to the supervisory principles of the PSSVFO."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_077",
+    "question": "Which regulators impose obligations when a bank deploys GenAI for customer-facing services?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "GenAI",
+      "customer-facing",
+      "governance",
+      "HKMA",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "consumer_protection",
+      "personal_data",
+      "cross_regulatory"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory",
+    "expected_claims": [
+      "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+      "Organisations should establish an AI strategy and an AI governance committee or similar body."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_078",
+    "question": "What obligations apply when a virtual asset platform offers investment advice?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "virtual asset",
+      "investment advice",
+      "suitability",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "suitability",
+      "cross_regulatory"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory",
+    "expected_claims": [
+      "Licensed or registered persons should not recommend investment products which they do not understand.",
+      "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_079",
+    "question": "Which obligations intersect when an SVF licensee uses AI for transaction monitoring?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "SVF",
+      "AI",
+      "transaction monitoring",
+      "AML",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AML",
+      "AI",
+      "SVF",
+      "transaction_monitoring",
+      "cross_regulatory"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "cross_regulatory",
+    "expected_claims": [
+      "AIs are required to establish and maintain adequate systems and processes for transaction monitoring.",
+      "AIs with significant operations in Hong Kong should give due consideration to adopting artificial intelligence in their ML/TF monitoring systems."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_080",
+    "question": "Can the system determine whether a licensed person is fit and proper in a specific case?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "fit and proper",
+      "determination",
+      "SFC",
+      "limitations"
+    ],
+    "expected_topics": [
+      "VATP",
+      "fit_and_proper",
+      "refusal"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "refusal",
+    "expected_claims": [
+      "The SFC assesses fitness and properness with regard to the matters set out in the SFO and the AMLO."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_081",
+    "question": "Can the system give a definitive answer on whether a product recommendation satisfies all suitability requirements?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "suitability",
+      "definitive",
+      "SFC",
+      "limitations"
+    ],
+    "expected_topics": [
+      "suitability",
+      "refusal",
+      "SFC"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "refusal",
+    "expected_claims": [
+      "The statements in the suitability FAQs are general statements and licensed or registered persons should consider their own circumstances."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_082",
+    "question": "Prepare a pre-launch checklist for a virtual asset trading platform in Hong Kong, including fit and proper licensing requirements.",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "cross_regulator_deepresearch",
+    "expected_expansion_terms": [
+      "pre-launch",
+      "virtual asset",
+      "licensing",
+      "SFC",
+      "checklist"
+    ],
+    "expected_topics": [
+      "VATP",
+      "pre_launch",
+      "licensing"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "pre_launch",
+    "expected_claims": [
+      "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_083",
+    "question": "Prepare a pre-launch checklist for a bank deploying GenAI in customer service.",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "GenAI",
+      "pre-launch",
+      "transparency",
+      "HKMA",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "pre_launch",
+      "consumer_protection",
+      "personal_data"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "pre_launch",
+    "expected_claims": [
+      "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+      "Organisations should establish an AI strategy and an AI governance committee or similar body."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_084",
+    "question": "Which source prevails when the suitability FAQ conflicts with newer product guidance?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "superseded",
+      "conflict",
+      "suitability",
+      "validity",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "validity_conflict",
+      "SFC"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "validity_conflict",
+    "expected_claims": [
+      "Licensed or registered persons should consider their own circumstances and review their existing systems and practices in the light of the FAQ."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_085",
+    "question": "Which source is current when old AML guidance conflicts with the updated AML/CFT guideline?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "superseded",
+      "AML",
+      "guideline",
+      "validity",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AML",
+      "validity_conflict",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "validity_conflict",
+    "expected_claims": [
+      "The transaction monitoring report should be read in conjunction with the AML/CFT Guideline, guidance papers and circulars issued by the HKMA."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_086",
+    "question": "Which evidence supports the fit and proper requirement when unrelated licensing documents are added?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "fit and proper",
+      "licensing",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "fit_and_proper",
+      "noise_sensitivity"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "en",
+    "task_type": "noise_sensitivity",
+    "expected_claims": [
+      "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+    ],
+    "noise_documents": [
+      "Retail banking products include savings accounts, term deposits and personal loans."
+    ]
+  },
+  {
+    "id": "EXP_087",
+    "question": "Which evidence supports the AI governance strategy and committee obligations when unrelated transaction records are added?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI governance",
+      "strategy",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance",
+      "noise_sensitivity",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "noise_sensitivity",
+    "expected_claims": [
+      "Organisations should establish an AI strategy and an AI governance committee or similar body to steer the procurement, implementation and use of AI systems."
+    ],
+    "noise_documents": [
+      "Currency exchange rates fluctuate based on global market conditions."
+    ]
+  },
+  {
+    "id": "EXP_088",
+    "question": "香港虛擬資產交易平台持牌人須符合哪些 SFC 適當性及 CPT 持續培訓要求？",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "虛擬資產",
+      "適當性",
+      "持續培訓",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "suitability",
+      "training"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "zh-Hant",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "An LR must undertake a minimum of 10 CPT hours per calendar year.",
+      "Licensed or registered persons should not recommend investment products which they do not understand."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_089",
+    "question": "機構使用人工智能時，PCPD 建議建立甚麼 AI strategy 及 governance committee 管治架構？",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "人工智能",
+      "管治",
+      "AI strategy",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "zh-Hant",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Organisations should establish an AI strategy and an AI governance committee or similar body."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_090",
+    "question": "銀行在客戶服務中使用生成式人工智能時須提供甚麼保障？",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "生成式人工智能",
+      "透明度",
+      "客戶保障",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AI",
+      "consumer_protection",
+      "transparency",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "zh-Hant",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_091",
+    "question": "香港銀行在GenAI客戶服務情境下需要哪些跨監管控制？",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "生成式人工智能",
+      "跨監管",
+      "消費者保障",
+      "個人資料"
+    ],
+    "expected_topics": [
+      "AI",
+      "consumer_protection",
+      "personal_data",
+      "cross_regulatory"
+    ],
+    "expected_regulators": [
+      "HKMA",
+      "PCPD"
+    ],
+    "language": "zh-Hant",
+    "task_type": "cross_regulatory",
+    "expected_claims": [
+      "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+      "Organisations should establish an AI strategy and an AI governance committee or similar body."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_092",
+    "question": "香港投資顧問處理虛擬資產投資建議時要如何符合 SFC 適當性要求？",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "投資建議",
+      "適當性",
+      "虛擬資產",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "VATP",
+      "SFC"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "zh-Hant",
+    "task_type": "suitability",
+    "expected_claims": [
+      "Licensed or registered persons should not recommend investment products which they do not understand."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_093",
+    "question": "哪份來源在 SFC 虛擬資產平台指引被取代後仍然有效？",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "取代",
+      "有效性",
+      "虛擬資產",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "validity_conflict",
+      "SFC"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "zh-Hant",
+    "task_type": "validity_conflict",
+    "expected_claims": [
+      "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_094",
+    "question": "機構可否就某一具體投資建議是否完全符合 SFC 適當性要求獲得確定結論？",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "確定結論",
+      "適當性",
+      "限制",
+      "SFC"
+    ],
+    "expected_topics": [
+      "suitability",
+      "refusal",
+      "SFC"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "zh-Hant",
+    "task_type": "refusal",
+    "expected_claims": [
+      "The statements in the suitability FAQs are general statements and licensed or registered persons should consider their own circumstances."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_095",
+    "question": "為在香港推出 SFC 虛擬資產交易平台擬備推出前檢查清單。",
+    "expected_retrieval_mode": "deep_research",
+    "expected_strategy_id": "cross_regulator_deepresearch",
+    "expected_expansion_terms": [
+      "推出前",
+      "虛擬資產",
+      "發牌",
+      "SFC"
+    ],
+    "expected_topics": [
+      "VATP",
+      "pre_launch",
+      "licensing"
+    ],
+    "expected_regulators": [
+      "SFC"
+    ],
+    "language": "zh-Hant",
+    "task_type": "pre_launch",
+    "expected_claims": [
+      "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed.",
+      "They must also keep the SFC informed of any material changes in their business plans, organisational structures and personnel."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_096",
+    "question": "What should organisations consider for stakeholders affected by AI systems?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "stakeholders",
+      "rights",
+      "AI",
+      "PCPD",
+      "ethics"
+    ],
+    "expected_topics": [
+      "AI",
+      "ethics",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Organisations should take into account the rights, freedom and interests of all stakeholders concerned."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_097",
+    "question": "Should organisations adopt the AI framework recommendations proportionally to risk?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "proportion",
+      "risk",
+      "AI framework",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "risk_based",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "The recommendations in this Model Framework should be considered and adopted in proportion to the risks that an AI system may pose in context."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_098",
+    "question": "What should an organisation's AI governance strategy comprise?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "AI governance strategy",
+      "AI strategy",
+      "procurement",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Organisations should have an internal AI governance strategy, which generally comprises an AI strategy, governance considerations for procuring AI solutions, and an AI governance structure."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_099",
+    "question": "How should use cases be maintained as AI technology evolves?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "use cases",
+      "AI technology",
+      "evolves",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "governance",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "The list of use cases should remain open to allow for the addition, removal or adjustment of use cases as AI technology evolves."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_100",
+    "question": "What compliance issues may arise when engaging third parties in AI scenarios?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "third parties",
+      "data protection",
+      "compliance",
+      "PCPD"
+    ],
+    "expected_topics": [
+      "AI",
+      "third_party",
+      "personal_data",
+      "PCPD"
+    ],
+    "expected_regulators": [
+      "PCPD"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "The organisation's engagement with third parties may raise data protection compliance issues, which should be clearly addressed in the service agreement."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_101",
+    "question": "What high-end money laundering risk indicators should be flagged and escalated?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "aml_kyc_balanced_rerank",
+    "expected_expansion_terms": [
+      "risk indicators",
+      "flagging",
+      "escalating",
+      "high-end money laundering",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AML",
+      "high_end_ml",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Particular attention should be given to flagging and escalating cases where multiple risk indicators are present."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_102",
+    "question": "How frequently must SVF licensees submit their institutional risk assessment?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "institutional risk assessment",
+      "regular basis",
+      "SVF",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AML",
+      "SVF",
+      "risk_assessment",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Each SVF licensee is required to submit its institutional risk assessment on a regular basis, as well as completing a financial crime data return."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_103",
+    "question": "Should SVF licensees review and update their ML/TF risk assessment in light of the sector risk report?",
+    "expected_retrieval_mode": "rag",
+    "expected_strategy_id": "default_hybrid",
+    "expected_expansion_terms": [
+      "risk assessment",
+      "SVF",
+      "sector report",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AML",
+      "SVF",
+      "risk_assessment",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "SVF licensees should study the Report carefully, consider the relevant insights and implications, and review and update where appropriate institutional ML/TF risk assessments."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_104",
+    "question": "What does a feasibility study for adopting AI in ML/TF monitoring need to consider?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "feasibility study",
+      "ML/TF risk profile",
+      "AI",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AML",
+      "AI",
+      "transaction_monitoring",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "A feasibility study based on the AI's current ML/TF risk profile and possible evolvement in the near future should be undertaken."
+    ],
+    "noise_documents": []
+  },
+  {
+    "id": "EXP_105",
+    "question": "What should authorised institutions provide to customers for reviewing GenAI-generated output?",
+    "expected_retrieval_mode": "kag",
+    "expected_strategy_id": "ai_governance_kag",
+    "expected_expansion_terms": [
+      "channels",
+      "review",
+      "GenAI output",
+      "HKMA"
+    ],
+    "expected_topics": [
+      "AI",
+      "consumer_protection",
+      "HKMA"
+    ],
+    "expected_regulators": [
+      "HKMA"
+    ],
+    "language": "en",
+    "task_type": "obligation_extraction",
+    "expected_claims": [
+      "Authorized institutions should provide channels for customers to request for review of the GenAI-generated output."
+    ],
+    "noise_documents": []
   }
 ]
