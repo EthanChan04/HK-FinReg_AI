@@ -35,6 +35,56 @@ def _metric_error(question_id: str, metric: str, exc: Exception) -> dict:
     }
 
 
+# T1-03: evaluation provenance. Bump when metric semantics change so old
+# runs are distinguishable from new ones (e.g. "eval-2" after the
+# faithfulness decoupling in 2026-08-05).
+EVAL_VERSION = "eval-2"
+
+
+def _eval_version() -> str:
+    return EVAL_VERSION
+
+
+def _benchmark_fingerprint(questions: list[dict]) -> str:
+    """Stable sha256 over sorted (id, question) pairs of the benchmark."""
+    import hashlib
+
+    digest = hashlib.sha256()
+    for item in sorted(questions, key=lambda q: q.get("id", "")):
+        digest.update(str(item.get("id", "")).encode("utf-8"))
+        digest.update(b"\x00")
+        digest.update(str(item.get("question", "")).encode("utf-8"))
+        digest.update(b"\x00")
+    return digest.hexdigest()
+
+
+def _corpus_fingerprint() -> str:
+    """sha256 of the source manifest (the corpus's ground truth)."""
+    import hashlib
+    from pathlib import Path
+
+    from app.services.corpus.cache import manifest_digest
+
+    manifest_path = _backend_root() / "data" / "source_manifest.json"
+    try:
+        return manifest_digest(manifest_path)
+    except OSError:
+        return hashlib.sha256(b"missing-manifest").hexdigest()
+
+
+def _build_provenance(questions: list[dict]) -> dict:
+    """Return auditable evaluation metadata for a run."""
+    from datetime import datetime, timezone
+
+    return {
+        "eval_version": _eval_version(),
+        "evaluated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "benchmark_fingerprint": _benchmark_fingerprint(questions),
+        "corpus_fingerprint": _corpus_fingerprint(),
+        "question_count": len(questions),
+    }
+
+
 def _avg_optional(values) -> float | None:
     """Average only non-None values; None when nothing was measured."""
 
@@ -456,6 +506,7 @@ def run_eval() -> dict:
         "avg_hallucination_rate": _avg_optional(row["hallucination_rate"] for row in rows),
         "avg_noise_sensitivity": round(sum(row["noise_sensitivity"] for row in rows) / total, 3),
         "metric_errors": metric_errors,
+        "provenance": _build_provenance(questions),
         "rows": rows,
     }
     return summary
