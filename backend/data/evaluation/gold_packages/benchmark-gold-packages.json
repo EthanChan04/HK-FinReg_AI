@@ -1,0 +1,2915 @@
+{
+  "schema_version": 1,
+  "benchmark_case_count": 108,
+  "packages": [
+    {
+      "case_id": "RAG_SVF_AML_001",
+      "decision": [
+        "An SVF licensee must perform customer due diligence."
+      ],
+      "witness_trace": [
+        {
+          "claim": "An SVF licensee must perform customer due diligence.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "KAG_AI_ADVISOR_001",
+      "decision": [
+        "The product launch requires controls across HKMA, SFC and PCPD obligations."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The product launch requires controls across HKMA, SFC and PCPD obligations.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory_analysis",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "DR_AI_ADVISOR_001",
+      "decision": [
+        "The product launch requires controls across HKMA, SFC and PCPD obligations."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The product launch requires controls across HKMA, SFC and PCPD obligations.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory_analysis",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_001",
+      "decision": [
+        "HKMA requires documented risk-based controls for AI wealth advice."
+      ],
+      "witness_trace": [
+        {
+          "claim": "HKMA requires documented risk-based controls for AI wealth advice.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "regulatory_obligation",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_002",
+      "decision": [
+        "HKMA requires documented risk-based controls for customer due diligence."
+      ],
+      "witness_trace": [
+        {
+          "claim": "HKMA requires documented risk-based controls for customer due diligence.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "regulatory_obligation",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_003",
+      "decision": [
+        "HKMA requires documented risk-based controls for model governance."
+      ],
+      "witness_trace": [
+        {
+          "claim": "HKMA requires documented risk-based controls for model governance.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "regulatory_obligation",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_004",
+      "decision": [
+        "HKMA requires documented risk-based controls for client data retention."
+      ],
+      "witness_trace": [
+        {
+          "claim": "HKMA requires documented risk-based controls for client data retention.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "regulatory_obligation",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_005",
+      "decision": [
+        "HKMA requires documented risk-based controls for human review."
+      ],
+      "witness_trace": [
+        {
+          "claim": "HKMA requires documented risk-based controls for human review.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "regulatory_obligation",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_006",
+      "decision": [
+        "The SFC suitability requirement applies when making a recommendation or solicitation."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The SFC suitability requirement applies when making a recommendation or solicitation.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_007",
+      "decision": [
+        "The SFC suitability requirement applies when making a recommendation or solicitation."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The SFC suitability requirement applies when making a recommendation or solicitation.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_008",
+      "decision": [
+        "The SFC suitability requirement applies when making a recommendation or solicitation."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The SFC suitability requirement applies when making a recommendation or solicitation.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_009",
+      "decision": [
+        "The SFC suitability requirement applies when making a recommendation or solicitation."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The SFC suitability requirement applies when making a recommendation or solicitation.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_010",
+      "decision": [
+        "The SFC suitability requirement applies when making a recommendation or solicitation."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The SFC suitability requirement applies when making a recommendation or solicitation.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_011",
+      "decision": [
+        "The organisation should document governance and personal-data controls for AI processing."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The organisation should document governance and personal-data controls for AI processing.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "privacy",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_012",
+      "decision": [
+        "The organisation should document governance and personal-data controls for AI processing."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The organisation should document governance and personal-data controls for AI processing.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "privacy",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_013",
+      "decision": [
+        "The organisation should document governance and personal-data controls for AI processing."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The organisation should document governance and personal-data controls for AI processing.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "privacy",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_014",
+      "decision": [
+        "The organisation should document governance and personal-data controls for AI processing."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The organisation should document governance and personal-data controls for AI processing.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "privacy",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_015",
+      "decision": [
+        "The organisation should document governance and personal-data controls for AI processing."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The organisation should document governance and personal-data controls for AI processing.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "privacy",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_016",
+      "decision": [
+        "The scenario requires coordinated banking, suitability and personal-data controls."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The scenario requires coordinated banking, suitability and personal-data controls.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_017",
+      "decision": [
+        "The scenario requires coordinated banking, suitability and personal-data controls."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The scenario requires coordinated banking, suitability and personal-data controls.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_018",
+      "decision": [
+        "The scenario requires coordinated banking, suitability and personal-data controls."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The scenario requires coordinated banking, suitability and personal-data controls.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_019",
+      "decision": [
+        "The scenario requires coordinated banking, suitability and personal-data controls."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The scenario requires coordinated banking, suitability and personal-data controls.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_020",
+      "decision": [
+        "The scenario requires coordinated banking, suitability and personal-data controls."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The scenario requires coordinated banking, suitability and personal-data controls.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_021",
+      "decision": [
+        "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "zh-Hant",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_022",
+      "decision": [
+        "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "zh-Hant",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_023",
+      "decision": [
+        "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "zh-Hant",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_024",
+      "decision": [
+        "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "zh-Hant",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_025",
+      "decision": [
+        "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "跨監管情境需要同時核對銀行、投資適當性及個人資料控制。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "zh-Hant",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_026",
+      "decision": [
+        "作出投資建議前須根據客戶資料評估建議的適當性。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "作出投資建議前須根據客戶資料評估建議的適當性。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_027",
+      "decision": [
+        "作出投資建議前須根據客戶資料評估建議的適當性。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "作出投資建議前須根據客戶資料評估建議的適當性。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_028",
+      "decision": [
+        "作出投資建議前須根據客戶資料評估建議的適當性。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "作出投資建議前須根據客戶資料評估建議的適當性。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_029",
+      "decision": [
+        "作出投資建議前須根據客戶資料評估建議的適當性。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "作出投資建議前須根據客戶資料評估建議的適當性。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_030",
+      "decision": [
+        "作出投資建議前須根據客戶資料評估建議的適當性。"
+      ],
+      "witness_trace": [
+        {
+          "claim": "作出投資建議前須根據客戶資料評估建議的適當性。",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_031",
+      "decision": [
+        "A superseded source must be downgraded or excluded in favour of the current source."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A superseded source must be downgraded or excluded in favour of the current source.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "validity_conflict",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_032",
+      "decision": [
+        "A superseded source must be downgraded or excluded in favour of the current source."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A superseded source must be downgraded or excluded in favour of the current source.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "validity_conflict",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_033",
+      "decision": [
+        "A superseded source must be downgraded or excluded in favour of the current source."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A superseded source must be downgraded or excluded in favour of the current source.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "validity_conflict",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_034",
+      "decision": [
+        "A superseded source must be downgraded or excluded in favour of the current source."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A superseded source must be downgraded or excluded in favour of the current source.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "validity_conflict",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_035",
+      "decision": [
+        "A superseded source must be downgraded or excluded in favour of the current source."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A superseded source must be downgraded or excluded in favour of the current source.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "validity_conflict",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_036",
+      "decision": [
+        "The system must state its limitations and require qualified human review for a legal conclusion."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The system must state its limitations and require qualified human review for a legal conclusion.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "refusal",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_037",
+      "decision": [
+        "The system must state its limitations and require qualified human review for a legal conclusion."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The system must state its limitations and require qualified human review for a legal conclusion.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "refusal",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_038",
+      "decision": [
+        "The system must state its limitations and require qualified human review for a legal conclusion."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The system must state its limitations and require qualified human review for a legal conclusion.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "refusal",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_039",
+      "decision": [
+        "The system must state its limitations and require qualified human review for a legal conclusion."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The system must state its limitations and require qualified human review for a legal conclusion.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "refusal",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_040",
+      "decision": [
+        "The system must state its limitations and require qualified human review for a legal conclusion."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The system must state its limitations and require qualified human review for a legal conclusion.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "refusal",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_041",
+      "decision": [
+        "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A pre-launch checklist should identify evidence, owners, effective dates and review gates.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "pre_launch",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_042",
+      "decision": [
+        "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A pre-launch checklist should identify evidence, owners, effective dates and review gates.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "pre_launch",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_043",
+      "decision": [
+        "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A pre-launch checklist should identify evidence, owners, effective dates and review gates.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "pre_launch",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_044",
+      "decision": [
+        "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A pre-launch checklist should identify evidence, owners, effective dates and review gates.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "pre_launch",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_045",
+      "decision": [
+        "A pre-launch checklist should identify evidence, owners, effective dates and review gates."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A pre-launch checklist should identify evidence, owners, effective dates and review gates.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "SFC",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "pre_launch",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_046",
+      "decision": [
+        "The cited control must be supported by relevant evidence rather than unrelated documents."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The cited control must be supported by relevant evidence rather than unrelated documents.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "noise_sensitivity",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_047",
+      "decision": [
+        "The cited control must be supported by relevant evidence rather than unrelated documents."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The cited control must be supported by relevant evidence rather than unrelated documents.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "noise_sensitivity",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_048",
+      "decision": [
+        "The cited control must be supported by relevant evidence rather than unrelated documents."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The cited control must be supported by relevant evidence rather than unrelated documents.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "noise_sensitivity",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_049",
+      "decision": [
+        "The cited control must be supported by relevant evidence rather than unrelated documents."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The cited control must be supported by relevant evidence rather than unrelated documents.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "noise_sensitivity",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_050",
+      "decision": [
+        "The cited control must be supported by relevant evidence rather than unrelated documents."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The cited control must be supported by relevant evidence rather than unrelated documents.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "noise_sensitivity",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_051",
+      "decision": [
+        "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_052",
+      "decision": [
+        "An LR must undertake a minimum of 10 CPT hours per calendar year."
+      ],
+      "witness_trace": [
+        {
+          "claim": "An LR must undertake a minimum of 10 CPT hours per calendar year.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_053",
+      "decision": [
+        "ROs are required to complete two additional CPT hours, at least 12 CPT hours per calendar year."
+      ],
+      "witness_trace": [
+        {
+          "claim": "ROs are required to complete two additional CPT hours, at least 12 CPT hours per calendar year.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_054",
+      "decision": [
+        "Individuals are also required to retain appropriate records of all CPT activities completed in each calendar year."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Individuals are also required to retain appropriate records of all CPT activities completed in each calendar year.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_055",
+      "decision": [
+        "They must also keep the SFC informed of any material changes in their business plans, organisational structures and personnel."
+      ],
+      "witness_trace": [
+        {
+          "claim": "They must also keep the SFC informed of any material changes in their business plans, organisational structures and personnel.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_056",
+      "decision": [
+        "In the SFC's view, all persons involved in the management or control of the Platform Operator must be honest and fair."
+      ],
+      "witness_trace": [
+        {
+          "claim": "In the SFC's view, all persons involved in the management or control of the Platform Operator must be honest and fair.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_057",
+      "decision": [
+        "If conflicting information or incomplete information is provided by a client, the licensed or registered persons should alert the client and seek clarification from the client before performing the suitability assessment."
+      ],
+      "witness_trace": [
+        {
+          "claim": "If conflicting information or incomplete information is provided by a client, the licensed or registered persons should alert the client and seek clarification from the client before performing the suitability assessment.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_058",
+      "decision": [
+        "Licensed or registered persons should not recommend investment products which they do not understand."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Licensed or registered persons should not recommend investment products which they do not understand.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_059",
+      "decision": [
+        "If licensed or registered persons use a risk-scoring questionnaire to support their assessment, they should pay particular attention to the design of the questions and the underlying scoring."
+      ],
+      "witness_trace": [
+        {
+          "claim": "If licensed or registered persons use a risk-scoring questionnaire to support their assessment, they should pay particular attention to the design of the questions and the underlying scoring.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_060",
+      "decision": [
+        "Each client's information should be properly documented and where appropriate, updated on a continuous basis."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Each client's information should be properly documented and where appropriate, updated on a continuous basis.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_061",
+      "decision": [
+        "The licensed or registered persons should explain to the client the assumptions, if any, they made in relation to such recommendations."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The licensed or registered persons should explain to the client the assumptions, if any, they made in relation to such recommendations.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_062",
+      "decision": [
+        "Organisations should establish an AI strategy and an AI governance committee or similar body to steer the procurement, implementation and use of AI systems."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Organisations should establish an AI strategy and an AI governance committee or similar body to steer the procurement, implementation and use of AI systems.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_063",
+      "decision": [
+        "A C-level executive should be designated to steer the implementation of the AI strategy and oversee the procurement, implementation and use of AI systems."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A C-level executive should be designated to steer the implementation of the AI strategy and oversee the procurement, implementation and use of AI systems.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_064",
+      "decision": [
+        "Adequate training should be provided to all relevant personnel to ensure that they have the appropriate knowledge, skills and awareness."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Adequate training should be provided to all relevant personnel to ensure that they have the appropriate knowledge, skills and awareness.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_065",
+      "decision": [
+        "Organisations sourcing third-party AI solutions should adopt a risk-based approach to procuring, implementing and using AI systems."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Organisations sourcing third-party AI solutions should adopt a risk-based approach to procuring, implementing and using AI systems.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_066",
+      "decision": [
+        "Reviewers should be able to properly exercise their discretion and authority to veto the recommendations made by AI or flag problematic decisions and contents."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Reviewers should be able to properly exercise their discretion and authority to veto the recommendations made by AI or flag problematic decisions and contents.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_067",
+      "decision": [
+        "The six DPPs represent the core requirements of the PDPO and cover the entire life cycle of the handling of personal data from collection to destruction."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The six DPPs represent the core requirements of the PDPO and cover the entire life cycle of the handling of personal data from collection to destruction.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_068",
+      "decision": [
+        "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_069",
+      "decision": [
+        "Where an opt-out option cannot be provided for some reasons, authorized institutions should provide channels for customers to request for review of the GenAI-generated output."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Where an opt-out option cannot be provided for some reasons, authorized institutions should provide channels for customers to request for review of the GenAI-generated output.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_070",
+      "decision": [
+        "Authorized institutions should implement effective protection measures to safeguard customer data."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Authorized institutions should implement effective protection measures to safeguard customer data.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_071",
+      "decision": [
+        "AIs are required to establish and maintain adequate systems and processes for transaction monitoring."
+      ],
+      "witness_trace": [
+        {
+          "claim": "AIs are required to establish and maintain adequate systems and processes for transaction monitoring.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_072",
+      "decision": [
+        "The design, degree of automation and sophistication of these systems and processes should be commensurate with the nature and size of AIs' businesses and level of ML/TF risk."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The design, degree of automation and sophistication of these systems and processes should be commensurate with the nature and size of AIs' businesses and level of ML/TF risk.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_073",
+      "decision": [
+        "AIs with significant operations in Hong Kong should give due consideration to adopting artificial intelligence in their ML/TF monitoring systems."
+      ],
+      "witness_trace": [
+        {
+          "claim": "AIs with significant operations in Hong Kong should give due consideration to adopting artificial intelligence in their ML/TF monitoring systems.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_074",
+      "decision": [
+        "AIs and SVF licensees are expected to ensure controls are proportionate to the risks associated with PEPs."
+      ],
+      "witness_trace": [
+        {
+          "claim": "AIs and SVF licensees are expected to ensure controls are proportionate to the risks associated with PEPs.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_075",
+      "decision": [
+        "The MA is empowered to decide whether an SVF licence should be granted and conduct ongoing supervision of licensees."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The MA is empowered to decide whether an SVF licence should be granted and conduct ongoing supervision of licensees.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_076",
+      "decision": [
+        "SVF licensees should strive to adhere to the supervisory principles of the PSSVFO."
+      ],
+      "witness_trace": [
+        {
+          "claim": "SVF licensees should strive to adhere to the supervisory principles of the PSSVFO.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_077",
+      "decision": [
+        "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+        "Organisations should establish an AI strategy and an AI governance committee or similar body."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        },
+        {
+          "claim": "Organisations should establish an AI strategy and an AI governance committee or similar body.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_078",
+      "decision": [
+        "Licensed or registered persons should not recommend investment products which they do not understand.",
+        "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Licensed or registered persons should not recommend investment products which they do not understand.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        },
+        {
+          "claim": "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_079",
+      "decision": [
+        "AIs are required to establish and maintain adequate systems and processes for transaction monitoring.",
+        "AIs with significant operations in Hong Kong should give due consideration to adopting artificial intelligence in their ML/TF monitoring systems."
+      ],
+      "witness_trace": [
+        {
+          "claim": "AIs are required to establish and maintain adequate systems and processes for transaction monitoring.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        },
+        {
+          "claim": "AIs with significant operations in Hong Kong should give due consideration to adopting artificial intelligence in their ML/TF monitoring systems.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_080",
+      "decision": [
+        "The SFC assesses fitness and properness with regard to the matters set out in the SFO and the AMLO."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The SFC assesses fitness and properness with regard to the matters set out in the SFO and the AMLO.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "refusal",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_081",
+      "decision": [
+        "The statements in the suitability FAQs are general statements and licensed or registered persons should consider their own circumstances."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The statements in the suitability FAQs are general statements and licensed or registered persons should consider their own circumstances.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "refusal",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_082",
+      "decision": [
+        "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "pre_launch",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_083",
+      "decision": [
+        "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+        "Organisations should establish an AI strategy and an AI governance committee or similar body."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        },
+        {
+          "claim": "Organisations should establish an AI strategy and an AI governance committee or similar body.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "pre_launch",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_084",
+      "decision": [
+        "Licensed or registered persons should consider their own circumstances and review their existing systems and practices in the light of the FAQ."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Licensed or registered persons should consider their own circumstances and review their existing systems and practices in the light of the FAQ.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "validity_conflict",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_085",
+      "decision": [
+        "The transaction monitoring report should be read in conjunction with the AML/CFT Guideline, guidance papers and circulars issued by the HKMA."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The transaction monitoring report should be read in conjunction with the AML/CFT Guideline, guidance papers and circulars issued by the HKMA.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "validity_conflict",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_086",
+      "decision": [
+        "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "en",
+      "task_type": "noise_sensitivity",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_087",
+      "decision": [
+        "Organisations should establish an AI strategy and an AI governance committee or similar body to steer the procurement, implementation and use of AI systems."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Organisations should establish an AI strategy and an AI governance committee or similar body to steer the procurement, implementation and use of AI systems.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "noise_sensitivity",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_088",
+      "decision": [
+        "An LR must undertake a minimum of 10 CPT hours per calendar year.",
+        "Licensed or registered persons should not recommend investment products which they do not understand."
+      ],
+      "witness_trace": [
+        {
+          "claim": "An LR must undertake a minimum of 10 CPT hours per calendar year.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        },
+        {
+          "claim": "Licensed or registered persons should not recommend investment products which they do not understand.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_089",
+      "decision": [
+        "Organisations should establish an AI strategy and an AI governance committee or similar body."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Organisations should establish an AI strategy and an AI governance committee or similar body.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "zh-Hant",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_090",
+      "decision": [
+        "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "zh-Hant",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_091",
+      "decision": [
+        "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+        "Organisations should establish an AI strategy and an AI governance committee or similar body."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Authorized institutions should provide an appropriate level of transparency to customers regarding their GenAI applications.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        },
+        {
+          "claim": "Organisations should establish an AI strategy and an AI governance committee or similar body.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA",
+        "PCPD"
+      ],
+      "language": "zh-Hant",
+      "task_type": "cross_regulatory",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_092",
+      "decision": [
+        "Licensed or registered persons should not recommend investment products which they do not understand."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Licensed or registered persons should not recommend investment products which they do not understand.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "suitability",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_093",
+      "decision": [
+        "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "validity_conflict",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_094",
+      "decision": [
+        "The statements in the suitability FAQs are general statements and licensed or registered persons should consider their own circumstances."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The statements in the suitability FAQs are general statements and licensed or registered persons should consider their own circumstances.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "refusal",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_095",
+      "decision": [
+        "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed.",
+        "They must also keep the SFC informed of any material changes in their business plans, organisational structures and personnel."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Persons applying to become a licensed person must satisfy the SFC that they are fit and proper to be licensed.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        },
+        {
+          "claim": "They must also keep the SFC informed of any material changes in their business plans, organisational structures and personnel.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "SFC"
+      ],
+      "language": "zh-Hant",
+      "task_type": "pre_launch",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_096",
+      "decision": [
+        "Organisations should take into account the rights, freedom and interests of all stakeholders concerned."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Organisations should take into account the rights, freedom and interests of all stakeholders concerned.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_097",
+      "decision": [
+        "The recommendations in this Model Framework should be considered and adopted in proportion to the risks that an AI system may pose in context."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The recommendations in this Model Framework should be considered and adopted in proportion to the risks that an AI system may pose in context.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_098",
+      "decision": [
+        "Organisations should have an internal AI governance strategy, which generally comprises an AI strategy, governance considerations for procuring AI solutions, and an AI governance structure."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Organisations should have an internal AI governance strategy, which generally comprises an AI strategy, governance considerations for procuring AI solutions, and an AI governance structure.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_099",
+      "decision": [
+        "The list of use cases should remain open to allow for the addition, removal or adjustment of use cases as AI technology evolves."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The list of use cases should remain open to allow for the addition, removal or adjustment of use cases as AI technology evolves.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_100",
+      "decision": [
+        "The organisation's engagement with third parties may raise data protection compliance issues, which should be clearly addressed in the service agreement."
+      ],
+      "witness_trace": [
+        {
+          "claim": "The organisation's engagement with third parties may raise data protection compliance issues, which should be clearly addressed in the service agreement.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "PCPD"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_101",
+      "decision": [
+        "Particular attention should be given to flagging and escalating cases where multiple risk indicators are present."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Particular attention should be given to flagging and escalating cases where multiple risk indicators are present.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_102",
+      "decision": [
+        "Each SVF licensee is required to submit its institutional risk assessment on a regular basis, as well as completing a financial crime data return."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Each SVF licensee is required to submit its institutional risk assessment on a regular basis, as well as completing a financial crime data return.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_103",
+      "decision": [
+        "SVF licensees should study the Report carefully, consider the relevant insights and implications, and review and update where appropriate institutional ML/TF risk assessments."
+      ],
+      "witness_trace": [
+        {
+          "claim": "SVF licensees should study the Report carefully, consider the relevant insights and implications, and review and update where appropriate institutional ML/TF risk assessments.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_104",
+      "decision": [
+        "A feasibility study based on the AI's current ML/TF risk profile and possible evolvement in the near future should be undertaken."
+      ],
+      "witness_trace": [
+        {
+          "claim": "A feasibility study based on the AI's current ML/TF risk profile and possible evolvement in the near future should be undertaken.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    },
+    {
+      "case_id": "EXP_105",
+      "decision": [
+        "Authorized institutions should provide channels for customers to request for review of the GenAI-generated output."
+      ],
+      "witness_trace": [
+        {
+          "claim": "Authorized institutions should provide channels for customers to request for review of the GenAI-generated output.",
+          "evidence_ids": [],
+          "clause_ids": [],
+          "reasoning": "Pending human evidence-to-clause review."
+        }
+      ],
+      "clause_set": [],
+      "expected_regulators": [
+        "HKMA"
+      ],
+      "language": "en",
+      "task_type": "obligation_extraction",
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "revision_history": []
+      }
+    }
+  ]
+}

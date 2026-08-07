@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from app.services.corpus.manifest_loader import validate_manifest_release_gate
 from app.services.evaluation.benchmark_loader import load_benchmark_questions
+from app.services.evaluation.gold_packages import load_gold_packages, validate_gold_packages
 from app.services.evaluation.run_eval import run_eval
 
 
@@ -79,6 +80,7 @@ def evaluate_quality_gate(summary: dict, thresholds: dict | None = None) -> dict
 def run_release_gate() -> dict:
     validate_manifest_release_gate()
     questions = load_benchmark_questions()
+    validate_gold_packages(load_gold_packages(), questions)
     if len(questions) < 50:
         raise RuntimeError(f"benchmark must contain at least 50 cases, found {len(questions)}")
     required = {"id", "question", "expected_regulators", "expected_claims", "language", "task_type"}

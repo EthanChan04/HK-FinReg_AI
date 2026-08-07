@@ -5,11 +5,13 @@
 ```bash
 cd backend
 python -m app.services.evaluation.run_eval
+python -m app.services.evaluation.run_eval --captured-responses path/to/actual-responses.json
 python -m app.services.corpus.build_cache
 python -m app.services.kag.build_graph_cache
+python -m app.services.evaluation.gold_packages
 ```
 
-This runs a deterministic, real-retrieval benchmark against the questions in `data/evaluation/benchmark_questions.json`. No LLM-as-judge is required -- metrics are computed from router output, retrieval counts, and citation verification.
+The default run is a deterministic, real-retrieval benchmark against the questions in `data/evaluation/benchmark_questions.json`. Generation faithfulness is measured only when `--captured-responses` supplies a JSON object mapping benchmark case IDs to actual generator response text. Missing responses remain explicitly unmeasured.
 
 ## Metrics
 
@@ -75,4 +77,4 @@ Re-run `python -m app.services.evaluation.run_eval` -- the new question is picke
 - **unsupported_claim_rate > 0.3**: the system is generating claims not grounded in retrieved evidence.
 - **deepresearch_gap_count > 2**: sub-questions are not producing enough evidence -- consider broadening retrieval or adding sources.
 
-The checked-in benchmark contains 53 auditable cases across HKMA, SFC, PCPD, cross-regulatory, English/Traditional Chinese, validity-conflict and refusal scenarios. The release gate requires complete provenance metadata, 100% evidence regulator coverage for the AI-advisor anchor cases, and the calibrated baseline floors (`claim_recall >= 0.45`, `context_precision >= 0.15`, `faithfulness >= 0.45`, `unsupported_claim_rate <= 0.1`). The recommended tightening targets are `0.90`, `0.75`, `0.95`, and `0.05` respectively after the human-reviewed golden set is expanded.
+The checked-in benchmark contains 108 auditable cases across HKMA, SFC, PCPD, cross-regulatory, English/Traditional Chinese, validity-conflict and refusal scenarios. The matching decision packages live in `data/evaluation/gold_packages/benchmark-gold-packages.json`; their current human-review status is tracked in `docs/eval-baselines/gold-review-2026-08-07.md`. The release gate requires complete provenance metadata, 100% evidence regulator coverage for the AI-advisor anchor cases, and the calibrated baseline floors (`claim_recall >= 0.45`, `context_precision >= 0.15`, measured `faithfulness >= 0.45`, `unsupported_claim_rate <= 0.1`). The recommended tightening targets are `0.90`, `0.75`, `0.95`, and `0.05` respectively only after all gold packages are human-approved.
