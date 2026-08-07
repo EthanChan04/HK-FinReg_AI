@@ -76,8 +76,12 @@ jobs:
         run: npm run typecheck
       - name: Frontend config tests
         run: npm run test:config
-      - name: Run frontend unit tests
-        run: npm run test
+      - name: Run frontend unit tests with coverage gate
+        run: npm run test:coverage
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: Run frontend critical-path E2E tests
+        run: npm run test:e2e
       - name: Audit production dependencies
         run: npm audit --audit-level=high
       - name: Build frontend

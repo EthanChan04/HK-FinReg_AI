@@ -50,13 +50,21 @@ export function useCopilotChat() {
   const activeAssistantMessageId = useRef<string | null>(null);
 
   const appendAssistantToken = useCallback((token: string) => {
+    // Resolve the message id before entering the state updater. React may invoke
+    // updater functions more than once in development Strict Mode, so mutating a
+    // ref inside the updater can make the second invocation look for a message
+    // that was only created by the discarded first invocation.
+    let messageId = activeAssistantMessageId.current;
+    if (!messageId) {
+      messageId = newMessageId("assistant");
+      activeAssistantMessageId.current = messageId;
+    }
+
     setState((prev) => {
       let nextMessages = [...prev.messages];
-      let messageId = activeAssistantMessageId.current;
+      const existingMessage = nextMessages.some((message) => message.id === messageId);
 
-      if (!messageId) {
-        messageId = newMessageId("assistant");
-        activeAssistantMessageId.current = messageId;
+      if (!existingMessage) {
         nextMessages.push({
           id: messageId,
           role: "assistant",
