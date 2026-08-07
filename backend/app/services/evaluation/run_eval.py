@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import re
+import argparse
+import json
+from collections.abc import Callable
 from functools import lru_cache
 from pathlib import Path
 
@@ -333,22 +336,47 @@ def _compute_deepresearch_gap_count(item: dict) -> int:
         return 0
 
 
-def _evaluate_claim_metrics(item: dict) -> dict:
+ResponseProvider = Callable[[dict, list[Document]], str | None]
+
+
+def load_captured_response_provider(path: str | Path) -> ResponseProvider:
+    """Load captured generator outputs keyed by benchmark case ID."""
+
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or any(
+        not isinstance(case_id, str) or not isinstance(response, str)
+        for case_id, response in payload.items()
+    ):
+        raise ValueError("captured responses must be a JSON object of case_id to response text")
+
+    def provide(item: dict, evidence: list[Document]) -> str | None:
+        del evidence
+        return payload.get(str(item.get("id", "")))
+
+    return provide
+
+
+def _evaluate_claim_metrics(
+    item: dict,
+    response_provider: ResponseProvider | None = None,
+) -> dict:
     evidence = _retrieve_eval_documents(item["question"], top_k=10)
     noise_documents = [
         Document(page_content=str(noise), metadata={"doc_id": str(noise)})
         for noise in item.get("noise_documents", [])
     ]
     noisy_evidence = evidence + noise_documents if noise_documents else None
+    generated_response = response_provider(item, evidence) if response_provider else None
     return evaluate_claim_level_metrics(
         item.get("expected_claims", []),
         evidence,
         noisy_evidence_chunks=noisy_evidence,
+        generated_response=generated_response,
     )
 
 
-def run_eval() -> dict:
-    """Evaluate router mode, topic, and regulator coverage with real retrieval metrics."""
+def run_eval(response_provider: ResponseProvider | None = None) -> dict:
+    """Evaluate retrieval and, when provided, actual generator responses."""
 
     questions = load_benchmark_questions()
     rows = []
@@ -407,7 +435,7 @@ def run_eval() -> dict:
             question_id,
             "claim_level_metrics",
             metric_errors,
-            lambda: _evaluate_claim_metrics(item),
+            lambda: _evaluate_claim_metrics(item, response_provider=response_provider),
             {
                 "claim_recall": 0.0,
                 "context_precision": 0.0,
@@ -452,6 +480,9 @@ def run_eval() -> dict:
         )
 
     total = len(rows) or 1
+    faithfulness_measured_rows = sum(
+        1 for row in rows if row["faithfulness"] is not None
+    )
     summary = {
         "total_questions": len(rows),
         "retrieval_mode_accuracy": round(
@@ -500,6 +531,10 @@ def run_eval() -> dict:
         # missing measurement as a zero score.
         "avg_faithfulness": _avg_optional(row["faithfulness"] for row in rows),
         "avg_hallucination_rate": _avg_optional(row["hallucination_rate"] for row in rows),
+        "faithfulness_measured_rows": faithfulness_measured_rows,
+        "faithfulness_measurement_coverage": round(
+            faithfulness_measured_rows / total, 3
+        ),
         "avg_noise_sensitivity": round(sum(row["noise_sensitivity"] for row in rows) / total, 3),
         "metric_errors": metric_errors,
         "provenance": _build_provenance(questions),
@@ -508,8 +543,20 @@ def run_eval() -> dict:
     return summary
 
 
-def main() -> None:
-    summary = run_eval()
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--captured-responses",
+        type=Path,
+        help="JSON object mapping benchmark case IDs to actual generated responses",
+    )
+    args = parser.parse_args(argv)
+    response_provider = (
+        load_captured_response_provider(args.captured_responses)
+        if args.captured_responses
+        else None
+    )
+    summary = run_eval(response_provider=response_provider)
     print("Evaluation Summary")
     for key, value in summary.items():
         if key == "metric_errors":

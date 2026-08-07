@@ -8,6 +8,8 @@ Requirement (from system-evaluation-report-2026-08-04.md):
 
 from __future__ import annotations
 
+import json
+
 from langchain_core.documents import Document
 
 from app.services.evaluation.rag_eval import (
@@ -105,3 +107,53 @@ class TestGenerationFaithfulness:
         result = evaluate_generation_faithfulness(response, [])
         assert result["faithfulness"] == 0.0
         assert result["per_claim"][0]["supported"] is False
+
+
+def test_eval_claim_metrics_uses_actual_response_provider(monkeypatch):
+    from app.services.evaluation import run_eval
+
+    evidence = [
+        Document(
+            page_content="Authorized institutions must perform customer due diligence.",
+            metadata={"doc_id": "hkma-cdd"},
+        )
+    ]
+    item = {
+        "id": "GEN_001",
+        "question": "What must authorized institutions perform?",
+        "expected_claims": ["CDD evidence should be retrievable."],
+    }
+    observed = {}
+
+    def response_provider(case, retrieved):
+        observed["case_id"] = case["id"]
+        observed["evidence"] = retrieved
+        return "Authorized institutions must perform customer due diligence."
+
+    monkeypatch.setattr(run_eval, "_retrieve_eval_documents", lambda question, top_k: evidence)
+
+    metrics = run_eval._evaluate_claim_metrics(item, response_provider=response_provider)
+
+    assert observed == {"case_id": "GEN_001", "evidence": evidence}
+    assert metrics["faithfulness"] == 1.0
+    assert metrics["hallucination_rate"] == 0.0
+
+
+def test_captured_response_provider_loads_actual_outputs_by_case_id(tmp_path):
+    from app.services.evaluation.run_eval import load_captured_response_provider
+
+    path = tmp_path / "captured-responses.json"
+    path.write_text(
+        json.dumps(
+            {
+                "GEN_001": "Authorized institutions must perform CDD.",
+                "GEN_002": "Customers may request human review.",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    provider = load_captured_response_provider(path)
+
+    assert provider({"id": "GEN_001"}, []) == "Authorized institutions must perform CDD."
+    assert provider({"id": "MISSING"}, []) is None

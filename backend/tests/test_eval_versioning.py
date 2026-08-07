@@ -77,7 +77,7 @@ def test_run_eval_summary_contains_provenance(monkeypatch):
     monkeypatch.setattr(module, "_compute_citation_audit", lambda item: (0.0, 0.0))
     monkeypatch.setattr(module, "_compute_deepresearch_gap_count", lambda item: 0)
     monkeypatch.setattr(module, "_compute_evidence_regulator_coverage", lambda item: 0.0)
-    monkeypatch.setattr(module, "_evaluate_claim_metrics", lambda item: {
+    monkeypatch.setattr(module, "_evaluate_claim_metrics", lambda item, response_provider=None: {
         "claim_recall": 0.0,
         "context_precision": 0.0,
         "faithfulness": None,
@@ -92,3 +92,5 @@ def test_run_eval_summary_contains_provenance(monkeypatch):
     assert "provenance" in summary
     assert summary["provenance"]["question_count"] == 1
     assert summary["provenance"]["benchmark_fingerprint"]
+    assert summary["faithfulness_measured_rows"] == 0
+    assert summary["faithfulness_measurement_coverage"] == 0.0

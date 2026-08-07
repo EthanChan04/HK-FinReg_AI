@@ -104,3 +104,7 @@ def run_release_gate() -> dict:
 if __name__ == "__main__":
     result = run_release_gate()
     print(f"Release gate passed: {result['total_questions']} benchmark cases")
+    print(
+        "Generation faithfulness measured: "
+        f"{result.get('faithfulness_measured_rows', 0)}/{result['total_questions']} cases"
+    )
