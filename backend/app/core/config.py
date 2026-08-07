@@ -105,6 +105,9 @@ class Settings(BaseSettings):
     WORKFLOW_DB_URL: str = ""                  # PostgreSQL 连接串，为空时 fallback 到 MemorySaver
     WORKFLOW_THREAD_PREFIX: str = "svf"        # workflow_run_id 前缀
 
+    RATE_LIMIT_STORAGE_URL: str = ""
+    TRUSTED_PROXY_HEADERS: bool = False
+
     model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",

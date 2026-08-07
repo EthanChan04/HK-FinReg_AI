@@ -4,12 +4,13 @@ FastAPI 应用主入口 (Main Entrypoint)
 安全策略：可选的 API Key 认证 + 生产环境关闭 Swagger 文档。
 """
 import sys
-import io
 
 # Windows GBK 控制台兼容：强制 stdout/stderr 使用 UTF-8 编码，避免 emoji 字符输出崩溃
 if sys.platform == "win32":
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8", errors="replace")
 
 from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,6 +22,7 @@ from app.core.config import get_settings
 from app.core.monitoring import get_tracker, setup_langsmith
 from app.core.security import verify_api_key
 from app.core.rate_limit import RateLimitMiddleware
+from app.core.health import readiness_report
 from app.core.startup_checks import run_startup_checks
 from app.schemas.requests import HealthResponse
 
@@ -57,7 +59,9 @@ app.add_middleware(
     RateLimitMiddleware,
     requests_per_minute=settings.RATE_LIMIT_RPM,
     requests_per_hour=settings.RATE_LIMIT_RPH,
+    storage_url=settings.RATE_LIMIT_STORAGE_URL,
 )
+app.state.settings = settings
 
 # --- 挂载业务路由 (受 API Key 保护) ---
 app.include_router(svf.router, prefix="/api/v1", dependencies=[Depends(verify_api_key)])
@@ -80,19 +84,51 @@ if settings.DEBUG:
 
 
 # --- 健康检查 (公开端点，不需要认证，但隐藏敏感配置状态) ---
-@app.get("/api/v1/health", response_model=HealthResponse, tags=["System"])
-async def health_check():
+def _dependency_checks() -> dict[str, bool]:
+    """Perform bounded local readiness checks without calling external services."""
+
+    graph_path = os.path.join(os.path.dirname(__file__), "..", "data", "graph", "regulatory_graph.json")
+    corpus_cache_path = os.path.join(
+        settings.CORPUS_INDEX_DIR, "corpus_documents.json"
+    )
+    llm_configured = bool(settings.COPILOT_API_KEY or settings.ZHIPU_API_KEY or settings.LONGCAT_API_KEY)
+    return {
+        "llm_service": llm_configured,
+        "corpus_index": os.path.isfile(corpus_cache_path),
+        "graph_store": os.path.exists(settings.GRAPH_STORE_PATH) or os.path.exists(graph_path),
+    }
+
+
+@app.get("/api/v1/health/live", response_model=HealthResponse, tags=["System"])
+async def health_live():
     tracker = get_tracker()
     langsmith_status = "enabled" if os.environ.get("LANGCHAIN_TRACING_V2") == "true" else "disabled"
     return HealthResponse(
         status="ok",
         version="2.0.0",
         engines={
-            "llm_service": "available",
+            "process": "alive",
             "langsmith_tracing": langsmith_status,
             "total_queries": tracker.session_stats["total_queries"]
         }
     )
+
+
+@app.get("/api/v1/health/ready", response_model=HealthResponse, tags=["System"])
+async def health_ready():
+    report = readiness_report(_dependency_checks())
+    status_code = 200 if report["status"] == "ready" else 503
+    return JSONResponse(
+        status_code=status_code,
+        content=HealthResponse(
+            status=report["status"], version="2.0.0", engines=report["engines"]
+        ).model_dump(),
+    )
+
+
+@app.get("/api/v1/health", response_model=HealthResponse, tags=["System"])
+async def health_check():
+    return await health_live()
 
 
 @app.get("/api/v1/metrics", tags=["System"], dependencies=[Depends(verify_api_key)])

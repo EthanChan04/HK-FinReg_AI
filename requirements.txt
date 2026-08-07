@@ -1,3 +1,2 @@
-# Canonical backend dependency entrypoint.
-# Keep versioned dependencies in backend/requirements.txt only.
--r backend/requirements.txt
+# Canonical locked backend dependency entrypoint.
+-r backend/requirements.lock

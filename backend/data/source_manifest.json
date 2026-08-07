@@ -31,9 +31,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://brdr.hkma.gov.hk/eng/doc-ldg/docId/20240207-5-EN",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_ai_suspicious_activity_monitoring_2024",
@@ -68,9 +70,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/aml-cft/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_amlcft_surveillance_capability_digitalisation_2024",
@@ -103,9 +107,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://brdr.hkma.gov.hk/eng/doc-ldg/docId/20240207-5-EN",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_amlcft_surveillance_capability_svf_2024",
@@ -139,9 +145,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/aml-cft/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_supporting_ai_adoption_amlcft_2025",
@@ -175,9 +183,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/aml-cft/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_tm_ai_thematic_review_2024",
@@ -210,9 +220,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/aml-cft/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_tm_systems_insights_2024",
@@ -244,9 +256,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/aml-cft/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_high_end_money_laundering_guidance_2025",
@@ -279,9 +293,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/aml-cft/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_pep_risk_based_controls_2025",
@@ -314,9 +330,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/aml-cft/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_genai_consumer_protection_2024",
@@ -347,9 +365,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/aml-cft/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_svf_amlcft_guideline_2023",
@@ -384,9 +404,10 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/media/eng/doc/key-information/guidelines-and-circular/guideline/Guideline_on_AML-CFT_%28for_SVFs%29_eng_May%202023.pdf",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active"
   },
   {
     "doc_id": "hkma_svf_licensing_explanatory_notes_2019",
@@ -416,9 +437,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/media/eng/doc/key-functions/financial-infrastructure/Guidelines-on-supervision-of-SVF-licensees_Eng.pdf",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_svf_mltf_risk_assessment_2019",
@@ -451,9 +474,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/stored-value-facilities/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_svf_practice_note_2025",
@@ -484,9 +509,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/eng/key-functions/banking-stability/stored-value-facilities/",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "hkma_svf_supervision_guideline_2016",
@@ -518,9 +545,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.hkma.gov.hk/media/eng/doc/key-functions/financial-infrastructure/Guidelines-on-supervision-of-SVF-licensees_Eng.pdf",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "pcpd_ai_model_personal_data_protection_framework_2024",
@@ -554,9 +583,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.pcpd.org.hk/english/resources_centre/publications.html",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "pcpd_ethical_ai_guidance_2021",
@@ -588,9 +619,11 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.pcpd.org.hk/english/resources_centre/publications.html",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
   },
   {
     "doc_id": "pcpd_genai_employee_guidelines_checklist_2025",
@@ -624,8 +657,82 @@
     "regulatory_functions": [
       "guidance"
     ],
-    "source_url": null,
+    "source_url": "https://www.pcpd.org.hk/english/resources_centre/publications.html",
     "supersedes": [],
-    "references": []
+    "references": [],
+    "status": "active",
+    "metadata_note": "Effective date is not separately stated by the source; issue date governs."
+  },
+  {
+    "doc_id": "sfc_suitability_faq_2016",
+    "title": "Frequently Asked Questions on Compliance with Suitability Obligations by Licensed or Registered Persons",
+    "regulator": "SFC",
+    "jurisdiction": "Hong Kong",
+    "doc_type": "FAQ",
+    "issue_date": "2016-12-23",
+    "effective_date": "2016-12-23",
+    "status": "active",
+    "sector": [
+      "Securities",
+      "Wealth Management"
+    ],
+    "topics": [
+      "suitability",
+      "investment_advice",
+      "investor_protection"
+    ],
+    "module_tags": [
+      "ai_advisor",
+      "deepresearch"
+    ],
+    "file_path": "sfc_advisory/sfc_suitability_faq_2016.pdf",
+    "priority": "P0",
+    "language": "en",
+    "regulatory_functions": [
+      "conduct",
+      "guidance"
+    ],
+    "source_url": "https://apps.sfc.hk/edistributionWeb/api/circular/openAppendix?appendix=0&lang=EN&refNo=16EC71",
+    "supersedes": [],
+    "references": [
+      "sfc_vatp_guidelines_2023"
+    ]
+  },
+  {
+    "doc_id": "sfc_vatp_guidelines_2023",
+    "title": "Guidelines for Virtual Asset Trading Platform Operators",
+    "regulator": "SFC",
+    "jurisdiction": "Hong Kong",
+    "doc_type": "Guideline",
+    "issue_date": "2023-06-01",
+    "effective_date": "2023-06-01",
+    "status": "active",
+    "sector": [
+      "Securities",
+      "Virtual Assets"
+    ],
+    "topics": [
+      "suitability",
+      "virtual_assets",
+      "investor_protection",
+      "AML"
+    ],
+    "module_tags": [
+      "ai_advisor",
+      "deepresearch"
+    ],
+    "file_path": "sfc_advisory/sfc_vatp_guidelines_2023.pdf",
+    "priority": "P0",
+    "language": "en",
+    "regulatory_functions": [
+      "conduct",
+      "licensing",
+      "guidance"
+    ],
+    "source_url": "https://www.sfc.hk/-/media/EN/assets/components/codes/files-current/web/guidelines/Guidelines-for-Virtual-Asset-Trading-Platform-Operators/Appendix-B--Guidelines-for-Virtual-Asset-Trading-Platform-Operators-Eng.pdf",
+    "supersedes": [],
+    "references": [
+      "sfc_suitability_faq_2016"
+    ]
   }
 ]

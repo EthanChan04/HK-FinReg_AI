@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  --font-geist-sans: "Avenir Next";
+  --font-geist-mono: "JetBrains Mono";
   --bg-primary: #050b16;
   --bg-secondary: #0b1426;
   --bg-card: #101c31;

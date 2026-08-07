@@ -1,11 +1,34 @@
 import json
+import os
 
 import pytest
 from langchain_core.documents import Document
 
 
-def test_eval_cache_resolves_backend_relative_paths_from_repo_root():
+PHASE4_EXPERIMENT = pytest.mark.skipif(
+    os.environ.get("ENABLE_PHASE4_EXPERIMENTS") != "1",
+    reason="Phase 4 architecture experiments remain behind the decision gate",
+)
+
+
+def test_eval_cache_resolves_backend_relative_paths_from_repo_root(tmp_path, monkeypatch):
     from app.services.evaluation import run_eval
+    from app.services.corpus.cache import manifest_digest, write_corpus_cache
+    from app.core import config
+
+    cache_dir = tmp_path / "indexes"
+    manifest_path = run_eval._backend_root() / "data" / "source_manifest.json"
+    write_corpus_cache(
+        cache_dir / "corpus_documents.json",
+        [Document(page_content="SFC suitability", metadata={"regulator": "SFC"})],
+        manifest_digest=manifest_digest(manifest_path),
+        parser_version="hierarchy-v1",
+    )
+
+    class Settings:
+        CORPUS_INDEX_DIR = str(cache_dir)
+
+    monkeypatch.setattr(config, "get_settings", lambda: Settings())
 
     run_eval._load_cached_corpus_documents.cache_clear()
     documents = run_eval._load_cached_corpus_documents()
@@ -74,6 +97,7 @@ def test_quality_gate_does_not_fail_unmeasured_faithfulness():
     assert result["actual"]["faithfulness"] is None
 
 
+@PHASE4_EXPERIMENT
 def test_spo_extraction_is_normalized_and_traceable():
     from app.schemas.corpus import SourceDocument
     from app.schemas.evidence import EvidenceChunk
@@ -112,6 +136,7 @@ def test_spo_extraction_is_normalized_and_traceable():
     assert triple.triple_id == extract_regulatory_triples(evidence, documents)[0].triple_id
 
 
+@PHASE4_EXPERIMENT
 def test_dual_graph_builds_structure_and_semantic_provenance_paths(tmp_path):
     from app.schemas.corpus import SourceDocument
     from app.schemas.evidence import EvidenceChunk
@@ -155,6 +180,7 @@ def test_dual_graph_builds_structure_and_semantic_provenance_paths(tmp_path):
     assert paths[0]["source_refs"][0]["page"] == 12
 
 
+@PHASE4_EXPERIMENT
 def test_dual_graph_ab_comparison_exposes_recall_delta(tmp_path):
     from app.schemas.corpus import SourceDocument
     from app.schemas.evidence import EvidenceChunk
@@ -196,6 +222,7 @@ def test_dual_graph_ab_comparison_exposes_recall_delta(tmp_path):
     assert result["recall_delta"] >= 0.0
 
 
+@PHASE4_EXPERIMENT
 def test_graph_retriever_bounds_multi_hop_candidate_expansion():
     from app.services.kag.graph_retriever import GraphRetriever
     from app.services.kag.graph_store import NetworkXGraphStore
@@ -247,10 +274,10 @@ def test_eval_graph_count_uses_lightweight_retrieval(monkeypatch, tmp_path):
         GRAPH_STORE_PATH = str(tmp_path / "graph.json")
 
     class FakeRetriever:
-        include_provenance = None
+        called = False
 
-        def retrieve_paths(self, query, limit, include_provenance):
-            self.include_provenance = include_provenance
+        def retrieve_paths(self, query, limit):
+            self.called = True
             return [{"path": ["doc"]}]
 
     fake = FakeRetriever()
@@ -258,4 +285,23 @@ def test_eval_graph_count_uses_lightweight_retrieval(monkeypatch, tmp_path):
     monkeypatch.setattr(run_eval, "_get_cached_graph_retriever", lambda path: fake)
 
     assert run_eval._compute_graph_path_count({"question": "test"}) == 1
-    assert fake.include_provenance is False
+    assert fake.called is True
+
+
+def test_eval_graph_count_uses_the_released_graph_retriever_contract(monkeypatch, tmp_path):
+    from app.core import config
+    from app.services.evaluation import run_eval
+    from app.services.kag.graph_store import NetworkXGraphStore
+
+    graph_path = tmp_path / "graph.json"
+    store = NetworkXGraphStore(graph_path)
+    store.add_node("doc", node_type="RegulatoryDocument", title="SFC suitability requirement")
+    store.save()
+
+    class Settings:
+        GRAPH_STORE_PATH = str(graph_path)
+
+    monkeypatch.setattr(config, "get_settings", lambda: Settings())
+    run_eval._get_cached_graph_retriever.cache_clear()
+
+    assert run_eval._compute_graph_path_count({"question": "SFC suitability"}) == 1

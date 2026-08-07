@@ -14,6 +14,7 @@ import hashlib
 import shutil
 import builtins
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
@@ -374,7 +375,10 @@ def _maybe_build_graph() -> None:
     from app.core.config import get_settings
 
     settings = get_settings()
-    graph_path = settings.GRAPH_STORE_PATH
+    backend_root = Path(__file__).resolve().parents[3]
+    graph_path = Path(settings.GRAPH_STORE_PATH)
+    if not graph_path.is_absolute():
+        graph_path = backend_root / graph_path
     if os.path.exists(graph_path):
         return
 
@@ -402,21 +406,25 @@ def _maybe_build_graph() -> None:
 @lru_cache()
 def _load_and_split_corpus() -> tuple:
     """Load manifest-backed corpus chunks, falling back to the legacy PDF path."""
-    import pickle
+    from app.services.corpus.cache import manifest_digest, read_corpus_cache, write_corpus_cache
 
     settings = get_settings()
-    os.makedirs(settings.CORPUS_INDEX_DIR, exist_ok=True)
-    cache_path = os.path.join(settings.CORPUS_INDEX_DIR, "corpus_documents.pkl")
-    if os.path.exists(cache_path):
-        try:
-            with open(cache_path, "rb") as cache_file:
-                cached_docs = pickle.load(cache_file)
-            if cached_docs:
-                print(f"Regulatory corpus loaded from cache: {len(cached_docs)} chunks")
-                _maybe_build_graph()
-                return tuple(cached_docs)
-        except Exception as exc:
-            print(f"Regulatory corpus cache unreadable, rebuilding: {exc}")
+    backend_root = Path(__file__).resolve().parents[3]
+    cache_dir = Path(settings.CORPUS_INDEX_DIR)
+    if not cache_dir.is_absolute():
+        cache_dir = backend_root / cache_dir
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_path = cache_dir / "corpus_documents.json"
+    manifest_path = backend_root / "data" / "source_manifest.json"
+    cached_docs = read_corpus_cache(
+        cache_path,
+        manifest_digest=manifest_digest(manifest_path),
+        parser_version="hierarchy-v1",
+    )
+    if cached_docs:
+        print(f"Regulatory corpus loaded from cache: {len(cached_docs)} chunks")
+        _maybe_build_graph()
+        return tuple(cached_docs)
 
     try:
         from app.services.corpus.corpus_ingestor import load_corpus_documents
@@ -425,8 +433,12 @@ def _load_and_split_corpus() -> tuple:
         if corpus_docs:
             print(f"Regulatory corpus loaded: {len(corpus_docs)} chunks")
             try:
-                with open(cache_path, "wb") as cache_file:
-                    pickle.dump(corpus_docs, cache_file)
+                write_corpus_cache(
+                    cache_path,
+                    corpus_docs,
+                    manifest_digest=manifest_digest(manifest_path),
+                    parser_version="hierarchy-v1",
+                )
                 print(f"Regulatory corpus cached to {cache_path}")
             except Exception as exc:
                 print(f"Regulatory corpus cache write failed: {exc}")

@@ -27,6 +27,7 @@ class SourceDocument(BaseModel):
     priority: Literal["P0", "P1", "P2", "P3"] = "P1"
     language: str = "en"
     notes: str | None = None
+    metadata_note: str | None = None
     supersedes: list[str] = Field(default_factory=list)
     references: list[str] = Field(default_factory=list)
     resolved_path: Path | None = Field(default=None, exclude=True)

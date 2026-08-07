@@ -153,7 +153,8 @@ Supported `task_type` values include:
 - `GET /api/v1/review-queue/pending`
 - `POST /api/v1/review-queue/{workflow_run_id}/resume`
 - `POST /api/v1/review-queue/{workflow_run_id}/reject`
-- `GET /api/v1/health`
+- `GET /api/v1/health/live` (process liveness)
+- `GET /api/v1/health/ready` (dependency readiness; returns 503 when degraded)
 - `GET /api/v1/metrics`
 
 Most business endpoints are protected by bearer-token API key validation when `API_KEY_ENABLED=True`.
@@ -199,11 +200,13 @@ Most business endpoints are protected by bearer-token API key validation when `A
 ### Backend Installation
 
 ```bash
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+python -m venv .venv
+.venv/Scripts/python -m pip install --upgrade pip
+.venv/Scripts/python -m pip install -r requirements.txt
+.venv/Scripts/python -m pip check
 ```
 
-The root `requirements.txt` delegates to `backend/requirements.txt`, which is the canonical backend dependency list.
+The root `requirements.txt` installs the generated, pinned `backend/requirements.lock`. Regenerate it with `uv pip compile backend/pyproject.toml --group test --output-file backend/requirements.lock`.
 
 ### Frontend Installation
 
@@ -234,6 +237,8 @@ Configure at least:
 - Optional `COHERE_API_KEY`
 - Optional LangSmith variables: `LANGCHAIN_TRACING_V2`, `LANGCHAIN_ENDPOINT`, `LANGCHAIN_API_KEY`, `LANGCHAIN_PROJECT`
 - CORS settings for deployed frontend origins
+- `RATE_LIMIT_STORAGE_URL` for Redis-backed multi-replica rate limiting
+- `TRUSTED_PROXY_HEADERS=true` only after the proxy chain is explicitly trusted
 
 ### Frontend Configuration
 
@@ -287,6 +292,9 @@ python -m pytest backend/tests -q
 cd frontend
 npm run validate:workspaces
 npm run lint
+npm run typecheck
+npm run test:config
+npm audit --audit-level=high
 npm run build
 ```
 
@@ -308,6 +316,11 @@ The deterministic evaluation summary includes:
 - `avg_citation_supported_rate`
 - `avg_unsupported_claim_rate`
 - `avg_deepresearch_gap_count`
+- `avg_claim_recall`
+- `avg_context_precision`
+- `avg_faithfulness`
+- `avg_hallucination_rate`
+- `avg_noise_sensitivity`
 
 See [docs/evaluation_protocol.md](./docs/evaluation_protocol.md) for metric definitions and interpretation.
 
@@ -350,13 +363,14 @@ Current release thresholds:
 
 `.github/workflows/release-gates.yml` runs:
 
-1. Backend test suite
+1. Locked backend installation, `pip check`, tests, corpus provenance and benchmark gates
 2. Obligation Mapper regression gate
-3. Frontend lint and build
+3. Frontend lint, TypeScript, config tests, high-severity audit and build
 
 ## Runtime Notes
 
 - The backend defaults to `DEBUG=False`; Swagger and `/test` are only exposed when debug mode is enabled.
+- Corpus chunks are cached as versioned JSON with manifest digest validation; runtime code never deserializes the legacy Pickle cache.
 - `API_KEY_ENABLED=True` is the secure default for business APIs.
 - The frontend talks to the backend through `/api/backend/...`; the proxy allowlist intentionally exposes only known backend paths.
 - If Cohere rerank returns `429`, the system cools down and falls back to top-k retrieval without reranking.

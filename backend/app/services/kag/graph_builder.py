@@ -20,6 +20,7 @@ def build_graph_from_sources(
 
     store = NetworkXGraphStore(graph_path)
 
+    document_ids = {doc.doc_id for doc in documents}
     for doc in documents:
         doc_node = doc.doc_id
         regulator_node = f"regulator:{doc.regulator}"
@@ -52,6 +53,21 @@ def build_graph_from_sources(
             risk_node = f"risk:{risk}"
             store.add_node(risk_node, node_type=NodeType.RISK.value, title=risk)
             store.add_edge(doc_node, risk_node, relation=RelationType.RELATED_TO.value)
+
+        for referenced_doc_id in doc.references:
+            if referenced_doc_id in document_ids:
+                store.add_edge(
+                    doc_node,
+                    referenced_doc_id,
+                    relation=RelationType.REFERENCES.value,
+                )
+        for superseded_doc_id in doc.supersedes:
+            if superseded_doc_id in document_ids:
+                store.add_edge(
+                    doc_node,
+                    superseded_doc_id,
+                    relation=RelationType.SUPERSEDES.value,
+                )
 
     for evidence in evidence_chunks:
         if not evidence.chunk_id and not evidence.evidence_id:

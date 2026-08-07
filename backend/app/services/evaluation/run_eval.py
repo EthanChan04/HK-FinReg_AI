@@ -260,11 +260,7 @@ def _compute_graph_path_count(item: dict) -> int:
         settings = get_settings()
         graph_path = _resolve_backend_path(settings.GRAPH_STORE_PATH)
         retriever = _get_cached_graph_retriever(str(graph_path))
-        paths = retriever.retrieve_paths(
-            item["question"],
-            limit=5,
-            include_provenance=False,
-        )
+        paths = retriever.retrieve_paths(item["question"], limit=5)
         return len(paths)
     except Exception:
         return 0

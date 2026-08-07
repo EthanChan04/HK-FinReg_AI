@@ -133,3 +133,39 @@ def test_graph_retriever_respects_metadata_filters(tmp_path):
 
     assert paths
     assert all(path["matched_doc_ids"] == ["doc_sfc"] for path in paths)
+
+
+def test_graph_builder_activates_reference_and_supersedes_relations(tmp_path):
+    from app.services.kag.graph_builder import build_graph_from_sources
+
+    docs = [
+        SourceDocument(
+            doc_id="doc_current",
+            title="Current",
+            regulator="SFC",
+            doc_type="Guideline",
+            file_path="current.pdf",
+            references=["doc_reference"],
+            supersedes=["doc_old"],
+        ),
+        SourceDocument(
+            doc_id="doc_old",
+            title="Old",
+            regulator="SFC",
+            doc_type="Guideline",
+            file_path="old.pdf",
+            status="superseded",
+        ),
+        SourceDocument(
+            doc_id="doc_reference",
+            title="Reference",
+            regulator="SFC",
+            doc_type="Code",
+            file_path="reference.pdf",
+        ),
+    ]
+
+    store = build_graph_from_sources(docs, [], graph_path=tmp_path / "graph.json")
+
+    assert store.graph.edges["doc_current", "doc_reference"]["relation"] == "REFERENCES"
+    assert store.graph.edges["doc_current", "doc_old"]["relation"] == "SUPERSEDES"
