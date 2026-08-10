@@ -60,6 +60,8 @@ colorama==0.4.6
     #   typer
 colorlog==6.12.0
     # via rapidocr
+coverage==7.15.4
+    # via pytest-cov
 cryptography==50.0.0
     # via hk-finreg-ai-backend (pyproject.toml)
 distro==1.9.0
@@ -257,7 +259,9 @@ packaging==26.2
 pillow==12.3.0
     # via rapidocr
 pluggy==1.6.0
-    # via pytest
+    # via
+    #   pytest
+    #   pytest-cov
 propcache==0.5.2
     # via
     #   aiohttp
@@ -315,6 +319,10 @@ pypika==0.51.1
 pyproject-hooks==1.2.0
     # via build
 pytest==9.1.1
+    # via
+    #   hk-finreg-ai-backend (pyproject.toml:test)
+    #   pytest-cov
+pytest-cov==7.1.0
     # via hk-finreg-ai-backend (pyproject.toml:test)
 python-dateutil==2.9.0.post0
     # via kubernetes

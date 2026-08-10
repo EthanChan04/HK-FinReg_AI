@@ -30,7 +30,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-test = ["pytest>=9.0.0"]
+test = ["pytest>=9.0.0", "pytest-cov>=7.0.0"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

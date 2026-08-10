@@ -24,6 +24,20 @@ jobs:
           .venv/bin/python -m pip check
       - name: Run backend test suite
         run: .venv/bin/python -m pytest tests -q
+      - name: Enforce targeted demo remediation coverage
+        run: |
+          .venv/bin/python -m pytest \
+            tests/test_deepseek_runtime.py \
+            tests/test_corpus_ingestion_report.py \
+            tests/test_corpus_ocr_fallback.py \
+            tests/test_live_demo_eval.py \
+            tests/test_live_demo_gate.py \
+            --cov=app.services.llm.deepseek \
+            --cov=app.services.corpus.corpus_ingestor \
+            --cov=app.services.evaluation.live_demo_eval \
+            --cov=app.services.evaluation.live_demo_gate \
+            --cov-report=term-missing \
+            --cov-fail-under=70
       - name: Build safe corpus cache
         run: .venv/bin/python -m app.services.corpus.build_cache
       - name: Build dual regulatory graph cache
