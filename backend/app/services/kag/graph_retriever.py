@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import re
 
+import networkx as nx
+
 from pydantic import BaseModel, Field
 
 from app.services.kag.graph_store import NetworkXGraphStore
@@ -20,17 +22,36 @@ class GraphPathResult(BaseModel):
     matched_risks: list[str] = Field(default_factory=list)
     confidence: float = 0.0
     explanation: str = ""
+    source_refs: list[dict] = Field(default_factory=list)
 
 
 class GraphRetriever:
     """Retrieve scored graph paths from the regulatory graph."""
+
+    QUERY_STOPWORDS = {
+        "a", "an", "and", "are", "be", "for", "how", "in", "is", "it", "key",
+        "of", "on", "the", "to", "what", "which", "who", "with",
+    }
+    NODE_TYPE_PRIORITY = {
+        "RegulatoryTriple": 7,
+        "Clause": 6,
+        "Section": 5,
+        "Topic": 4,
+        "RegulatoryDocument": 3,
+        "Document": 3,
+        "Product": 1,
+    }
 
     def __init__(self, store: NetworkXGraphStore):
         self.store = store
 
     @staticmethod
     def _tokens(text: str) -> list[str]:
-        return [token.lower() for token in re.findall(r"[a-zA-Z0-9_]+", text or "") if len(token) > 1]
+        return [
+            token.lower()
+            for token in re.findall(r"[a-zA-Z0-9_]+", text or "")
+            if len(token) > 1 and token.lower() not in GraphRetriever.QUERY_STOPWORDS
+        ]
 
     def _node_match_score(self, query_tokens: list[str], title: str) -> float:
         title_lower = title.lower()
@@ -59,6 +80,47 @@ class GraphRetriever:
                 risks.append(title)
         return {"topics": topics, "obligations": obligations, "risks": risks, "relations": relations}
 
+    def _candidate_docs_for_node(self, node_id: str, max_hops: int = 4) -> list[str]:
+        """Resolve a matched semantic/structure node back to source documents."""
+
+        graph = self.store.graph.to_undirected()
+        docs: list[str] = []
+        for candidate, distance in nx.single_source_shortest_path_length(graph, node_id, cutoff=max_hops).items():
+            if distance == 0:
+                continue
+            node_type = self.store.graph.nodes[candidate].get("node_type")
+            if node_type in {"RegulatoryDocument", "Document"}:
+                docs.append(candidate)
+        return docs
+
+    def _path_details(self, doc_id: str, node_id: str) -> tuple[list[str], list[str], list[dict]]:
+        graph = self.store.graph.to_undirected()
+        try:
+            node_path = nx.shortest_path(graph, doc_id, node_id)
+        except nx.NetworkXNoPath:
+            node_path = [doc_id, node_id]
+        titles = [str(self.store.graph.nodes[node].get("title", node)) for node in node_path]
+        relations: list[str] = []
+        refs: list[dict] = []
+        for source, target in zip(node_path, node_path[1:]):
+            edge = self.store.graph.get_edge_data(source, target)
+            if edge is None:
+                edge = self.store.graph.get_edge_data(target, source) or {}
+            relations.append(str(edge.get("relation", "")))
+        for node in node_path:
+            attrs = self.store.graph.nodes[node]
+            if attrs.get("node_type") in {"Clause", "EvidenceChunk", "RegulatoryTriple"}:
+                source = attrs.get("source") or {}
+                refs.append(
+                    {
+                        "doc_id": attrs.get("doc_id") or source.get("doc_id", doc_id),
+                        "clause_id": attrs.get("clause_id") or source.get("clause_id"),
+                        "page": attrs.get("page") or source.get("page"),
+                        "official_url": attrs.get("source_url") or source.get("official_url"),
+                    }
+                )
+        return titles, relations, refs
+
     @staticmethod
     def _metadata_matches(doc_attrs: dict, filters: dict | None) -> bool:
         if not filters:
@@ -80,27 +142,46 @@ class GraphRetriever:
                 return False
         return True
 
-    def retrieve_paths(self, query: str, filters: dict | None = None, limit: int = 5) -> list[dict]:
+    def retrieve_paths(
+        self,
+        query: str,
+        filters: dict | None = None,
+        limit: int = 5,
+        include_provenance: bool = True,
+    ) -> list[dict]:
         tokens = self._tokens(query)
         results: list[GraphPathResult] = []
         seen: set[tuple[str, str]] = set()
 
+        matched_nodes: list[tuple[float, str, dict]] = []
         for node_id, attributes in self.store.graph.nodes(data=True):
             title = str(attributes.get("title", node_id))
             node_match_score = self._node_match_score(tokens, title)
             if node_match_score <= 0:
                 continue
+            matched_nodes.append((node_match_score, node_id, attributes))
+
+        # A broad regulatory corpus contains hundreds of chunks with generic
+        # terms such as "requirement". Bound graph expansion after ranking so
+        # each query has predictable latency and cannot trigger path explosion.
+        candidate_budget = max(limit * 3, 12)
+        for node_match_score, node_id, attributes in sorted(
+            matched_nodes,
+            key=lambda item: (
+                item[0],
+                self.NODE_TYPE_PRIORITY.get(item[2].get("node_type", ""), 0),
+            ),
+            reverse=True,
+        )[:candidate_budget]:
 
             node_type = attributes.get("node_type")
+            title = str(attributes.get("title", node_id))
 
             candidate_docs: list[str] = []
             if node_type in {"RegulatoryDocument", "Document"}:
                 candidate_docs.append(node_id)
             else:
-                for pred in self.store.graph.predecessors(node_id):
-                    pred_attrs = self.store.graph.nodes[pred]
-                    if pred_attrs.get("node_type") in {"RegulatoryDocument", "Document"}:
-                        candidate_docs.append(pred)
+                candidate_docs.extend(self._candidate_docs_for_node(node_id))
 
             for doc_id in candidate_docs:
                 doc_attrs = self.store.graph.nodes[doc_id]
@@ -136,9 +217,15 @@ class GraphRetriever:
                     + 0.10 * priority_boost(doc_attrs)
                 )
 
+                if include_provenance:
+                    titles, path_relations, source_refs = self._path_details(doc_id, node_id)
+                else:
+                    titles = [doc_title, title]
+                    path_relations = []
+                    source_refs = []
                 tail = [] if title == doc_title else [title]
-                path = regulator_titles[:1] + [doc_title] + tail
-                relation_chain += neighbors["relations"][:2]
+                path = regulator_titles[:1] + ([doc_title] if titles else []) + tail
+                relation_chain += path_relations + neighbors["relations"][:2]
                 dedupe_key = (doc_id, title)
                 if dedupe_key in seen:
                     continue
@@ -153,6 +240,7 @@ class GraphRetriever:
                         matched_obligations=neighbors["obligations"],
                         matched_risks=neighbors["risks"],
                         confidence=round(confidence, 3),
+                        source_refs=source_refs,
                         explanation=(
                             f"Matched node '{title}' with document '{doc_title}' "
                             f"and {len(neighbors['obligations'])} obligations."

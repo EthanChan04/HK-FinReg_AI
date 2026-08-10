@@ -1,4 +1,4 @@
-"""Build the persisted regulatory graph from the validated JSON corpus cache."""
+"""Build the persisted dual graph from the validated JSON corpus cache."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ def _backend_root() -> Path:
 
 
 def build_graph_cache():
-    """Materialize the metadata and evidence graph from the safe corpus cache."""
+    """Materialize structure + SPO graph nodes from the safe corpus cache."""
 
     settings = get_settings()
     backend_root = _backend_root()
@@ -61,15 +61,20 @@ def build_graph_cache():
     graph_path = Path(settings.GRAPH_STORE_PATH)
     if not graph_path.is_absolute():
         graph_path = backend_root / graph_path
-    return build_graph_from_sources(documents, evidence_chunks, graph_path)
-
+    store = build_graph_from_sources(documents, evidence_chunks, graph_path)
+    return store
 
 
 def main() -> None:
     store = build_graph_cache()
+    triple_count = sum(
+        1
+        for _, attrs in store.graph.nodes(data=True)
+        if attrs.get("node_type") == "RegulatoryTriple"
+    )
     print(
-        f"Built regulatory graph: {store.graph.number_of_nodes()} nodes, "
-        f"{store.graph.number_of_edges()} edges"
+        f"Built dual regulatory graph: {store.graph.number_of_nodes()} nodes, "
+        f"{store.graph.number_of_edges()} edges, {triple_count} SPO triples"
     )
 
 
