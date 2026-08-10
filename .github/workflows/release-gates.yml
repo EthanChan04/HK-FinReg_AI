@@ -65,7 +65,7 @@ jobs:
       - name: Run Obligation Mapper regression gate
         run: .venv/bin/python -m app.services.evaluation.run_obligation_mapper_regression
       - name: Upload latest regression report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: obligation-mapper-regression-report
           path: backend/tests/regression/obligation_mapper/latest_regression_report.json
