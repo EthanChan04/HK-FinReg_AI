@@ -32,10 +32,10 @@ from app.services.utils import pii_scrubber, format_output, get_current_timestam
 from app.services.agents.builder import (
     build_profiled_retriever,
     build_reranked_retriever,
-    build_zhipu_llm,
     classify_query_type,
     get_structured_reviewer_llm,
 )
+from app.services.llm.deepseek import build_deepseek_llm
 from app.core.monitoring import get_tracker
 from app.services.workflow_checkpoint import (
     CheckpointManager,
@@ -446,7 +446,7 @@ def _build_svf_graph(checkpointer=None):
         checkpointer: LangGraph checkpointer 实例（PostgresSaver / MemorySaver），
                       为 None 时不用持久化
     """
-    llm = build_zhipu_llm()
+    llm = build_deepseek_llm("interactive")
     base_retriever = build_reranked_retriever()
 
     def extractor_node(state: SVFState):

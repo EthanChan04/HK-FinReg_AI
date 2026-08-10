@@ -86,14 +86,14 @@ async def _stream_chat(request: CopilotChatRequest):
             },
         )
     except Exception as exc:
-        yield _sse("tool_call", {"tool": "mimo", "status": "error", "message": str(exc)})
+        yield _sse("tool_call", {"tool": "deepseek", "status": "error", "message": str(exc)})
         yield _sse("done", {"conversation_id": conversation_id, "intent": "smalltalk_or_help", "engine": "error"})
 
 
 @router.post("/chat/stream")
 async def chat_stream(request: CopilotChatRequest):
     settings = get_settings()
-    if not (settings.COPILOT_API_KEY or settings.ZHIPU_API_KEY):
+    if not settings.DEEPSEEK_API_KEY:
         raise HTTPException(
             status_code=503,
             detail="Compliance Copilot model credentials are not configured.",

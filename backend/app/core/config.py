@@ -11,8 +11,7 @@ from functools import lru_cache
 class Settings(BaseSettings):
     """应用全局配置"""
     # --- API Keys ---
-    ZHIPU_API_KEY: str = ""
-    LONGCAT_API_KEY: str = ""
+    DEEPSEEK_API_KEY: str = ""
     DASHSCOPE_API_KEY: str | None = None
     COHERE_API_KEY: str = ""
 
@@ -30,21 +29,16 @@ class Settings(BaseSettings):
     LANGCHAIN_PROJECT: str | None = None
 
     # --- Model Config ---
-    ZHIPU_MODEL: str = "MiMo-v2.5"
-    ZHIPU_BASE_URL: str = "https://token-plan-cn.xiaomimimo.com/v1"
-    ZHIPU_EMBEDDING_MODEL: str = "embedding-3"
-    EMBEDDING_PROVIDER: str = "openai_compatible"  # openai_compatible | local_hash
-    EMBEDDING_MODEL: str = "embedding-3"
+    DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
+    DEEPSEEK_MODEL: str = "deepseek-v4-flash"
+    DEEPSEEK_TIMEOUT_SECONDS: int = 60
+    DEEPSEEK_INTERACTIVE_THINKING: bool = False
+    DEEPSEEK_REASONING_THINKING: bool = True
+    EMBEDDING_PROVIDER: str = "local_hash"  # local_hash | openai_compatible
+    EMBEDDING_MODEL: str = "local-hash"
     EMBEDDING_BASE_URL: str = ""
     EMBEDDING_API_KEY: str = ""
     EMBEDDING_DIMENSIONS: int = 256
-    LONGCAT_MODEL: str = "MiMo-v2.5"
-    LONGCAT_BASE_URL: str = "https://token-plan-cn.xiaomimimo.com/v1"
-    LLM_TIMEOUT_SECONDS: int = 60  # LLM API 调用超时时间（秒）
-    COPILOT_MODEL: str = "MiMo-v2.5"
-    COPILOT_BASE_URL: str = "https://token-plan-cn.xiaomimimo.com/v1"
-    COPILOT_API_KEY: str = ""
-    COPILOT_TIMEOUT_SECONDS: int = 60
     COPILOT_MAX_CONTEXT_CHARS: int = 16000
     COPILOT_MAX_HISTORY_MESSAGES: int = 8
 

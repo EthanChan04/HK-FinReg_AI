@@ -2,10 +2,10 @@
 LLM 工厂 & 检索引擎模块 (Builder)
 
 职责：
-  1. 构建 LLM 实例 (MiMo-v2.5, OpenAI-compatible)
+  1. 构建显式 DeepSeek V4 Flash LLM 实例
   2. 构建 Hybrid Retriever (BM25 + ChromaDB Dense, 自定义 RRF 融合)
 
-所有构建函数均使用 @lru_cache 做单例缓存。
+DeepSeek 客户端由中央工厂按运行配置缓存。
 """
 import os
 import re
@@ -13,6 +13,7 @@ import math
 import hashlib
 import shutil
 import builtins
+import warnings
 from functools import lru_cache
 from pathlib import Path
 from typing import List
@@ -27,17 +28,7 @@ from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from pydantic import ConfigDict
 
 from app.core.config import get_settings
-
-
-def _normalize_model_name(model_name: str) -> str:
-    """Normalize known provider model aliases for compatibility."""
-    if not model_name:
-        return model_name
-    lowered = model_name.lower()
-    # Current gateway supports lowercase MiMo model ids.
-    if lowered == "mimo-v2.5":
-        return "mimo-v2.5"
-    return model_name
+from app.services.llm.deepseek import build_deepseek_llm
 
 
 def _safe_print(*args, **kwargs) -> None:
@@ -95,10 +86,10 @@ class LocalHashEmbeddings:
 
 def _embedding_runtime_config():
     settings = get_settings()
-    provider = (getattr(settings, "EMBEDDING_PROVIDER", "") or "openai_compatible").lower()
-    model = getattr(settings, "EMBEDDING_MODEL", "") or settings.ZHIPU_EMBEDDING_MODEL
-    base_url = getattr(settings, "EMBEDDING_BASE_URL", "") or settings.ZHIPU_BASE_URL
-    api_key = getattr(settings, "EMBEDDING_API_KEY", "") or settings.ZHIPU_API_KEY
+    provider = (getattr(settings, "EMBEDDING_PROVIDER", "") or "local_hash").lower()
+    model = getattr(settings, "EMBEDDING_MODEL", "") or "local-hash"
+    base_url = getattr(settings, "EMBEDDING_BASE_URL", "")
+    api_key = getattr(settings, "EMBEDDING_API_KEY", "")
     dimensions = int(getattr(settings, "EMBEDDING_DIMENSIONS", 256) or 256)
     return provider, model, base_url, api_key, dimensions
 
@@ -162,32 +153,19 @@ def classify_query_type(extracted_entities: str) -> str:
 # LLM 实例构建
 # ==========================================
 
-@lru_cache()
 def build_zhipu_llm() -> ChatOpenAI:
-    """构建通用主 LLM 实例（默认 MiMo-v2.5）"""
-    settings = get_settings()
-    model_name = _normalize_model_name(settings.ZHIPU_MODEL)
-    return ChatOpenAI(
-        model_name=model_name,
-        temperature=0,
-        openai_api_key=settings.ZHIPU_API_KEY,
-        openai_api_base=settings.ZHIPU_BASE_URL,
-        timeout=settings.LLM_TIMEOUT_SECONDS
+    """Deprecated compatibility wrapper for the interactive DeepSeek profile."""
+    warnings.warn(
+        "build_zhipu_llm is deprecated; use build_deepseek_llm",
+        DeprecationWarning,
+        stacklevel=2,
     )
+    return build_deepseek_llm("interactive")
 
 
-@lru_cache()
 def build_thinking_llm() -> ChatOpenAI:
-    """构建深度推理 LLM 实例（默认 MiMo-v2.5）"""
-    settings = get_settings()
-    model_name = _normalize_model_name(settings.LONGCAT_MODEL)
-    return ChatOpenAI(
-        model_name=model_name,
-        temperature=0,
-        openai_api_key=settings.LONGCAT_API_KEY,
-        openai_api_base=settings.LONGCAT_BASE_URL,
-        timeout=settings.LLM_TIMEOUT_SECONDS
-    )
+    """Build the DeepSeek reasoning profile."""
+    return build_deepseek_llm("reasoning")
 
 
 # 缓存 structured LLM 尝试结果（避免每次 reviewer_node 调用都重复尝试）
@@ -197,7 +175,7 @@ _structured_llm_cache: dict = {"result": None, "checked": False}
 def get_structured_reviewer_llm():
     """P2.5: 尝试构建支持 with_structured_output 的 Reviewer LLM
 
-    验证当前模型（默认 MiMo-v2.5）是否支持 function calling / tool_choice。
+    验证当前 DeepSeek 模型是否支持 function calling / tool_choice。
     如果支持 → 返回结构化 LLM（直接输出 ReviewerVerdict）
     如果不支持 → 返回 None（调用方 fallback 到正则解析）
 
@@ -210,7 +188,7 @@ def get_structured_reviewer_llm():
         return _structured_llm_cache["result"]
 
     from app.schemas.requests import ReviewerVerdict
-    llm = build_zhipu_llm()
+    llm = build_deepseek_llm("interactive")
     try:
         structured = llm.with_structured_output(ReviewerVerdict)
         # 简单验证：检查返回对象是否有 invoke 方法

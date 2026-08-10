@@ -129,6 +129,6 @@ def classify_intent(message: str) -> IntentDecision:
 
     matched = _contains_any(normalized, _SMALLTALK_KEYWORDS)
     if matched and len(normalized.split()) <= 12:
-        return IntentDecision("smalltalk_or_help", "mimo", f"matched keyword: {matched}")
+        return IntentDecision("smalltalk_or_help", "deepseek", f"matched keyword: {matched}")
 
     return IntentDecision("regulatory_qa", "rag", "default regulatory Q&A fallback")

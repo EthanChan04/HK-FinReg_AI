@@ -24,7 +24,7 @@ CopilotToolName = Literal[
     "deepresearch",
     "human_review",
     "workflow_router",
-    "mimo",
+    "deepseek",
 ]
 
 

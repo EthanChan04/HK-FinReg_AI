@@ -28,5 +28,7 @@ def test_intent_classifier_routes_all_required_intents():
     assert classify_intent("this case has low confidence evidence insufficient").intent == "case_explanation"
     assert classify_intent("which workflow should i use").intent == "workflow_recommendation"
     assert classify_intent("can reviewer approve this pending queue item").intent == "human_review_help"
-    assert classify_intent("hello, help").intent == "smalltalk_or_help"
+    smalltalk = classify_intent("hello, help")
+    assert smalltalk.intent == "smalltalk_or_help"
+    assert smalltalk.engine == "deepseek"
     assert classify_intent("What does HKMA require for eKYC?").intent == "regulatory_qa"

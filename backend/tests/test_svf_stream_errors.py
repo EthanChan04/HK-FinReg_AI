@@ -202,7 +202,7 @@ No material information gap was identified for this test.
                 )
             ]
 
-    monkeypatch.setattr(svf, "build_zhipu_llm", lambda: FakeLLM())
+    monkeypatch.setattr(svf, "build_deepseek_llm", lambda _profile: FakeLLM())
     monkeypatch.setattr(svf, "build_reranked_retriever", lambda: FakeRetriever())
 
     final_report = svf._run_svf_graph("SVF CDD obligations")

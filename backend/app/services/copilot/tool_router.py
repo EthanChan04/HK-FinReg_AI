@@ -21,7 +21,7 @@ from app.services.retrieval.retrieval_service import RetrievalService
 @dataclass
 class ToolRouteResult:
     payload: CopilotRuntimePayload = field(default_factory=CopilotRuntimePayload)
-    tool_name: str = "mimo"
+    tool_name: str = "deepseek"
 
 
 def _build_retrieval_service() -> RetrievalService:
@@ -89,8 +89,8 @@ def route_tools(intent: IntentDecision, request: CopilotChatRequest, compact_con
                     chunk.metadata.setdefault("query_plan", bundle.query_plan)
             return ToolRouteResult(payload=payload, tool_name="rag")
         except Exception as exc:
-            payload.notes.append(f"RAG retrieval unavailable, fallback to MiMo direct answer: {type(exc).__name__}")
-            return ToolRouteResult(payload=payload, tool_name="mimo")
+            payload.notes.append(f"RAG retrieval unavailable, fallback to DeepSeek direct answer: {type(exc).__name__}")
+            return ToolRouteResult(payload=payload, tool_name="deepseek")
 
     if intent.intent == "obligation_mapping":
         try:
@@ -120,8 +120,8 @@ def route_tools(intent: IntentDecision, request: CopilotChatRequest, compact_con
             )
             return ToolRouteResult(payload=payload, tool_name="kag")
         except Exception as exc:
-            payload.notes.append(f"KAG routing unavailable, fallback to MiMo direct answer: {type(exc).__name__}")
-            return ToolRouteResult(payload=payload, tool_name="mimo")
+            payload.notes.append(f"KAG routing unavailable, fallback to DeepSeek direct answer: {type(exc).__name__}")
+            return ToolRouteResult(payload=payload, tool_name="deepseek")
 
     if intent.intent == "deep_research":
         try:
@@ -147,9 +147,9 @@ def route_tools(intent: IntentDecision, request: CopilotChatRequest, compact_con
             return ToolRouteResult(payload=payload, tool_name="deepresearch")
         except Exception as exc:
             payload.notes.append(
-                f"DeepResearch unavailable for this request, fallback to MiMo direct answer: {type(exc).__name__}"
+                f"DeepResearch unavailable for this request, fallback to DeepSeek direct answer: {type(exc).__name__}"
             )
-            return ToolRouteResult(payload=payload, tool_name="mimo")
+            return ToolRouteResult(payload=payload, tool_name="deepseek")
 
     if intent.intent == "case_explanation":
         raw_evidence = case_context.get("evidence_chunks") or []
@@ -165,9 +165,9 @@ def route_tools(intent: IntentDecision, request: CopilotChatRequest, compact_con
                 return ToolRouteResult(payload=payload, tool_name="rag")
             except Exception as exc:
                 payload.notes.append(
-                    f"Case-context RAG augmentation unavailable, fallback to MiMo direct answer: {type(exc).__name__}"
+                    f"Case-context RAG augmentation unavailable, fallback to DeepSeek direct answer: {type(exc).__name__}"
                 )
-                return ToolRouteResult(payload=payload, tool_name="mimo")
+                return ToolRouteResult(payload=payload, tool_name="deepseek")
         return ToolRouteResult(payload=payload, tool_name="rag")
 
     if intent.intent == "workflow_recommendation":
@@ -188,5 +188,5 @@ def route_tools(intent: IntentDecision, request: CopilotChatRequest, compact_con
         }
         return ToolRouteResult(payload=payload, tool_name="human_review")
 
-    payload.notes.append("Direct MiMo response without additional tools.")
-    return ToolRouteResult(payload=payload, tool_name="mimo")
+    payload.notes.append("Direct DeepSeek response without additional tools.")
+    return ToolRouteResult(payload=payload, tool_name="deepseek")

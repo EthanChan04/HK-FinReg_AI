@@ -195,7 +195,7 @@ export interface CopilotCaseContext {
 }
 
 export interface CopilotToolEvent {
-  tool: "rag" | "kag" | "deepresearch" | "human_review" | "workflow_router" | "mimo";
+  tool: "rag" | "kag" | "deepresearch" | "human_review" | "workflow_router" | "deepseek";
   status: "running" | "done" | "error";
   message?: string;
 }

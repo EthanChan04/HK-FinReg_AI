@@ -91,7 +91,7 @@ def _dependency_checks() -> dict[str, bool]:
     corpus_cache_path = os.path.join(
         settings.CORPUS_INDEX_DIR, "corpus_documents.json"
     )
-    llm_configured = bool(settings.COPILOT_API_KEY or settings.ZHIPU_API_KEY or settings.LONGCAT_API_KEY)
+    llm_configured = bool(settings.DEEPSEEK_API_KEY)
     return {
         "llm_service": llm_configured,
         "corpus_index": os.path.isfile(corpus_cache_path),

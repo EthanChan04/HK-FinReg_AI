@@ -21,9 +21,6 @@ def test_build_embeddings_client_falls_back_to_local_when_probe_fails(monkeypatc
         EMBEDDING_MODEL="embedding-3",
         EMBEDDING_BASE_URL="https://invalid.example/v1",
         EMBEDDING_API_KEY="fake-key",
-        ZHIPU_EMBEDDING_MODEL="embedding-3",
-        ZHIPU_BASE_URL="https://invalid.example/v1",
-        ZHIPU_API_KEY="fake-key",
     )
 
     class FailingEmbeddings:
@@ -38,3 +35,27 @@ def test_build_embeddings_client_falls_back_to_local_when_probe_fails(monkeypatc
 
     emb = builder.build_embeddings_client()
     assert isinstance(emb, builder.LocalHashEmbeddings)
+
+
+def test_empty_embedding_provider_uses_local_hash_without_remote_probe(monkeypatch):
+    from app.services.agents import builder
+
+    settings = types.SimpleNamespace(
+        EMBEDDING_PROVIDER="",
+        EMBEDDING_MODEL="",
+        EMBEDDING_BASE_URL="",
+        EMBEDDING_API_KEY="",
+        EMBEDDING_DIMENSIONS=96,
+    )
+
+    class UnexpectedRemoteClient:
+        def __init__(self, **_kwargs):
+            raise AssertionError("the default embedding path must stay local")
+
+    monkeypatch.setattr(builder, "get_settings", lambda: settings)
+    monkeypatch.setattr(builder, "OpenAIEmbeddings", UnexpectedRemoteClient)
+
+    emb = builder.build_embeddings_client()
+
+    assert isinstance(emb, builder.LocalHashEmbeddings)
+    assert emb.dimensions == 96

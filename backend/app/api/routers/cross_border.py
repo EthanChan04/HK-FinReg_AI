@@ -184,7 +184,7 @@ async def _stream_cb(safe_input: str) -> AsyncGenerator[str, None]:
     agent_steps = [
         ("Extraction Specialist", "正在切分资金链路，抽离发送方与收款方金融特征..."),
         ("Sanctions Screener", "正在调用全球制裁名单库 (OFAC/UN/EU) 执行刚性碰撞匹配..."),
-        ("AML Investigator", "正在唤醒 MiMo-v2.5 深度拆解跨境汇款经济合理性..."),
+        ("AML Investigator", "正在唤醒 DeepSeek V4 Flash 深度拆解跨境汇款经济合理性..."),
         ("Compliance Director", "正在进行最终的逻辑自洽测试与否决拦截校验..."),
     ]
     async for chunk in create_streaming_response(_run_cb_graph, safe_input, agent_steps):

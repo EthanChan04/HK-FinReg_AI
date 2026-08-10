@@ -9,8 +9,7 @@ def test_copilot_api_missing_credentials_returns_safe_error(monkeypatch):
     from app.api.routers import copilot
 
     class _Settings:
-        COPILOT_API_KEY = ""
-        ZHIPU_API_KEY = ""
+        DEEPSEEK_API_KEY = ""
 
     monkeypatch.setattr(copilot, "get_settings", lambda: _Settings())
 

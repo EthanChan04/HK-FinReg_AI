@@ -100,3 +100,13 @@ def test_tool_router_human_review_uses_gate_context():
     assert result.tool_name == "human_review"
     assert result.payload.review_guidance is not None
     assert result.payload.review_guidance["current_gate"] == "low_confidence_gate"
+
+
+def test_tool_router_smalltalk_uses_explicit_deepseek_runtime():
+    request = CopilotChatRequest(message="hello")
+    decision = IntentDecision(intent="smalltalk_or_help", engine="deepseek", reason="test")
+
+    result = route_tools(decision, request, {"case_context": {}})
+
+    assert result.tool_name == "deepseek"
+    assert result.payload.notes == ["Direct DeepSeek response without additional tools."]
