@@ -19,12 +19,14 @@ describe("useAgentStream cancellation", () => {
       }),
     );
     vi.stubGlobal("fetch", fetchMock);
-    const module = bankWorkflows.find((workflow) => workflow.id === "account-kyc-review")!;
+    const workflowConfig = bankWorkflows.find(
+      (workflow) => workflow.id === "account-kyc-review",
+    )!;
     const { result } = renderHook(() => useAgentStream());
 
     let request: Promise<void>;
     act(() => {
-      request = result.current.startStream(module, "cancel test");
+      request = result.current.startStream(workflowConfig, "cancel test");
     });
     await waitFor(() => expect(result.current.isStreaming).toBe(true));
 
