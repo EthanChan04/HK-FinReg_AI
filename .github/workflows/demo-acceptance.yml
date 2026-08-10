@@ -2,6 +2,9 @@ name: DeepSeek Demo Acceptance
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - codex/deepseek-demo-remediation
 
 permissions:
   contents: read
