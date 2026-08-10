@@ -21,6 +21,47 @@ class EmptyDocument(RuntimeError):
     """Raised when a source yields no pages or no usable chunks."""
 
 
+def _build_pdf_document(path: Path):
+    import pypdfium2 as pdfium
+
+    return pdfium.PdfDocument(path)
+
+
+def _build_ocr_engine():
+    from rapidocr import RapidOCR
+
+    return RapidOCR()
+
+
+def _ocr_pdf_pages(path: Path) -> list[Document]:
+    """Extract text from an image-only official PDF with local OCR."""
+
+    pdf = _build_pdf_document(path)
+    engine = _build_ocr_engine()
+    pages: list[Document] = []
+    try:
+        for page_number in range(len(pdf)):
+            image = pdf[page_number].render(scale=2.0).to_numpy()
+            result = engine(image)
+            lines = getattr(result, "txts", None) or ()
+            text = "\n".join(str(line).strip() for line in lines if str(line).strip())
+            pages.append(
+                Document(
+                    page_content=text,
+                    metadata={
+                        "source": str(path),
+                        "page": page_number,
+                        "parser": "rapidocr",
+                    },
+                )
+            )
+    finally:
+        close = getattr(pdf, "close", None)
+        if callable(close):
+            close()
+    return pages
+
+
 def _metadata_value(value):
     """Keep Chroma-compatible scalar metadata while preserving searchability."""
 
@@ -50,15 +91,29 @@ def enrich_document_metadata(doc: Document, source: SourceDocument) -> Document:
     return Document(page_content=doc.page_content, metadata=metadata)
 
 
-def _load_source_pages(source: SourceDocument) -> list[Document]:
+def _load_source_pages(
+    source: SourceDocument,
+    *,
+    pdf_loader_cls=None,
+    ocr_loader=None,
+) -> list[Document]:
     if source.resolved_path is None:
         raise FileNotFoundError(f"No resolved path for {source.doc_id}")
     if not source.resolved_path.is_file():
         raise FileNotFoundError(f"Source file not found: {source.resolved_path}")
 
-    from langchain_community.document_loaders import PyPDFLoader
+    if pdf_loader_cls is None:
+        from langchain_community.document_loaders import PyPDFLoader
 
-    return PyPDFLoader(str(source.resolved_path)).load()
+        pdf_loader_cls = PyPDFLoader
+    if ocr_loader is None:
+        ocr_loader = _ocr_pdf_pages
+
+    pages = pdf_loader_cls(str(source.resolved_path)).load()
+    if any(page.page_content.strip() for page in pages):
+        return pages
+    logger.info("Native PDF extraction was empty for %s; using local OCR", source.doc_id)
+    return ocr_loader(source.resolved_path)
 
 
 def _parse_source_pages(pages: list[Document], source: SourceDocument) -> list[Document]:

@@ -14,6 +14,8 @@ annotated-doc==0.0.5
     #   typer
 annotated-types==0.8.0
     # via pydantic
+antlr4-python3-runtime==4.9.3
+    # via omegaconf
 anyio==4.14.2
     # via
     #   httpx
@@ -52,9 +54,12 @@ colorama==0.4.6
     # via
     #   build
     #   click
+    #   colorlog
     #   pytest
     #   tqdm
     #   typer
+colorlog==6.12.0
+    # via rapidocr
 cryptography==50.0.0
     # via hk-finreg-ai-backend (pyproject.toml)
 distro==1.9.0
@@ -197,13 +202,20 @@ numpy==2.4.6
     #   chromadb
     #   langchain-community
     #   onnxruntime
+    #   opencv-python
     #   rank-bm25
+    #   rapidocr
+    #   shapely
 oauthlib==3.3.1
     # via requests-oauthlib
+omegaconf==2.3.1
+    # via rapidocr
 onnxruntime==1.28.0
     # via chromadb
 openai==2.52.0
     # via langchain-openai
+opencv-python==5.0.0.93
+    # via rapidocr
 opentelemetry-api==1.44.0
     # via
     #   chromadb
@@ -242,6 +254,8 @@ packaging==26.2
     #   langsmith
     #   onnxruntime
     #   pytest
+pillow==12.3.0
+    # via rapidocr
 pluggy==1.6.0
     # via pytest
 propcache==0.5.2
@@ -263,6 +277,8 @@ psycopg-pool==3.3.1
     # via langgraph-checkpoint-postgres
 pybase64==1.4.3
     # via chromadb
+pyclipper==1.4.0
+    # via rapidocr
 pycparser==3.0
     # via cffi
 pydantic==2.13.4
@@ -292,6 +308,8 @@ pygments==2.20.0
     #   rich
 pypdf==6.14.2
     # via hk-finreg-ai-backend (pyproject.toml)
+pypdfium2==5.12.1
+    # via hk-finreg-ai-backend (pyproject.toml)
 pypika==0.51.1
     # via chromadb
 pyproject-hooks==1.2.0
@@ -313,8 +331,12 @@ pyyaml==6.0.3
     #   langchain-classic
     #   langchain-community
     #   langchain-core
+    #   omegaconf
+    #   rapidocr
     #   uvicorn
 rank-bm25==0.2.2
+    # via hk-finreg-ai-backend (pyproject.toml)
+rapidocr==3.9.2
     # via hk-finreg-ai-backend (pyproject.toml)
 redis==8.1.0
     # via hk-finreg-ai-backend (pyproject.toml)
@@ -331,6 +353,7 @@ requests==2.34.2
     #   langchain-classic
     #   langchain-community
     #   langsmith
+    #   rapidocr
     #   requests-oauthlib
     #   requests-toolbelt
     #   tiktoken
@@ -346,12 +369,15 @@ rpds-py==2026.6.3
     # via
     #   jsonschema
     #   referencing
+shapely==2.1.2
+    # via rapidocr
 shellingham==1.5.4
     # via typer
 six==1.17.0
     # via
     #   kubernetes
     #   python-dateutil
+    #   rapidocr
 sniffio==1.3.1
     # via
     #   langsmith
@@ -378,6 +404,7 @@ tqdm==4.70.0
     #   chromadb
     #   huggingface-hub
     #   openai
+    #   rapidocr
 typer==0.27.1
     # via chromadb
 types-requests==2.33.0.20260712
