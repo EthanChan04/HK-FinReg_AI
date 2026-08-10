@@ -105,6 +105,8 @@ coverage/
 .coverage
 htmlcov/
 output/
+.artifacts/
+artifacts/evaluation/live/
 .worktrees/
 
 

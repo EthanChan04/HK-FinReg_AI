@@ -181,7 +181,7 @@ def _load_cached_corpus_documents() -> tuple:
     )
 
 
-def _retrieve_eval_documents(question: str, top_k: int = 10) -> list:
+def retrieve_eval_documents(question: str, top_k: int = 10) -> list:
     """Return deterministic local evidence candidates for benchmark metrics."""
 
     profile = classify_query(question)
@@ -242,6 +242,11 @@ def _retrieve_eval_documents(question: str, top_k: int = 10) -> list:
                 selected.append(doc)
         return selected[:top_k]
     return [doc for _, doc in ranked_pairs[:top_k]]
+
+
+# Compatibility alias for older callers and tests. New integrations should use
+# the public name above.
+_retrieve_eval_documents = retrieve_eval_documents
 
 
 def _compute_evidence_count(item: dict) -> int:
