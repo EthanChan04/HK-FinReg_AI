@@ -23,7 +23,7 @@ cohere>=5.0.0
 chromadb>=0.4.0
 pypdf>=4.0.0
 cryptography>=42.0.0
-langchain-text-splitters>=0.3.0
+langchain-text-splitters>=1.1.2
 rank_bm25>=0.2.2
 networkx>=3.2.0
 
