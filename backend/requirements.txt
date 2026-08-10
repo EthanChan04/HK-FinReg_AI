@@ -3,7 +3,7 @@
 
 # --- Web Framework ---
 fastapi>=0.110.0
-uvicorn[standard]>=0.27.0
+uvicorn[standard]>=0.52.1
 pydantic-settings>=2.1.0
 
 # --- AI / LLM Framework ---
