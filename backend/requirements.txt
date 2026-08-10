@@ -36,4 +36,4 @@ redis>=5.0.0
 pytest>=9.0.0
 
 # --- Workflow Checkpoint (Phase 1) ---
-psycopg[binary]>=3.1.0
+psycopg[binary]>=3.3.4
