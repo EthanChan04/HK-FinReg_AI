@@ -314,7 +314,19 @@ export function useAgentStream() {
         }
       }
     } catch (err: unknown) {
-      if (err instanceof Error && err.name !== "AbortError") {
+      const errorName =
+        typeof err === "object" && err !== null && "name" in err
+          ? String(err.name)
+          : "";
+      if (errorName === "AbortError") {
+        setState((prev) => ({
+          ...prev,
+          error: "Analysis cancelled.",
+          phase: "idle",
+          isStreaming: false,
+          currentAgent: null,
+        }));
+      } else if (err instanceof Error) {
         setState((prev) => ({
           ...prev,
           error: err.message || "Unknown error",
@@ -322,6 +334,7 @@ export function useAgentStream() {
       }
     } finally {
       if (timerRef.current) clearInterval(timerRef.current);
+      abortRef.current = null;
       setState((prev) => {
         if (prev.phase === "action_required") {
           return { ...prev, isStreaming: false };
@@ -329,7 +342,7 @@ export function useAgentStream() {
         return {
           ...prev,
           isStreaming: false,
-          phase: prev.error ? "idle" : "done",
+          phase: prev.error || prev.phase === "idle" ? "idle" : "done",
           elapsedTime: Math.round((performance.now() - startTimeRef.current) / 1000),
         };
       });

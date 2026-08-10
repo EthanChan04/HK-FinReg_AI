@@ -80,3 +80,56 @@ test("sends report context to Copilot and renders its streamed answer", async ({
     },
   });
 });
+
+test("reports a stream HTTP error and allows a clean retry", async ({ page }) => {
+  let attempts = 0;
+  await page.route("**/api/backend/api/v1/bank-account/verify/stream", async (route) => {
+    attempts += 1;
+    if (attempts === 1) {
+      await route.fulfill({ status: 503, contentType: "application/json", body: "{}" });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "text/event-stream",
+      body: sse([
+        ["token", { text: "Recovered grounded report." }],
+        ["done", { workflow_run_id: "workflow-retry-001" }],
+      ]),
+    });
+  });
+
+  await page.goto("/");
+  const input = page.getByPlaceholder("Enter compliance scenario...");
+  await input.fill("Test transient failure recovery.");
+  await page.getByRole("button", { name: "Submit Analysis" }).click();
+
+  await expect(page.getByText(/HTTP 503/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Submit Analysis" })).toBeEnabled();
+
+  await page.getByRole("button", { name: "Submit Analysis" }).click();
+  await expect(page.getByText("Recovered grounded report.")).toBeVisible();
+  await expect(page.getByText("Completed in")).toBeVisible();
+});
+
+test("cancels an in-flight analysis without reporting completion", async ({ page }) => {
+  await page.route("**/api/backend/api/v1/bank-account/verify/stream", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 2_000));
+    await route.fulfill({
+      status: 200,
+      contentType: "text/event-stream",
+      body: sse([["done", { workflow_run_id: "too-late" }]]),
+    }).catch(() => undefined);
+  });
+
+  await page.goto("/");
+  await page.getByPlaceholder("Enter compliance scenario...").fill("Cancel this analysis.");
+  await page.getByRole("button", { name: "Submit Analysis" }).click();
+  const cancel = page.getByRole("banner").getByRole("button", { name: "Cancel" });
+  await expect(cancel).toBeVisible();
+  await cancel.click();
+
+  await expect(page.getByText("Analysis cancelled.")).toBeVisible();
+  await expect(page.getByText("Completed in")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Submit Analysis" })).toBeEnabled();
+});
