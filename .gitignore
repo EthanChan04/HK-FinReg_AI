@@ -105,6 +105,7 @@ coverage/
 .coverage
 htmlcov/
 output/
+.worktrees/
 
 
 # ----- Local Planning / Upgrade Docs (keep local only) -----
