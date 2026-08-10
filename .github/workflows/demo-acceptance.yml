@@ -33,8 +33,6 @@ jobs:
           .venv/bin/python -m pip install --upgrade pip
           .venv/bin/python -m pip install -r requirements.lock
           .venv/bin/python -m pip check
-      - name: Require real DeepSeek credential
-        run: test -n "$DEEPSEEK_API_KEY" || (echo "DEEPSEEK_API_KEY secret is required" && exit 1)
       - name: Run focused acceptance tests
         run: >-
           .venv/bin/python -m pytest -q
@@ -47,8 +45,20 @@ jobs:
         run: |
           .venv/bin/python scripts/refresh_required_sources.py --doc-id hkma_amlcft_surveillance_capability_digitalisation_2024
           .venv/bin/python scripts/refresh_required_sources.py --doc-id hkma_svf_amlcft_guideline_2023
+      - name: Upload refreshed required HKMA sources
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: refreshed-required-hkma-sources
+          path: |
+            backend/data/regulations/hkma_aml_ai/hkma_amlcft_surveillance_capability_digitalisation_2024.pdf
+            backend/data/regulations/hkma_svf/hkma_svf_amlcft_guideline_2023.pdf
+          if-no-files-found: error
+          retention-days: 1
       - name: Build fail-closed corpus cache
         run: .venv/bin/python -m app.services.corpus.build_cache
+      - name: Require real DeepSeek credential
+        run: test -n "$DEEPSEEK_API_KEY" || (echo "DEEPSEEK_API_KEY secret is required" && exit 1)
       - name: Capture and gate 12 real DeepSeek responses
         run: .venv/bin/python -m app.services.evaluation.live_demo_gate --output-dir ../artifacts/evaluation/live
       - name: Upload redacted acceptance evidence
