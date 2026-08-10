@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 from app.schemas.corpus import SourceDocument
@@ -9,6 +10,89 @@ from app.schemas.evidence import EvidenceChunk
 from app.services.kag.graph_store import NetworkXGraphStore
 from app.services.kag.obligation_extractor import extract_obligations_from_chunks
 from app.services.kag.ontology import NodeType, RelationType
+from app.services.kag.triples import extract_regulatory_triples
+
+
+def _structure_type(title: str) -> str:
+    lowered = title.casefold()
+    if lowered.startswith(("chapter ", "part ", "schedule ")):
+        return NodeType.CHAPTER.value
+    if lowered.startswith("section "):
+        return NodeType.SECTION.value
+    if lowered.startswith(("clause ", "paragraph ")):
+        return NodeType.CLAUSE.value
+    if lowered.startswith("definition"):
+        return NodeType.DEFINITION.value
+    if lowered.startswith("exception"):
+        return NodeType.EXCEPTION.value
+    if lowered.startswith(("annex ", "appendix ")):
+        return NodeType.ANNEX.value
+    return NodeType.SECTION.value
+
+
+def _add_dual_graph_evidence(store: NetworkXGraphStore, documents, evidence_chunks) -> None:
+    """Add document structure and provenance-rich SPO nodes to the existing graph."""
+
+    document_by_id = {doc.doc_id: doc for doc in documents}
+    structure_nodes: dict[tuple[str, str], str] = {}
+    for evidence in evidence_chunks:
+        if not evidence.doc_id or evidence.doc_id not in document_by_id:
+            continue
+        hierarchy = [part.strip() for part in (evidence.hierarchy_path or "").split(">") if part.strip()]
+        parent_id = evidence.doc_id
+        for index, title in enumerate(hierarchy):
+            key = (evidence.doc_id, " > ".join(hierarchy[: index + 1]))
+            stable_suffix = hashlib.sha256(key[1].encode("utf-8")).hexdigest()[:12]
+            node_id = structure_nodes.setdefault(key, f"structure:{evidence.doc_id}:{index}:{stable_suffix}")
+            if node_id not in store.graph:
+                store.add_node(
+                    node_id,
+                    node_type=_structure_type(title),
+                    title=title,
+                    doc_id=evidence.doc_id,
+                    hierarchy_path=key[1],
+                    page=evidence.page,
+                    source_url=document_by_id[evidence.doc_id].source_url,
+                )
+            if not store.graph.has_edge(parent_id, node_id):
+                store.add_edge(parent_id, node_id, relation=RelationType.CONTAINS.value)
+            parent_id = node_id
+        if hierarchy:
+            store.add_edge(
+                parent_id,
+                f"chunk:{evidence.chunk_id or evidence.evidence_id}",
+                relation=RelationType.SUPPORTED_BY.value,
+                page=evidence.page,
+            )
+
+    for triple in extract_regulatory_triples(evidence_chunks, documents):
+        triple_node = triple.triple_id
+        source = triple.source.model_dump()
+        extraction = triple.extraction.model_dump()
+        store.add_node(
+            triple_node,
+            node_type=NodeType.REGULATORY_TRIPLE.value,
+            title=f"{triple.subject} {triple.predicate} {triple.object}",
+            subject=triple.subject,
+            predicate=triple.predicate,
+            object=triple.object,
+            qualifiers=triple.qualifiers,
+            source=source,
+            extraction=extraction,
+        )
+        source_node = triple.source.doc_id
+        clause_key = (triple.source.doc_id, triple.source.hierarchy_path or "")
+        if clause_key in structure_nodes:
+            source_node = structure_nodes[clause_key]
+        store.add_edge(source_node, triple_node, relation=RelationType.ASSERTS.value)
+        chunk_node = f"chunk:{triple.source.clause_id}"
+        if chunk_node in store.graph:
+            store.add_edge(
+                triple_node,
+                chunk_node,
+                relation=RelationType.SUPPORTED_BY.value,
+                page=triple.source.page,
+            )
 
 
 def build_graph_from_sources(
@@ -19,8 +103,8 @@ def build_graph_from_sources(
     """Build a metadata-first graph, preserving backward compatibility."""
 
     store = NetworkXGraphStore(graph_path)
-
     document_ids = {doc.doc_id for doc in documents}
+
     for doc in documents:
         doc_node = doc.doc_id
         regulator_node = f"regulator:{doc.regulator}"
@@ -39,21 +123,6 @@ def build_graph_from_sources(
         )
         store.add_edge(doc_node, regulator_node, relation=RelationType.ISSUED_BY.value)
 
-        for topic in doc.topics:
-            topic_node = f"topic:{topic}"
-            store.add_node(topic_node, node_type=NodeType.TOPIC.value, title=topic)
-            store.add_edge(doc_node, topic_node, relation=RelationType.RELATED_TO.value)
-
-        for tag in doc.module_tags:
-            product_node = f"product:{tag}"
-            store.add_node(product_node, node_type=NodeType.PRODUCT.value, title=tag)
-            store.add_edge(doc_node, product_node, relation=RelationType.APPLIES_TO.value)
-
-        for risk in doc.risk_tags:
-            risk_node = f"risk:{risk}"
-            store.add_node(risk_node, node_type=NodeType.RISK.value, title=risk)
-            store.add_edge(doc_node, risk_node, relation=RelationType.RELATED_TO.value)
-
         for referenced_doc_id in doc.references:
             if referenced_doc_id in document_ids:
                 store.add_edge(
@@ -68,6 +137,21 @@ def build_graph_from_sources(
                     superseded_doc_id,
                     relation=RelationType.SUPERSEDES.value,
                 )
+
+        for topic in doc.topics:
+            topic_node = f"topic:{topic}"
+            store.add_node(topic_node, node_type=NodeType.TOPIC.value, title=topic)
+            store.add_edge(doc_node, topic_node, relation=RelationType.RELATED_TO.value)
+
+        for tag in doc.module_tags:
+            product_node = f"product:{tag}"
+            store.add_node(product_node, node_type=NodeType.PRODUCT.value, title=tag)
+            store.add_edge(doc_node, product_node, relation=RelationType.APPLIES_TO.value)
+
+        for risk in doc.risk_tags:
+            risk_node = f"risk:{risk}"
+            store.add_node(risk_node, node_type=NodeType.RISK.value, title=risk)
+            store.add_edge(doc_node, risk_node, relation=RelationType.RELATED_TO.value)
 
     for evidence in evidence_chunks:
         if not evidence.chunk_id and not evidence.evidence_id:
@@ -90,6 +174,8 @@ def build_graph_from_sources(
             relation=RelationType.SUPPORTED_BY.value,
             evidence_chunk_id=evidence.evidence_id,
         )
+
+    _add_dual_graph_evidence(store, documents, evidence_chunks)
 
     store.save()
     return store
@@ -130,4 +216,3 @@ def build_obligation_graph_from_evidence(
 
     store.save()
     return store
-

@@ -17,6 +17,12 @@ class NodeType(str, Enum):
     USE_CASE = "UseCase"
     TOPIC = "Topic"
     EVIDENCE_CHUNK = "EvidenceChunk"
+    CHAPTER = "Chapter"
+    SECTION = "Section"
+    DEFINITION = "Definition"
+    EXCEPTION = "Exception"
+    ANNEX = "Annex"
+    REGULATORY_TRIPLE = "RegulatoryTriple"
 
 
 class RelationType(str, Enum):
@@ -33,6 +39,7 @@ class RelationType(str, Enum):
     SUPERSEDES = "SUPERSEDES"
     RELATED_TO = "RELATED_TO"
     HAS_JURISDICTION = "HAS_JURISDICTION"
+    ASSERTS = "ASSERTS"
 
 
 NODE_TYPES = {item.value for item in NodeType}
