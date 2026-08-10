@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 from langchain_core.documents import Document
 
@@ -66,3 +67,30 @@ def test_successful_source_is_counted_and_compatibility_wrapper_returns_document
 
     monkeypatch.setattr(corpus_ingestor, "ingest_corpus_documents", lambda **_: result)
     assert corpus_ingestor.load_corpus_documents() == result.documents
+
+
+def test_missing_required_manifest_file_is_reported(tmp_path):
+    manifest = tmp_path / "source_manifest.json"
+    manifest.write_text(
+        json.dumps(
+            [
+                {
+                    "doc_id": "missing_required_source",
+                    "title": "Missing required source",
+                    "regulator": "HKMA",
+                    "doc_type": "Guideline",
+                    "file_path": "missing.pdf",
+                    "required_for_demo": True,
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = corpus_ingestor.ingest_corpus_documents(
+        manifest_path=manifest,
+        reg_doc_dir=tmp_path / "regulations",
+    )
+
+    assert [failure.doc_id for failure in result.required_failures] == ["missing_required_source"]
+    assert result.required_failures[0].error_type == "FileNotFoundError"

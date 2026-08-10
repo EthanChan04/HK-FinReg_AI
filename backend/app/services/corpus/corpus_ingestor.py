@@ -53,6 +53,8 @@ def enrich_document_metadata(doc: Document, source: SourceDocument) -> Document:
 def _load_source_pages(source: SourceDocument) -> list[Document]:
     if source.resolved_path is None:
         raise FileNotFoundError(f"No resolved path for {source.doc_id}")
+    if not source.resolved_path.is_file():
+        raise FileNotFoundError(f"Source file not found: {source.resolved_path}")
 
     from langchain_community.document_loaders import PyPDFLoader
 
@@ -75,7 +77,11 @@ def ingest_corpus_documents(
 ) -> CorpusIngestionResult:
     """Attempt every manifest source and report all successes and failures."""
 
-    sources = load_source_manifest(manifest_path=manifest_path, reg_doc_dir=reg_doc_dir)
+    sources = load_source_manifest(
+        manifest_path=manifest_path,
+        reg_doc_dir=reg_doc_dir,
+        include_missing=True,
+    )
     if not sources:
         return CorpusIngestionResult(documents=[], loaded_source_ids=[], failures=[])
 

@@ -67,6 +67,7 @@ def _resolve_backend_relative(path_value: str | Path) -> Path:
 def load_source_manifest(
     manifest_path: str | Path | None = None,
     reg_doc_dir: str | Path | None = None,
+    include_missing: bool = False,
 ) -> list[SourceDocument]:
     """Load valid manifest documents whose local files exist.
 
@@ -101,7 +102,8 @@ def load_source_manifest(
         resolved = doc_dir / doc.file_path
         if not resolved.exists():
             logger.warning("Source file not found: %s", resolved)
-            continue
+            if not include_missing:
+                continue
         doc.resolved_path = resolved
         docs.append(doc)
 
