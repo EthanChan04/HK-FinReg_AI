@@ -1,5 +1,34 @@
 # HK-FinReg Evaluation Protocol
 
+## DeepSeek V4 Flash Demo Acceptance
+
+The demo uses one explicit chat runtime: `deepseek` / `deepseek-v4-flash` at
+`https://api.deepseek.com`. A real `DEEPSEEK_API_KEY` is mandatory; there is no
+mock, alternate provider, or human-review bypass in the live acceptance result.
+Human approval of gold packages is not required for this demo gate.
+
+Run the complete local gate from `backend` after building the corpus cache:
+
+```bash
+python -m app.services.corpus.build_cache
+python -m app.services.evaluation.live_demo_gate --output-dir ../artifacts/evaluation/live
+```
+
+The gate calls DeepSeek for a fixed, stratified set of 12 benchmark cases and
+fails unless all of these conditions hold:
+
+- provider/model are exactly `deepseek` / `deepseek-v4-flash`;
+- all 12 responses are non-empty and have no live-call errors;
+- generation faithfulness is measured for all 12 selected rows;
+- average selected faithfulness is at least `0.45`;
+- average selected unsupported-claim rate is at most `0.10`.
+
+Transient HTTP `429` and `5xx` responses are retried twice (after one and two
+seconds). Authentication failures, malformed responses, and empty responses are
+not retried. Captured artifacts are redacted, stored below
+`artifacts/evaluation/live/`, ignored by Git, and uploaded by the manually
+dispatched `DeepSeek Demo Acceptance` workflow for 14 days.
+
 ## Running the Benchmark
 
 ```bash

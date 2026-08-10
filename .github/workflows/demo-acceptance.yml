@@ -1,0 +1,58 @@
+name: DeepSeek Demo Acceptance
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-deepseek-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      DEEPSEEK_BASE_URL: https://api.deepseek.com
+      DEEPSEEK_MODEL: deepseek-v4-flash
+      EMBEDDING_PROVIDER: local_hash
+      EMBEDDING_MODEL: local-hash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install locked backend dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements.lock
+          .venv/bin/python -m pip check
+      - name: Require real DeepSeek credential
+        run: test -n "$DEEPSEEK_API_KEY" || (echo "DEEPSEEK_API_KEY secret is required" && exit 1)
+      - name: Run focused acceptance tests
+        run: >-
+          .venv/bin/python -m pytest -q
+          tests/test_deepseek_runtime.py
+          tests/test_corpus_ingestion_report.py
+          tests/test_corpus_ocr_fallback.py
+          tests/test_live_demo_eval.py
+          tests/test_live_demo_gate.py
+      - name: Refresh truncated required HKMA sources
+        run: |
+          .venv/bin/python scripts/refresh_required_sources.py --doc-id hkma_amlcft_surveillance_capability_digitalisation_2024
+          .venv/bin/python scripts/refresh_required_sources.py --doc-id hkma_svf_amlcft_guideline_2023
+      - name: Build fail-closed corpus cache
+        run: .venv/bin/python -m app.services.corpus.build_cache
+      - name: Capture and gate 12 real DeepSeek responses
+        run: .venv/bin/python -m app.services.evaluation.live_demo_gate --output-dir ../artifacts/evaluation/live
+      - name: Upload redacted acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deepseek-v4-flash-demo-acceptance
+          path: artifacts/evaluation/live/
+          if-no-files-found: warn
+          retention-days: 14
