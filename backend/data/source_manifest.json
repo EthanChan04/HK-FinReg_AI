@@ -1,6 +1,7 @@
 [
   {
     "doc_id": "hkma_ai_monitoring_mltf_technologies_annex_2024",
+    "required_for_demo": true,
     "title": "Use of Technologies to improve the Effectiveness and Operational Efficiency of Monitoring for MLTF",
     "regulator": "HKMA",
     "doc_type": "Annex",
@@ -39,6 +40,7 @@
   },
   {
     "doc_id": "hkma_ai_suspicious_activity_monitoring_2024",
+    "required_for_demo": true,
     "title": "Use of Artificial Intelligence for Monitoring of Suspicious Activities",
     "regulator": "HKMA",
     "doc_type": "Circular",
@@ -78,6 +80,7 @@
   },
   {
     "doc_id": "hkma_amlcft_surveillance_capability_digitalisation_2024",
+    "required_for_demo": true,
     "title": "AML/CFT Surveillance Capability Enhancement and Digitalisation",
     "regulator": "HKMA",
     "doc_type": "Circular",
@@ -115,6 +118,7 @@
   },
   {
     "doc_id": "hkma_amlcft_surveillance_capability_svf_2024",
+    "required_for_demo": true,
     "title": "AML/CFT Surveillance Capability Enhancement Project for SVF Licensees",
     "regulator": "HKMA",
     "doc_type": "Circular",
@@ -153,6 +157,7 @@
   },
   {
     "doc_id": "hkma_supporting_ai_adoption_amlcft_2025",
+    "required_for_demo": true,
     "title": "Supporting Artificial Intelligence Adoption in AML/CFT",
     "regulator": "HKMA",
     "doc_type": "Circular",
@@ -191,6 +196,7 @@
   },
   {
     "doc_id": "hkma_tm_ai_thematic_review_2024",
+    "required_for_demo": true,
     "title": "Thematic Review of Transaction Monitoring Systems and Use of Artificial Intelligence",
     "regulator": "HKMA",
     "doc_type": "Thematic Review",
@@ -228,6 +234,7 @@
   },
   {
     "doc_id": "hkma_tm_systems_insights_2024",
+    "required_for_demo": true,
     "title": "Insights for Design, Implementation and Optimisation of Transaction Monitoring Systems",
     "regulator": "HKMA",
     "doc_type": "Guidance",
@@ -264,6 +271,7 @@
   },
   {
     "doc_id": "hkma_high_end_money_laundering_guidance_2025",
+    "required_for_demo": true,
     "title": "Guidance on combating high-end money laundering",
     "regulator": "HKMA",
     "doc_type": "Guidance",
@@ -301,6 +309,7 @@
   },
   {
     "doc_id": "hkma_pep_risk_based_controls_2025",
+    "required_for_demo": true,
     "title": "Guidance on risk-based AML/CFT controls for politically exposed persons",
     "regulator": "HKMA",
     "doc_type": "Guidance",
@@ -338,6 +347,7 @@
   },
   {
     "doc_id": "hkma_genai_consumer_protection_2024",
+    "required_for_demo": true,
     "title": "Consumer Protection in respect of Use of Generative Artificial Intelligence",
     "regulator": "HKMA",
     "doc_type": "Circular",
@@ -373,6 +383,7 @@
   },
   {
     "doc_id": "hkma_svf_amlcft_guideline_2023",
+    "required_for_demo": true,
     "title": "Guideline on Anti-Money Laundering and Counter-Financing of Terrorism for Stored Value Facility Licensees",
     "regulator": "HKMA",
     "doc_type": "Guideline",
@@ -411,6 +422,7 @@
   },
   {
     "doc_id": "hkma_svf_licensing_explanatory_notes_2019",
+    "required_for_demo": true,
     "title": "Explanatory Notes on Licensing for Stored Value Facilities",
     "regulator": "HKMA",
     "doc_type": "Explanatory Notes",
@@ -445,6 +457,7 @@
   },
   {
     "doc_id": "hkma_svf_mltf_risk_assessment_2019",
+    "required_for_demo": true,
     "title": "Stored Value Facility Sector MLTF Risk Assessment Report",
     "regulator": "HKMA",
     "doc_type": "Risk Assessment",
@@ -482,6 +495,7 @@
   },
   {
     "doc_id": "hkma_svf_practice_note_2025",
+    "required_for_demo": true,
     "title": "Practice Note on Supervision of Stored Value Facility Licensees",
     "regulator": "HKMA",
     "doc_type": "Practice Note",
@@ -517,6 +531,7 @@
   },
   {
     "doc_id": "hkma_svf_supervision_guideline_2016",
+    "required_for_demo": true,
     "title": "Guideline on Supervision of Stored Value Facility Licensees",
     "regulator": "HKMA",
     "doc_type": "Guideline",
@@ -553,6 +568,7 @@
   },
   {
     "doc_id": "pcpd_ai_model_personal_data_protection_framework_2024",
+    "required_for_demo": true,
     "title": "Artificial Intelligence: Model Personal Data Protection Framework",
     "regulator": "PCPD",
     "doc_type": "Framework",
@@ -591,6 +607,7 @@
   },
   {
     "doc_id": "pcpd_ethical_ai_guidance_2021",
+    "required_for_demo": true,
     "title": "Guidance on the Ethical Development and Use of Artificial Intelligence",
     "regulator": "PCPD",
     "doc_type": "Guidance",
@@ -627,6 +644,7 @@
   },
   {
     "doc_id": "pcpd_genai_employee_guidelines_checklist_2025",
+    "required_for_demo": true,
     "title": "Checklist on Guidelines for the Use of Generative AI by Employees",
     "regulator": "PCPD",
     "doc_type": "Checklist",
@@ -665,6 +683,7 @@
   },
   {
     "doc_id": "sfc_suitability_faq_2016",
+    "required_for_demo": true,
     "title": "Frequently Asked Questions on Compliance with Suitability Obligations by Licensed or Registered Persons",
     "regulator": "SFC",
     "jurisdiction": "Hong Kong",
@@ -700,6 +719,7 @@
   },
   {
     "doc_id": "sfc_vatp_guidelines_2023",
+    "required_for_demo": true,
     "title": "Guidelines for Virtual Asset Trading Platform Operators",
     "regulator": "SFC",
     "jurisdiction": "Hong Kong",

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from app.core.config import get_settings
 from app.services.corpus.cache import manifest_digest, write_corpus_cache
-from app.services.corpus.corpus_ingestor import load_corpus_documents
+from app.services.corpus.corpus_ingestor import ingest_corpus_documents
 
 
 def main() -> None:
@@ -17,16 +17,24 @@ def main() -> None:
     if not cache_path.is_absolute():
         cache_path = backend_root / cache_path
     cache_path = cache_path / "corpus_documents.json"
-    documents = load_corpus_documents()
-    if not documents:
+    result = ingest_corpus_documents()
+    if result.required_failures:
+        failed_ids = ", ".join(failure.doc_id for failure in result.required_failures)
+        raise RuntimeError(f"required demo sources failed ingestion: {failed_ids}")
+    if not result.documents:
         raise RuntimeError("corpus ingestion produced no documents")
     write_corpus_cache(
         cache_path,
-        documents,
+        result.documents,
         manifest_digest=manifest_digest(manifest_path),
         parser_version="hierarchy-v1",
     )
-    print(f"Built safe corpus cache: {len(documents)} chunks")
+    print(
+        "Built safe corpus cache: "
+        f"sources_loaded={len(result.loaded_source_ids)}, "
+        f"sources_failed={len(result.failures)}, "
+        f"chunks={len(result.documents)}"
+    )
 
 
 if __name__ == "__main__":

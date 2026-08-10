@@ -5,6 +5,9 @@ caller rebuilds the corpus instead of trusting corrupted data.
 """
 
 import json
+from types import SimpleNamespace
+
+import pytest
 
 from langchain_core.documents import Document
 
@@ -68,3 +71,32 @@ def test_corrupted_json_returns_empty_list(tmp_path):
         )
         == []
     )
+
+
+def test_cache_build_fails_before_write_when_required_source_failed(monkeypatch, tmp_path):
+    from app.schemas.corpus import CorpusIngestionFailure, CorpusIngestionResult
+    from app.services.corpus import build_cache
+
+    result = CorpusIngestionResult(
+        documents=[Document(page_content="partial", metadata={})],
+        loaded_source_ids=["healthy_source"],
+        failures=[
+            CorpusIngestionFailure(
+                doc_id="required_broken_source",
+                path="broken.pdf",
+                required=True,
+                error_type="PdfReadError",
+                message="Cannot find Root object",
+            )
+        ],
+    )
+    monkeypatch.setattr(build_cache, "get_settings", lambda: SimpleNamespace(CORPUS_INDEX_DIR=str(tmp_path)))
+    monkeypatch.setattr(build_cache, "ingest_corpus_documents", lambda: result)
+
+    def unexpected_write(*_args, **_kwargs):
+        raise AssertionError("a partial corpus cache must never be written")
+
+    monkeypatch.setattr(build_cache, "write_corpus_cache", unexpected_write)
+
+    with pytest.raises(RuntimeError, match="required_broken_source"):
+        build_cache.main()

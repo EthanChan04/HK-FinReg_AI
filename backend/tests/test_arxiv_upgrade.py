@@ -38,6 +38,7 @@ def test_eval_cache_resolves_backend_relative_paths_from_repo_root(tmp_path, mon
 
 
 def test_build_cache_targets_a_json_file_not_the_index_directory(monkeypatch):
+    from app.schemas.corpus import CorpusIngestionResult
     from app.services.corpus import build_cache
 
     captured = {}
@@ -46,7 +47,15 @@ def test_build_cache_targets_a_json_file_not_the_index_directory(monkeypatch):
         CORPUS_INDEX_DIR = "data/indexes"
 
     monkeypatch.setattr(build_cache, "get_settings", lambda: Settings())
-    monkeypatch.setattr(build_cache, "load_corpus_documents", lambda: [Document(page_content="ok")])
+    monkeypatch.setattr(
+        build_cache,
+        "ingest_corpus_documents",
+        lambda: CorpusIngestionResult(
+            documents=[Document(page_content="ok")],
+            loaded_source_ids=["test_source"],
+            failures=[],
+        ),
+    )
     monkeypatch.setattr(build_cache, "manifest_digest", lambda path: "digest")
 
     def capture_write(path, documents, **kwargs):
