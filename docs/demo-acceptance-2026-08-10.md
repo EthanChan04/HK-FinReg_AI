@@ -2,11 +2,11 @@
 
 日期：2026-08-10  
 范围：受控 Demo；不要求人工审核黄金集；Phase 4 不在本次范围内  
-最终状态：**未通过（外部语料下载阻塞）**
+最终状态：**通过（受控 Demo）**
 
 ## 1. 验收结论
 
-实现层面的修复已完成，并且真实 `deepseek-v4-flash` 调用成功；但必需语料目前仅 18/20 可解析，完整语料缓存无法通过失败关闭门禁，因此固定 12 条真实回答的质量验收尚未执行。严格口径下不能签发 Demo 通过结论。
+实现层面的修复、20/20 必需语料缓存和固定 12 条真实 `deepseek-v4-flash` 质量门禁均已通过。黄金集人工审核依本轮范围保持非阻断；本结论仅适用于受控 Demo。
 
 ## 2. 可复现证据
 
@@ -17,15 +17,18 @@
 | 后端全量测试（候选分支） | 248 passed, 4 skipped；3 个既有 warning | 通过 |
 | 新增模块定向测试/覆盖率 | 28 passed；84.13% | 通过（阈值 70%） |
 | PCPD 扫描件 OCR | 6 页；10,947 字符；6 分块 | 通过 |
-| 全量语料摄取 | 18/20 成功；2 失败；1,094 分块 | **失败** |
+| 全量语料摄取 | 20/20 成功；0 失败；1,339 分块 | 通过 |
 | 前端单元测试 | 15 passed；statements 21.88%，lines 23.28% | 通过 |
 | 前端 E2E | 6 passed | 通过 |
 | 前端 lint / typecheck / config / production build | 全部通过 | 通过 |
 | `npm audit --audit-level=high` | 0 high/critical；2 moderate | Demo 接受风险 |
-| 固定 12 条真实 DeepSeek 门禁 | 未执行 | **阻断** |
+| 固定 12 条真实 DeepSeek 门禁 | 12/12 回答；12/12 faithfulness；0 API/评测错误 | 通过 |
+| 平均 faithfulness | 0.866（阈值 ≥ 0.45） | 通过 |
+| 平均 unsupported-claim rate | 0.092（阈值 ≤ 0.10） | 通过 |
+| 真实调用统计 | 46,493 tokens；平均 4,370.8 ms | 已记录 |
 | 人工审核黄金集 | 108 pending | Demo 范围内非阻断 |
 
-后端最终全量回归和完整前端链仍应在候选提交上重新执行；本报告不会把早于最后依赖/CI 调整的结果描述为最终候选验证。
+脱敏、无回答正文的运行摘要见 `docs/eval-baselines/deepseek-demo-live-2026-08-10.json`；原始回答工件保留在 Git 忽略目录。
 
 ## 3. 已落地控制
 
@@ -37,29 +40,26 @@
 - 图片型官方 PDF 使用本地 OCR，不向第三方上传监管文件。
 - CI 提供无人工审批的手动 Demo 验收工作流；原始回答工件 Git 忽略，仅作为短期 CI artifact 保存。
 
-## 4. 阻塞明细
+## 4. 语料阻塞解除证据
 
-以下两个本地文件均为 1,048,576 字节的截断 PDF，`pypdf` 报 `Cannot find Root object in pdf`：
+GitHub Actions 运行 `31400706659` 在可访问 HKMA 的网络中成功执行官方刷新、artifact 上传和完整缓存构建。本地下载 artifact 后进行二次校验，确认只有预期的两个文件：
 
-| 文档 ID | 官方来源 | 本机刷新结果 |
-|---|---|---|
-| `hkma_amlcft_surveillance_capability_digitalisation_2024` | HKMA `20240207e2a1.pdf` | TLS 握手 60 秒超时 |
-| `hkma_svf_amlcft_guideline_2023` | HKMA 2023 SVF AML/CFT Guideline | TLS 握手 60 秒超时 |
+| 文档 ID | 页数 / 大小 | SHA-256 |
+|---|---:|---|
+| `hkma_amlcft_surveillance_capability_digitalisation_2024` | 10 页 / 2,426,715 字节 | `575faf16f097ae0382f6f95193f5a1852abfa878707c08042e508020fd6ac8ca` |
+| `hkma_svf_amlcft_guideline_2023` | 98 页 / 768,692 字节 | `41dbdb48693faea844871c651248a0b4dd29ab693daa57cc21a54e99f9a40be7` |
 
-刷新脚本在下载成功并通过完整验证前不会覆盖现有文件。PCPD 扫描件已不再是阻塞项。
+两个文件均通过严格 PDF 解析且包含可提取文本。原截断文件仍可从 Git 历史恢复；PCPD 扫描件继续通过本地 OCR 摄取。
 
-## 5. 解除阻塞后的自动验收
+## 5. 真实门禁证据
 
-在可访问 HKMA 的网络或 GitHub Actions 中配置仓库 secret `DEEPSEEK_API_KEY`，手动运行 `DeepSeek Demo Acceptance` 工作流。该工作流依次：
+本地使用安全进程环境中的 `DEEPSEEK_API_KEY` 执行：
 
-1. 安装锁定依赖并执行定向测试；
-2. 从官方 HKMA URL 安全刷新两份截断文件；
-3. 构建失败关闭的完整语料缓存；
-4. 调用真实 DeepSeek 生成固定 12 条回答；
-5. 计算并阻断式检查质量阈值；
-6. 上传脱敏响应和门禁报告，保留 14 天。
+```bash
+python -m app.services.evaluation.live_demo_gate --output-dir ../artifacts/evaluation/live
+```
 
-只有该工作流退出码为 0，且报告显示 20/20 语料、12/12 回答和 12/12 faithfulness 实测后，才可把本报告状态改为“通过”。
+命令退出码为 0，门禁报告显示 `responses=12`、`faithfulness=0.866`、`unsupported=0.092`。运行总计 46,493 tokens，单次延迟范围 2,129～7,653 ms，无鉴权、限流、空响应、畸形响应或选定评测错误。
 
 ## 6. 范围声明
 

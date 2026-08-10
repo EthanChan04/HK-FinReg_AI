@@ -105,13 +105,19 @@ dcbb8f6 test(frontend): enforce critical workflow gates
 - 前端已覆盖 HTTP 503 恢复和用户取消流程；Playwright 共 6 条通过，取消不会再误报完成。
 - 新增模块定向后端覆盖率门禁为 70%；本地实测 28 项通过、综合覆盖率 84.13%。
 
-### 当前阻断与严格判定
+### 最终解除阻断与严格判定
 
-最新全量摄取实测为 **18/20 源成功、2 源失败、1,094 分块**。剩余两份 HKMA 本地 PDF 均为 1,048,576 字节的截断文件，解析错误为 `Cannot find Root object in pdf`：
+GitHub Actions 已从 HKMA 官方地址成功刷新并验证两份原先截断的 PDF；本地对下载 artifact 再次校验路径、PDF 结构、页数、可读文本与 SHA-256 后才替换：
 
-1. `hkma_amlcft_surveillance_capability_digitalisation_2024`
-2. `hkma_svf_amlcft_guideline_2023`
+1. `hkma_amlcft_surveillance_capability_digitalisation_2024`：10 页、2,426,715 字节、SHA-256 `575faf16...fd6ac8ca`；
+2. `hkma_svf_amlcft_guideline_2023`：98 页、768,692 字节、SHA-256 `41dbdb48...9a40be7`。
 
-安全刷新已在本机重复尝试，但 HKMA 域名的 TLS 握手在 60 秒后超时；原子替换保证旧文件没有被半成品覆盖。因此完整缓存未生成，12 条真实 DeepSeek 质量门禁没有执行，也没有生成可签收的 `deepseek-demo-live-2026-08-10.json`。
+最新失败关闭缓存构建结果为 **20/20 源成功、0 失败、1,339 分块**。随后使用安全进程环境中的真实密钥执行固定 12 条 DeepSeek 门禁，结果为：
 
-**结论：修复代码已完成，真实 DeepSeek 运行时已验证，但本次 Demo 尚未达到最终验收通过条件。** 当前不能把最小真实握手、旧缓存或 18/20 语料冒充为 12/12 正式验收。官方文件成功刷新并跑通自动工作流后，方可把状态改为“通过”。
+- 真实回答：12/12；API 错误：0；
+- faithfulness 实测：12/12；平均值 `0.866`（阈值 `≥ 0.45`）；
+- 平均 unsupported-claim rate：`0.092`（阈值 `≤ 0.10`）；
+- 总 token：46,493；平均调用延迟：4,370.8 ms；
+- 原始回答保留在 Git 忽略目录；提交的摘要不包含回答正文或密钥。
+
+**结论：本次受控 Demo 已达到自动验收通过条件。** 黄金集人工审核仍为非阻断的后续工作；此结论不扩展为生产合规批准，也不改变 Phase 4 的冻结状态。

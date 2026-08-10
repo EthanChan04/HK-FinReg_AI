@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "accepted": true,
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "prompt_version": "demo-grounded-v1",
+  "case_ids": [
+    "RAG_SVF_AML_001",
+    "KAG_AI_ADVISOR_001",
+    "DR_AI_ADVISOR_001",
+    "EXP_051",
+    "EXP_062",
+    "EXP_071",
+    "EXP_077",
+    "EXP_082",
+    "EXP_088",
+    "EXP_089",
+    "EXP_090",
+    "EXP_095"
+  ],
+  "response_count": 12,
+  "error_count": 0,
+  "latency_ms": {
+    "total": 52449,
+    "average": 4370.8,
+    "min": 2129,
+    "max": 7653
+  },
+  "usage_totals": {
+    "input_tokens": 41314,
+    "output_tokens": 5179,
+    "total_tokens": 46493
+  },
+  "metrics": {
+    "provider": "deepseek",
+    "model": "deepseek-v4-flash",
+    "response_count": 12,
+    "faithfulness_measured_rows": 12,
+    "avg_faithfulness": 0.866,
+    "avg_unsupported_claim_rate": 0.092,
+    "live_error_count": 0,
+    "selected_metric_error_count": 0
+  },
+  "thresholds": {
+    "response_count": 12,
+    "faithfulness_measured_rows": 12,
+    "avg_faithfulness": 0.45,
+    "avg_unsupported_claim_rate": 0.1
+  },
+  "benchmark_fingerprint": "8e31c047972a299a5875ed554164332fb589fb19b378c0806a7d2f83bf691450",
+  "corpus_fingerprint": "e9edd7e40329bf758cd49f1942f42240477183b59e79c4648e422516b44d69a2",
+  "raw_artifact_sha256": "7b6008b71c5d151b144119c673ae5f11db623ec773c30d3fc569e86493a919f5",
+  "gate_artifact_sha256": "5c56eac0c983a6a075a1c78a8cc4f2065c7fe8c4e44bbb13ec6f6715e611518d"
+}

@@ -2,9 +2,6 @@ name: DeepSeek Demo Acceptance
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - codex/deepseek-demo-remediation
 
 permissions:
   contents: read
@@ -41,20 +38,6 @@ jobs:
           tests/test_corpus_ocr_fallback.py
           tests/test_live_demo_eval.py
           tests/test_live_demo_gate.py
-      - name: Refresh truncated required HKMA sources
-        run: |
-          .venv/bin/python scripts/refresh_required_sources.py --doc-id hkma_amlcft_surveillance_capability_digitalisation_2024
-          .venv/bin/python scripts/refresh_required_sources.py --doc-id hkma_svf_amlcft_guideline_2023
-      - name: Upload refreshed required HKMA sources
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: refreshed-required-hkma-sources
-          path: |
-            backend/data/regulations/hkma_aml_ai/hkma_amlcft_surveillance_capability_digitalisation_2024.pdf
-            backend/data/regulations/hkma_svf/hkma_svf_amlcft_guideline_2023.pdf
-          if-no-files-found: error
-          retention-days: 1
       - name: Build fail-closed corpus cache
         run: .venv/bin/python -m app.services.corpus.build_cache
       - name: Require real DeepSeek credential
