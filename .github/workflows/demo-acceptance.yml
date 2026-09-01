@@ -20,8 +20,8 @@ jobs:
       EMBEDDING_PROVIDER: local_hash
       EMBEDDING_MODEL: local-hash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       - name: Install locked backend dependencies
@@ -46,7 +46,7 @@ jobs:
         run: .venv/bin/python -m app.services.evaluation.live_demo_gate --output-dir ../artifacts/evaluation/live
       - name: Upload redacted acceptance evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: deepseek-v4-flash-demo-acceptance
           path: artifacts/evaluation/live/
