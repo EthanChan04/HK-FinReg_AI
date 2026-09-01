@@ -12,7 +12,16 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: "Asia/Hong_Kong"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
+    groups:
+      frontend-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      frontend-security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "security"
@@ -28,7 +37,16 @@ updates:
       day: "monday"
       time: "09:30"
       timezone: "Asia/Hong_Kong"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
+    groups:
+      backend-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      backend-security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "python"
@@ -37,7 +55,16 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
+    groups:
+      actions-version-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      actions-security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "ci"
